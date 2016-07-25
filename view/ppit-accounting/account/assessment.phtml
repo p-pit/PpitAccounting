@@ -1,0 +1,72 @@
+<style>
+
+table.account {
+	font-size:0.9em; 
+	border-width:1px; 
+ 	border-style:solid; 
+	border-color:gray;
+}
+table.account caption { 
+	padding:1em 0 0.5em 1em;
+}
+table.account th {
+	font-size:1.2em; 
+	font-weight: bold;
+	border-width:1px; 
+ 	border-style:solid; 
+	border-color:gray;
+	background-color:#DDD;
+	text-align: center;
+}
+
+table.account td.value {
+	text-align: right;
+}
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<strong><?php echo $this->translate('Assessment', 'ppit-accounting', $context->getLocale());?> -
+			</div>
+			<div class="panel-body">
+				<table class="table table-condensed">
+					<tr>
+						<td class="ppit-header-caption"><?php echo $this->translate('Accounting year', 'ppit-accounting', $context->getLocale());?></td>
+						<td><?php echo $assessment->year ?></td>
+					</tr>
+				</table>
+				<table class="table table-striped account">
+					<thead>
+						<tr>
+							<th width="20%"><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale())?></th>
+							<th width="10%"><?php echo $this->translate('Debit', 'ppit-accounting', $context->getLocale())?></th>
+							<th width="10%"><?php echo $this->translate('Credit', 'ppit-accounting', $context->getLocale())?></th>
+							<th width="10%"><?php echo $this->translate('Gap', 'ppit-accounting', $context->getLocale())?></th>
+						</tr>
+					</thead>
+<?php foreach ($assessment->rows as $row) : ?>
+					<tr>
+						<td><?php echo $row->account_caption ?></td>
+						<td class="value"><?php echo $context->formatFLoat($row->debit_amount, 2) ?></td>
+						<td class="value"><?php echo $context->formatFLoat($row->credit_amount, 2) ?></td>
+						<td class="value"><?php echo $context->formatFLoat($row->debit_amount - $row->credit_amount, 2) ?></td>
+					</tr>
+<?php endforeach;?>
+					<tfoot>
+					<tr>
+						<td style="text-align: right"><?php echo $this->translate('Sum', 'ppit-core', $context->getLocale()) ?></td>
+						<td class="value"><?php echo $context->formatFLoat($assessment->debit_sum, 2) ?></td>
+						<td class="value"><?php echo $context->formatFLoat($assessment->credit_sum, 2) ?></td>
+						<td class="value"><?php echo $context->formatFLoat($assessment->debit_sum - $assessment->credit_sum, 2) ?></td>
+					</tr>
+					</tfoot>
+				</table>
+
+			</div>
+		</div>
+	</div>
+</div>
+	

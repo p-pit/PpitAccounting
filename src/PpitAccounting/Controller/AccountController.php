@@ -1,0 +1,130 @@
+<?php
+namespace PpitAccounting\Controller;
+
+use DOMPDFModule\View\Model\PdfModel;
+use PpitAccounting\Model\Account;
+use PpitAccounting\Model\Assessment;
+use PpitAccounting\Model\Balance;
+use PpitAccounting\Model\IncomeStatement;
+use PpitAccounting\Model\Journal;
+use PpitCore\Form\CsrfForm;
+use PpitCore\Model\Context;
+use PpitCore\Model\Csrf;
+use PpitLearning\Model\Evaluation;
+use Zend\Session\Container;
+use Zend\View\Model\ViewModel;
+use Zend\Mvc\Controller\AbstractActionController;
+
+class AccountController extends AbstractActionController
+{
+	public function accountAction()
+	{
+		// Retrieve the context
+		$context = Context::getCurrent();
+
+    	$year = $this->params()->fromQuery('year', date('Y'));
+    	$account = $this->params()->fromQuery('account', date('Y'));
+    	$account = new Account($year, $account);
+		$view = new ViewModel(array(
+				'context' => $context,
+				'config' => $context->getconfig(),
+				'account' => $account,
+		));
+//		if ($context->isSpaMode()) $view->setTerminal(true);
+		return $view;
+	}
+
+	public function balanceAction()
+	{
+		// Retrieve the context
+		$context = Context::getCurrent();
+
+    	$year = $this->params()->fromQuery('year', date('Y'));
+    	$month = $this->params()->fromQuery('month', null);
+    	$includes_closing = $this->params()->fromQuery('includes_closing', false);
+    	$balance = new Balance($year, $month, $includes_closing);
+		$view = new ViewModel(array(
+				'context' => $context,
+				'config' => $context->getconfig(),
+				'balance' => $balance,
+		));
+//		if ($context->isSpaMode()) $view->setTerminal(true);
+		return $view;
+	}
+
+	public function balancePdfAction()
+	{
+		// Retrieve the context
+		$context = Context::getCurrent();
+	
+		$year = $this->params()->fromQuery('year', date('Y'));
+		$month = $this->params()->fromQuery('month', null);
+		$includes_closing = $this->params()->fromQuery('includes_closing', false);
+		$balance = new Balance($year, $month, $includes_closing);
+    	$pdf = new PdfModel();
+    	$pdf->setOption('filename', 'Balance');
+    	$pdf->setOption("paperSize", "a4"); //Defaults to 8x11
+ 		$pdf->setOption("paperOrientation", "portrait"); //Defaults to portrait
+     	$pdf->setVariables(array(
+				'context' => $context,
+				'config' => $context->getconfig(),
+				'balance' => $balance,
+     	));
+		return $pdf;
+	}
+	
+	public function incomeStatementAction()
+	{
+		// Retrieve the context
+		$context = Context::getCurrent();
+
+    	$year = $this->params()->fromQuery('year', date('Y'));
+		$incomeStatement = new IncomeStatement($year);
+		$view = new ViewModel(array(
+				'context' => $context,
+				'config' => $context->getconfig(),
+				'incomeStatement' => $incomeStatement,
+		));
+		if ($context->isSpaMode()) $view->setTerminal(true);
+		return $view;
+	}
+
+	public function assessmentAction()
+	{
+		// Retrieve the context
+		$context = Context::getCurrent();
+	
+		$year = $this->params()->fromQuery('year', date('Y'));
+		$assessment = new Assessment($year);
+		$view = new ViewModel(array(
+				'context' => $context,
+				'config' => $context->getconfig(),
+				'assessment' => $assessment,
+		));
+		//		if ($context->isSpaMode()) $view->setTerminal(true);
+		return $view;
+	}
+	
+	public function exportAction()
+    {
+    	// Retrieve the context
+    	$context = Context::getCurrent();
+
+    	$year = $this->params()->fromQuery('year', date('Y'));
+    	$journal_code = $this->params()->fromQuery('journal_code', 'general');
+
+    	$params = array();
+    	$params['year'] = $year;
+    	$params['journal_code'] = $journal_code;
+    	$rows = Journal::getList($params, 'sequence', 'DESC');
+    	$view = new ViewModel(array(
+    			'context' => $context,
+				'config' => $context->getconfig(),
+    			'year' => $year,
+    			'journal_code' => $journal_code,
+    			'rows' => $rows,
+    	));
+    	$view->setTerminal(true);
+    	return $view;
+    }
+}

@@ -1,0 +1,530 @@
+
+function connectRemoveIcon(id, target)
+{
+	$('#' + id).click(function () {
+		$('#' + target).hide();
+		filterJournalList();
+	});
+}
+
+function getParams() {
+
+	// Create a new FormData object.
+	var params = '?', todo = true;
+
+<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['main'] as $propertyId => $rendering) : ?>
+
+	<?php if ($rendering == 'range') : ?>
+		<?php $property = $context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId] ?>
+	
+	var min_<?php echo $propertyId ?> = document.getElementById('search_min_<?php echo $propertyId ?>').value;
+	var max_<?php echo $propertyId ?> = document.getElementById('search_max_<?php echo $propertyId ?>').value;
+
+		<?php if ($property['type'] == 'date') : ?>
+	if (min_<?php echo $propertyId ?>) min_<?php echo $propertyId ?> = encodeDate(min_<?php echo $propertyId ?>);
+	if (max_<?php echo $propertyId ?>) max_<?php echo $propertyId ?> = encodeDate(max_<?php echo $propertyId ?>);
+		<?php else : ?>
+	if (min_<?php echo $propertyId ?>) min_<?php echo $propertyId ?> = min_<?php echo $propertyId ?>;
+	if (max_<?php echo $propertyId ?>) max_<?php echo $propertyId ?> = max_<?php echo $propertyId ?>;
+		<?php endif;?>
+
+	if (min_<?php echo $propertyId ?>.length >= 2) { params += 'min_<?php echo $propertyId ?>=' + min_<?php echo $propertyId ?> + '&'; todo = false; }		
+	if (max_<?php echo $propertyId ?>.length >= 2) { params += 'max_<?php echo $propertyId ?>=' + max_<?php echo $propertyId ?> + '&'; todo = false; }
+	
+	<?php elseif ($rendering == 'select') : ?>
+
+	var <?php echo $propertyId ?> = document.getElementById('search_<?php echo $propertyId ?>').value;
+	if (<?php echo $propertyId ?>) { params += '<?php echo $propertyId ?>=' + <?php echo $propertyId ?> + '&'; todo = false; }
+	
+	<?php else : ?>
+
+	var <?php echo $propertyId ?> = document.getElementById('search_<?php echo $propertyId ?>').value;
+	if (<?php echo $propertyId ?>.length >= 2) { params += '<?php echo $propertyId ?>=' + <?php echo $propertyId ?> + '&'; todo = false; }
+	
+	<?php endif;?>
+
+<?php endforeach;?>
+
+<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['more'] as $propertyId => $rendering) : ?>
+
+	<?php if ($rendering == 'range') : ?>
+		<?php $property = $context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId] ?>
+	
+	var min_<?php echo $propertyId ?> = document.getElementById('search_min_<?php echo $propertyId ?>').value;
+	var max_<?php echo $propertyId ?> = document.getElementById('search_max_<?php echo $propertyId ?>').value;
+
+		<?php if ($property['type'] == 'date') : ?>
+	if (min_<?php echo $propertyId ?>) min_<?php echo $propertyId ?> = encodeDate(min_<?php echo $propertyId ?>);
+	if (max_<?php echo $propertyId ?>) max_<?php echo $propertyId ?> = encodeDate(max_<?php echo $propertyId ?>);
+		<?php else : ?>
+	if (min_<?php echo $propertyId ?>) min_<?php echo $propertyId ?> = min_<?php echo $propertyId ?>;
+	if (max_<?php echo $propertyId ?>) max_<?php echo $propertyId ?> = max_<?php echo $propertyId ?>;
+		<?php endif;?>
+
+	if (min_<?php echo $propertyId ?>.length >= 2) { params += 'min_<?php echo $propertyId ?>=' + min_<?php echo $propertyId ?> + '&'; todo = false; }		
+	if (max_<?php echo $propertyId ?>.length >= 2) { params += 'max_<?php echo $propertyId ?>=' + max_<?php echo $propertyId ?> + '&'; todo = false; }
+	
+	<?php elseif ($rendering == 'select') : ?>
+
+	var <?php echo $propertyId ?> = document.getElementById('search_<?php echo $propertyId ?>').value;
+	if (<?php echo $propertyId ?>) { params += '<?php echo $propertyId ?>=' + <?php echo $propertyId ?> + '&'; todo = false; }
+	
+	<?php else : ?>
+
+	var <?php echo $propertyId ?> = document.getElementById('search_<?php echo $propertyId ?>').value;
+	if (<?php echo $propertyId ?>.length >= 2) { params += '<?php echo $propertyId ?>=' + <?php echo $propertyId ?> + '&'; todo = false; }
+	
+	<?php endif;?>
+
+<?php endforeach;?>
+
+	<?php
+	$todoTitle = $context->getInstance()->specifications['ppitAccounting']['journal/search']['todoTitle']['fr_FR'];
+	$searchTitle = $context->getInstance()->specifications['ppitAccounting']['journal/search']['searchTitle']['fr_FR'];
+	?>
+	$('#mode-text').text((todo) ? '<?php echo $todoTitle ?>' : '<?php echo $searchTitle ?>');
+
+	return params;
+}
+
+// Export the list
+function exportJournalList() {
+
+	var params = getParams();
+	document.location.href = '<?php echo $this->url('journal/export') ?>' + params;
+}
+
+function eraseJournalSearch() {
+
+<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['main'] as $propertyId => $rendering) : ?>
+
+	<?php if ($rendering == 'range') : ?>
+	$('#search_min_<?php echo $propertyId ?>').val('');
+	$('#search_max_<?php echo $propertyId ?>').val('');
+
+	<?php else : ?>
+	$('#search_<?php echo $propertyId ?>').val('');
+	
+	<?php endif;?>
+
+<?php endforeach;?>
+
+<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['more'] as $propertyId => $rendering) : ?>
+
+	<?php if ($rendering == 'range') : ?>
+	$('#search_min_<?php echo $propertyId ?>').val('');
+	$('#search_max_<?php echo $propertyId ?>').val('');
+
+	<?php else : ?>
+	$('#search_<?php echo $propertyId ?>').val('');
+	
+	<?php endif;?>
+
+<?php endforeach;?>
+
+	getJournalList(getParams(), 'operation_date', 'DESC');
+}
+
+function sortJournalList(criterion) {
+
+	var dir;
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (criterion + '-anchor' == ascCriterion) dir = 'DESC'; else dir = 'ASC';
+	getJournalList(getParams(), criterion, dir);
+}
+
+function filterJournalList() {
+
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (ascCriterion) {
+		criterion = ascCriterion.split('-')[0];
+		dir = 'ASC';
+	}
+	else if (ascCriterion) {
+		criterion = descCriterion.split('-')[0];
+		dir = 'DESC';
+	}
+	else {
+		criterion = 'sequence';
+		dir = 'DESC';
+	}
+	getJournalList(getParams(), criterion, dir);
+}
+
+function connectJournalSearchInputs() {
+
+	$('#export-button').click(function () { exportJournalList(); });
+	
+	$('#erase-button').unbind();
+	$('#erase-button').click(function () { eraseJournalSearch(); });
+
+<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['main'] as $propertyId => $rendering) : ?>
+
+	<?php if ($rendering == 'range') : ?>
+	$('#search_min_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
+	$('#search_max_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
+
+		<?php if ($context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['type'] == 'date') : ?>
+	$("#search_min_<?php echo $propertyId ?>").datepicker();
+	$("#search_max_<?php echo $propertyId ?>").datepicker();
+	$('#search_min_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
+	$('#search_max_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
+		<?php endif;?>
+	
+	<?php elseif ($rendering == 'select') : ?>
+		$('#search_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
+	
+	<?php else : ?>
+		$('#search_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
+
+		<?php if ($context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['type'] == 'date') : ?>
+	$("#search_<?php echo $propertyId ?>").datepicker();
+	$('#search_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
+		<?php endif;?>
+
+	<?php endif;?>
+
+<?php endforeach;?>
+
+<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['more'] as $propertyId => $rendering) : ?>
+
+	<?php if ($rendering == 'range') : ?>
+	$('#search_min_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
+	$('#search_max_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
+
+		<?php if ($context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['type'] == 'date') : ?>
+	$("#search_min_<?php echo $propertyId ?>").datepicker();
+	$("#search_max_<?php echo $propertyId ?>").datepicker();
+	$('#search_min_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
+	$('#search_max_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
+		<?php endif;?>
+	
+	<?php elseif ($rendering == 'select') : ?>
+		$('#search_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
+
+	<?php else : ?>
+		$('#search_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
+
+		<?php if ($context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['type'] == 'date') : ?>
+	$("#search_<?php echo $propertyId ?>").datepicker();
+	$('#search_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
+		<?php endif;?>
+		
+	<?php endif;?>
+
+<?php endforeach;?>
+}
+
+// Load the list
+function getJournalList(params, major, dir) {		
+
+	// Execute the ajax request
+	route = '<?php echo $this->url('journal/list') ?>' + params + '&major=' + major + ((dir =='ASC') ? '&dir=ASC' : '&dir=DESC');
+
+	xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, true);
+	xhttp.onreadystatechange = function() {
+
+		if (xhttp.readyState == 4 <?php if (!$config['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+			document.getElementById('journal-list-panel').innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('showing panel: journal-list-panel, url = ' + route);
+			console.log(xhttp.responseText);
+<?php endif;?>
+
+			// Connect the sort anchors
+			$('.ppit-sort-anchor').each(function () {
+				$(this).click(function () {
+					sortJournalList($(this).attr('id').split('-')[0]);
+				});
+			});
+			
+			// Connect the detail anchors
+			$('.journal-detail-anchor').each(function () {
+				$(this).click(function () {
+					getJournalDetail($(this).attr('id').split('_')[1]);
+				});
+			});
+		}
+	}
+	xhttp.send();
+}
+
+function connectAuditPanel()
+{
+	$('#audit-panel').hide();
+	$('#audit-label').click(function () {
+		if ($('#audit-label').text() == '<?php echo $this->translate('Show', 'ppit-core', $context->getLocale()) ?>') {
+			$('#audit-panel').show();
+			$('#audit-label').text('<?php echo $this->translate('Mask', 'ppit-core', $context->getLocale()) ?>');
+		}
+		else {
+			$('#audit-panel').hide();
+			$('#audit-label').text('<?php echo $this->translate('Show', 'ppit-core', $context->getLocale()) ?>');
+		}
+	});
+}
+
+function connectJournalUpdateForm(id, action)
+{
+<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal_properties'] as $propertyId => $property) : ?>
+	<?php if ($property['type'] == 'date') : ?>
+		$('#input_<?php echo $propertyId ?>').datepicker();
+	<?php endif;?>
+<?php endforeach ?>
+
+	var form = document.getElementById('ppit-form');
+	form.onsubmit = function(event) {
+		
+		event.preventDefault();
+	
+		// Check validity
+		var validity = checkJournalUpdateProperties(id);
+	
+		if (validity) {
+		
+			// Create a new FormData object.
+			var formData = new FormData();
+			
+			// Get the properties values
+<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal_properties'] as $propertyId => $property) : ?>
+
+	<?php if ($property['type'] == 'input' || $property['type'] == 'date' || $property['type'] == 'textarea' || $property['type'] == 'select' || $property['type'] == 'number' || $property['type'] == 'email' || $property['type'] == 'phone' || $property['type'] == 'hidden') : ?>
+				formData.append('<?php echo $propertyId ?>', document.getElementById('<?php echo $propertyId ?>').value);
+
+	<?php elseif ($property['type'] == 'checkbox') : ?>
+				formData.append('<?php echo $propertyId ?>', ((document.getElementById('<?php echo $propertyId ?>').checked) ? 1 : 0));
+
+	<?php elseif ($property['type'] == 'file') : ?>
+				var fileSelect = document.getElementById('order_form');
+				if (fileSelect) {
+					var files = fileSelect.files;
+					for (var i = 0; i < files.length; i++) {
+						var file = files[i];
+						formData.append('order_form', file, file.name);
+					}
+				}
+
+	<?php endif ?>
+
+<?php endforeach ?>
+
+			var xhttp = new XMLHttpRequest();
+			var route, target;
+			route = '<?php echo $this->url('journal/update') ?>/' + id + '/' + action;
+			target = 'account-update-panel';
+			xhttp.open('POST', route, true);
+			// Set up a handler for when the request finishes.
+			xhttp.onload = function () {
+				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+
+<?php if ($context->getConfig()['ppitCoreSettings']['isTraceActive']) : ?>
+					console.log('post, route = ' + route);
+					console.log(xhttp.responseText);
+<?php endif;?>
+					document.getElementById(target).innerHTML = xhttp.responseText;
+					getJournalList('?', 'operation_date', 'DESC');
+					$('.action-btn').removeClass('btn-primary').addClass('btn-default');
+				}
+			};
+			xhttp.send(formData);
+		}
+		else return false;
+	}
+}
+
+function getBankList() {
+	
+	var xhttp = new XMLHttpRequest();
+	var route = '<?php echo $this->url('journal/bankList') ?>';
+
+	xhttp.open('GET', route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 <?php if (!$config['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+			document.getElementById('journal-bank-list-panel').innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('journal-bank-list-panel, route = ' + route);
+			console.log(xhttp.responseText);
+<?php endif;?>
+		}
+	}
+	xhttp.send();
+}
+
+<?php 
+$properties = array();
+$properties['operation_date'] = array('type' => 'date', 'mandatory' => true);
+$properties['reference'] = array('type' => 'input', 'mandatory' => false, 'maxSize' => 255);
+$properties['caption'] = array('type' => 'input', 'mandatory' => false, 'maxSize' => 255);
+$properties['proof_id'] = array('type' => 'file');
+$properties['bank_journal_reference'] = array('type' => 'select', 'mandatory' => false);
+
+for ($i = 0; $i < 10; $i++) {
+	$properties['direction_'.$i] = array('type' => 'select', 'mandatory' => false);
+	$properties['amount_'.$i] = array('type' => 'number', 'mandatory' => false, 'minValue' => 0, 'maxValue' => 9999999999);
+	$properties['account_'.$i] = array('type' => 'select', 'mandatory' => false);
+}
+$properties['update_time'] = array('type' => 'hidden');
+
+echo $this->partial('/partials/check-update-properties', array('entity' => 'Journal', 'context' => $context, 'properties' => $properties)) 
+?>
+
+function connectJournalUpdateForm(id, action)
+{
+<?php foreach ($properties as $property_id => $property) : ?>
+	<?php if ($property['type'] == 'date') : ?>
+		$('#input_<?php echo $property_id ?>').datepicker();
+	<?php endif;?>
+<?php endforeach ?>
+
+	var form = document.getElementById('ppit-form');
+	form.onsubmit = function(event) {
+		
+		event.preventDefault();
+	
+		// Check validity
+		var validity = checkJournalUpdateProperties(id);
+	
+		if (validity) {
+		
+			// Create a new FormData object.
+			var formData = new FormData();
+			
+			// Get the properties values
+<?php foreach ($properties as $property_id => $property) : ?>
+
+	<?php if ($property['type'] == 'input' || $property['type'] == 'date' || $property['type'] == 'textarea' || $property['type'] == 'select' || $property['type'] == 'number' || $property['type'] == 'email' || $property['type'] == 'phone' || $property['type'] == 'hidden') : ?>
+				formData.append('<?php echo $property_id ?>', document.getElementById('<?php echo $property_id ?>').value);
+
+	<?php elseif ($property['type'] == 'checkbox') : ?>
+				formData.append('<?php echo $property_id ?>', ((document.getElementById('<?php echo $property_id ?>').checked) ? 1 : 0));
+
+	<?php elseif ($property['type'] == 'file') : ?>
+				var fileSelect = document.getElementById('proof_id');
+				if (fileSelect) {
+					var files = fileSelect.files;
+					for (var i = 0; i < files.length; i++) {
+						var file = files[i];
+						formData.append('proof_id', file, file.name);
+					}
+				}
+	<?php endif ?>
+
+<?php endforeach ?>
+
+			var xhttp = new XMLHttpRequest();
+			var route, target;
+			route = '<?php echo $this->url('journal/update') ?>/' + id;
+			target = 'journal-update-panel';
+			xhttp.open('POST', route, true);
+			// Set up a handler for when the request finishes.
+			xhttp.onload = function () {
+				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+
+<?php if ($context->getConfig()['ppitCoreSettings']['isTraceActive']) : ?>
+					console.log('post, route = ' + route);
+					console.log(xhttp.responseText);
+<?php endif;?>
+					document.getElementById(target).innerHTML = xhttp.responseText;
+					getJournalList('?', 'operation_date', 'DESC');
+					$('.action-btn').removeClass('btn-primary').addClass('btn-default');
+				}
+			};
+			xhttp.send(formData);
+		}
+		else return false;
+	}
+}
+
+function getJournalUpdate(id) {
+	
+	var xhttp = new XMLHttpRequest();
+	var route = '<?php echo $this->url('journal/update') ?>/' + id;
+
+	xhttp.open('GET', route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 <?php if (!$config['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+			document.getElementById('journal-update-panel').innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('journal-update-panel, route = ' + route);
+			console.log(xhttp.responseText);
+<?php endif;?>
+
+			connectJournalUpdateForm(id);
+		}
+	}
+	xhttp.send();
+}
+
+// Load the detail panel
+function getJournalDetail(id) {
+
+	// Ensure the target is displayed
+	$('#form_action').show();
+
+	// Anchor to the new panel
+	$(location).attr('hash', 'form_action');
+
+	var route = '<?php echo $this->url('journal/detail') ?>' + '/' + id;
+
+	// Execute the ajax request
+	xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 <?php if (!$config['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+			document.getElementById('form_action').innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('showing panel: form_action, url = ' + route);
+			console.log(xhttp.responseText);
+<?php endif;?>
+
+//			connectAuditPanel();
+			connectRemoveIcon('remove-anchor', 'form_action');
+			getBankList();
+			getJournalUpdate(id);
+<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal_actions'] as $actionId => $action) : ?>
+			if (id) $('#<?php echo $actionId ?>-anchor').click(function () { connectJournalAnchors(type, id, '<?php echo $actionId ?>'); });
+<?php endforeach;?>
+}
+	}
+	xhttp.send();
+
+	// Highlight the clicked button (and only it in its class)
+	$('.index-btn').removeClass("btn-primary").addClass("btn-default");
+	$('#journal-detail-anchor_' + id).removeClass("btn-default").addClass("btn-primary");
+}
+
+function activateJournal() {
+
+	// Load the search panel and highlight the menu entry
+	loadPanel('index_action', '<?php echo $this->url('journal/search') ?>');
+	$('.menu-btn').removeClass("btn-primary").addClass("btn-default");
+	var journalAnchor;
+	journalAnchor = '#journal-anchor';
+	$(journalAnchor).removeClass("btn-default").addClass("btn-primary");
+
+	<?php
+	$todoTitle = $context->getInstance()->specifications['ppitAccounting']['journal/search']['todoTitle']['fr_FR'];
+	?>
+	$('#mode-text').text('<?php echo $todoTitle ?>');
+		
+	// Connect the search inputs
+	connectJournalSearchInputs();
+	
+	getJournalList('?', 'operation_date', 'DESC');
+	
+	$('#add-criteria').click(function () {
+		mode = $('#add-criteria').text();
+		if (mode == '<?php echo $this->translate('More criteria', 'ppit-core', $context->getLocale()) ?>') {
+			$('#add-criteria').text('<?php echo $this->translate('Less criteria', 'ppit-core', $context->getLocale()) ?>');
+			$('#search-area').show();
+		}
+		else {
+			$('#add-criteria').text('<?php echo $this->translate('More criteria', 'ppit-core', $context->getLocale()) ?>');
+			$('#search-area').hide();
+		}
+	});
+	$('#search-area').hide();
+}

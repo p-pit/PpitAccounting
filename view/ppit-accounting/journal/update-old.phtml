@@ -1,0 +1,254 @@
+<!-- A supprimer -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+
+<div id='form_action' class="panel panel-default">
+	<div class="panel-heading">
+		<?php echo $this->translate('Add a book entry', 'ppit-accounting', $context->getLocale()) ?>
+ 		<div class="btn-group pull-right">
+			<?php echo $this->partial('/partials/action-widget.phtml', array(
+					'context' => $context,
+					'target' => 'form_action',
+					'id' => 'update-remove-anchor',
+					'glyphicon' => 'glyphicon-remove',
+					'class' => 'index-btn',
+					'title' => $this->translate('Return to list', 'ppit-core', $context->getLocale()),
+			)) ?>
+		</div>
+	</div>
+    <div class="panel-body">
+
+		<table class="table table-striped ppit">
+			<tr>
+				<th><?php echo $this->translate('Operation date', 'ppit-accounting', $context->getLocale()) ?></th>
+				<th><?php echo $this->translate('Accounting date', 'ppit-accounting', $context->getLocale()) ?></th>
+				<th><?php echo $this->translate('Reference', 'ppit-accounting', $context->getLocale()) ?></th>
+				<th><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale()) ?></th>
+				<th><?php echo $this->translate('Debit', 'ppit-accounting', $context->getLocale()) ?></th>
+				<th><?php echo $this->translate('Credit', 'ppit-accounting', $context->getLocale()) ?></th>
+			</tr>
+<?php
+$debitSum = 0;
+$creditSum = 0;
+foreach ($journal->availableBankJournalEntries as $entry) : 
+	if ($entry->direction < 0) $debitSum += $entry->amount;
+	else $creditSum += $entry->amount;
+?>
+			<tr>
+				<td><?php echo $context->decodeDate($entry->operation_date) ?></td>
+				<td><?php echo $context->decodeDate($entry->accounting_date) ?></td>
+				<td><?php echo $entry->reference ?></td>
+				<td><?php echo $entry->caption ?></td>
+				<td style="text-align: right"><?php echo ($entry->direction < 0) ? $context->formatFloat($entry->amount, 2) : '&nbsp;' ?></td>
+				<td style="text-align: right"><?php echo ($entry->direction >= 0) ? $context->formatFloat($entry->amount, 2) : '&nbsp;' ?></td>
+			</tr>
+<?php endforeach ?>
+			<tr>
+				<td colspan="4" style="text-align: right"><?php echo $this->translate('Sum', 'ppit-accounting', $context->getLocale()) ?></td>
+				<td style="text-align: right"><?php echo $context->formatFloat($debitSum, 2) ?></td>
+				<td style="text-align: right"><?php echo $context->formatFloat($creditSum, 2) ?></td>
+			</tr>
+		</table>
+
+		<!-- Form header -->
+		<?php echo $this->partial('/partials/form-header', array(
+					'update_time' => $journal->update_time,
+					'message' => $message,
+					'error' => $error,
+					'csrfForm' => $csrfForm,
+					'context' => $context,
+		));
+		$properties = array();
+		?>
+
+		<?php if ($message == 'OK') $isDisabled = true; else $isDisabled = false; ?>
+	
+<!-- Operation date -->
+		<?php
+			echo $this->partial('/partials/date-widget.phtml', array(
+				'property' => 'operation_date',
+				'label' => '* '.$this->translate('Operation date', 'ppit-accounting', $context->getLocale()),
+				'value' => $journal->operation_date,
+				'isMandatory' => true,
+				'context' => $context,
+				'isDisabled' => $isDisabled,
+		));
+		$properties['operation_date'] = 'input';
+		?>
+		
+<!-- Reference -->
+		
+		<?php
+			echo $this->partial('/partials/input-widget.phtml', array(
+				'property' => 'reference',
+				'label' => '* '.$this->translate('Reference', 'ppit-accounting', $context->getLocale()),
+				'value' => $journal->reference,
+				'isMandatory' => true,
+				'maxLength' => 255,
+				'context' => $context,
+				'isDisabled' => $isDisabled,
+		));
+		$properties['reference'] = 'input';
+		?>
+		
+<!-- Caption -->
+		<?php
+			echo $this->partial('/partials/input-widget.phtml', array(
+				'property' => 'caption',
+				'label' => '* '.$this->translate('Caption', 'ppit-core', $context->getLocale()),
+				'value' => $journal->caption,
+				'isMandatory' => true,
+				'maxLength' => 255,
+				'context' => $context,
+				'isDisabled' => $isDisabled,
+		));
+		$properties['caption'] = 'input';
+		?>
+	    
+<!-- Proof -->
+		<div class="form-group" id="proof_id_group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Proof', 'ppit-accounting', $context->getLocale())?></label>
+			<div class="col-sm-7">
+				<input type="file" name="proof_id" id="proof_id" class="form-control" />
+			</div>
+		</div>
+		<?php 
+		$properties['proof_id'] = 'file';
+		?>
+		
+<!-- Bank denoting -->
+		<?php
+			$modalities = array();
+			foreach ($journal->availableBankJournalEntries as $entry) $modalities[$entry->id] = $entry->caption.' ('.$context->decodeDate($entry->operation_date).') : '.$context->formatFloat($entry->amount, 2);
+			echo $this->partial('/partials/select-widget.phtml', array(
+				'property' => 'bank_journal_reference',
+				'label' => $this->translate('Bank journal reference', 'ppit-accounting', $context->getLocale()),
+				'modalities' => $modalities,
+				'value' => $journal->bank_journal_reference,
+				'isMandatory' => false,
+				'maxLength' => 255,
+				'context' => $context,
+				'isDisabled' => $isDisabled,
+		));
+		$properties['bank_journal_reference'] = 'input';
+		?>
+		
+<?php for ($i = 0; $i < 10; $i++) : ?>
+
+		<div>&nbsp;</div>
+
+<!-- Direction -->
+		<?php
+			echo $this->partial('/partials/select-widget.phtml', array(
+				'property' => 'direction_'.$i,
+				'label' => $this->translate('Direction', 'ppit-accounting', $context->getLocale()),
+				'modalities' => array('-1' => $this->translate('Debit', 'ppit-accounting', $context->getLocale()), '1' => $this->translate('Credit', 'ppit-acounting', $context->getLocale())),
+				'value' => (array_key_exists($i, $journal->rows)) ? $journal->rows[$i]['direction'] : '',
+				'isMandatory' => false,
+				'context' => $context,
+				'isDisabled' => $isDisabled,
+		));
+		$properties['direction_'.$i] = 'select';
+		?>
+		
+<!-- Amount -->
+		<?php
+			echo $this->partial('/partials/number-widget.phtml', array(
+				'property' => 'amount_'.$i,
+				'label' => $this->translate('Amount', 'ppit-core', $context->getLocale()),
+				'value' => (array_key_exists($i, $journal->rows)) ? $context->formatFloat($journal->rows[$i]['amount'], 2) : '',
+				'isMandatory' => false,
+				'min' => 0,
+				'max' => 999999,
+				'context' => $context,
+				'isDisabled' => $isDisabled,
+		));
+		$properties['amount_'.$i] = 'input';
+		?>
+
+<!-- Direction -->
+		<?php
+			$modalities = array();
+			foreach ($config['ppitAccountingSettings']['accounts'] as $accountId => $account) {
+				$modalities[$accountId] = $accountId.' - '.$account['caption'];
+			}
+			echo $this->partial('/partials/select-widget.phtml', array(
+				'property' => 'account_'.$i,
+				'label' => $this->translate('Account', 'ppit-accounting', $context->getLocale()),
+				'modalities' => $modalities,
+				'value' => (array_key_exists($i, $journal->rows)) ? $journal->rows[$i]['account'] : '',
+				'isMandatory' => false,
+				'context' => $context,
+				'isDisabled' => $isDisabled,
+		));
+		$properties['account_'.$i] = 'input';
+		?>
+
+<?php endfor;?>
+
+<?php if ($message == 'OK') : ?>
+
+<!-- Foot return link -->
+		<div class="form-group" id="foot_return_link">
+			<div class="col-sm-5">&nbsp;</div>
+			<div class="col-sm-7">
+				<?php echo $this->partial('/partials/action-widget.phtml', array(
+						'context' => $context,
+						'target' => 'form_action',
+						'id' => 'update-foot-return-anchor',
+						'class' => 'index-btn',
+						'text' => $this->translate('Close', 'ppit-core', $context->getLocale()),
+				)) ?>
+			</div>
+		</div>
+
+<?php else : ?>
+
+<!-- Submit button -->
+	    <div class="form-group">
+			<div class="col-sm-5">&nbsp;</div>
+			<div class="col-sm-7">
+				<input name="submit" type="submit" id="update-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Confirm', 'ppit-core', $context->getLocale()) ?>">
+				&nbsp;&nbsp;
+				<?php echo $this->partial('/partials/action-widget.phtml', array(
+						'context' => $context,
+						'target' => 'form_action',
+						'id' => 'update-cancel-anchor',
+						'class' => 'index-btn',
+						'text' => $this->translate('Cancel', 'ppit-core', $context->getLocale()),
+				)) ?>
+			</div>
+		</div>
+
+<?php endif;?>
+
+	</div>
+</div>
+
+<script id="journal/update-script">
+
+// Return to list
+eval(document.getElementById('update-remove-anchor-script').innerHTML);
+
+<?php if ($message == 'OK') : ?>
+
+	eval(document.getElementById('update-foot-return-anchor-script').innerHTML);
+
+<?php else : ?>
+
+	eval(document.getElementById('update-cancel-anchor-script').innerHTML);
+
+	// Submit
+	<?php
+	echo $this->partial('/partials/form-script', array(
+			'context' => $context,
+			'formRoute' => $this->url('journal/update', array('id' => $id)),
+			'formScript' =>'journal/update-script',
+			'properties' => $properties,
+/*			'mainRoute' => $this->url('journal/index'),
+			'mainScript' =>'journal/index-script',
+			'hideForm' => false,*/
+	)) ?>
+
+<?php endif;?>
+
+</script>

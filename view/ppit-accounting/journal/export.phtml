@@ -1,0 +1,36 @@
+<?php 
+header('Content-Type: text/csv; charset=utf-8');
+header('Content-disposition: filename=journal-'.$year.'-'.$journal_code.'.csv');
+echo "\xEF\xBB\xBF";
+echo
+	$this->translate('Accounting year', 'ppit-accounting', $context->getLocale()).";".
+	$this->translate('Sequence', 'ppit-accounting', $context->getLocale()).";".
+	$this->translate('Journal', 'ppit-accounting', $context->getLocale()).";".
+	$this->translate('Operation date', 'ppit-accounting', $context->getLocale()).";".
+	$this->translate('Accounting date', 'ppit-accounting', $context->getLocale()).";".
+	$this->translate('Reference', 'ppit-accounting', $context->getLocale()).";".
+	$this->translate('Caption', 'ppit-core', $context->getLocale()).";".
+	$this->translate('Direction', 'ppit-accounting', $context->getLocale()).";".
+	$this->translate('Amount', 'ppit-accounting', $context->getLocale()).";".
+	$this->translate('Currency', 'ppit-accounting', $context->getLocale()).";".
+	$this->translate('Account', 'ppit-accounting', $context->getLocale()).";".
+	$this->translate('Sub-account', 'ppit-accounting', $context->getLocale())."\n";
+
+$previous = 0;
+foreach ($rows as $row) {
+	if ($row->sequence != $previous) echo ";;;;;;;;;;;\n";
+	$previous = $row->sequence;
+	echo 
+		$row->year.";".
+		$row->sequence.";".
+		$row->journal_code.";".
+		$context->decodeDate($row->operation_date).";".
+		$context->decodeDate($row->accounting_date).";".
+		$row->reference.";".
+		$row->caption.";".
+		$row->direction.";".
+		$context->formatFloat($row->amount, 2).";".
+		$row->currency.";".
+		$row->account.";".
+		$row->sub_account."\n";
+} ?>

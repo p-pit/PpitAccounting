@@ -1,0 +1,131 @@
+<style>
+
+table.income_statement {
+	font-size:0.9em; 
+	border-width:1px; 
+ 	border-style:solid; 
+	border-color:gray;
+}
+table.income_statement caption { 
+	padding:1em 0 0.5em 1em;
+}
+table.income_statement th {
+	font-size:1.2em; 
+	font-weight: bold;
+	border-width:1px; 
+ 	border-style:solid; 
+	border-color:gray;
+	background-color:#DDD;
+	text-align: center;
+}
+
+table.income_statement td.outer {
+	border-width:1px; 
+ 	border-style:solid; 
+	border-color:gray;
+}
+
+table.income_statement td.group {
+	font-weight: bold;
+}
+
+table.income_statement td.column {
+	font-weight: bold;
+	background-color:#DDD;
+}
+
+table.income_statement td.value {
+	text-align: right;
+}
+</style>
+
+<!-- Display header on MPA mode -->
+<?php if (!$context->isSpaMode()) : ?>
+<?php echo $this->partial('/partials/menu'); ?>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+<?php endif;?>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<strong><?php echo $this->translate('Income statement', 'ppit-accounting', $context->getLocale());?> -
+				<?php echo $this->translate('Accounting year', 'ppit-accounting', $context->getLocale());?> 
+				<?php echo $incomeStatement->year ?></strong>
+			</div>
+			<div class="panel-body">
+
+				<table class="table income_statement">
+					<thead>
+						<tr>
+							<th><?php echo $this->translate('Charges', 'ppit-accounting', $context->getLocale())?></th>
+							<th><?php echo $this->translate('Products', 'ppit-accounting', $context->getLocale())?></th>
+						</tr>
+					</thead>
+<?php foreach ($incomeStatement->tree as $tableCode => $table) : ?>
+					<tr>
+	<?php foreach ($table as $columnCode => $column) : ?>
+						<td class="outer">
+							<table class="table table-condensed">
+								<tbody>
+		<?php foreach ($column as $groupCode => $group) : ?>
+			<?php if ($incomeStatement->captions[$groupCode] && $incomeStatement->table[$groupCode]) :?>
+									<tr>
+										<td class="group caption"><?php echo $incomeStatement->captions[$groupCode] ?></td>
+										<td class="group value"><?php echo $context->formatFloat($incomeStatement->table[$groupCode], 2) ?></td>
+									</tr>
+			<?php endif;?>
+			<?php foreach ($group as $rowCode) : ?>
+				<?php if ($incomeStatement->table[$rowCode]) :?>
+									<tr>
+										<td class="caption">&nbsp;&nbsp;<?php echo $incomeStatement->captions[$rowCode] ?></td>
+										<td class="value"><?php echo $context->formatFloat($incomeStatement->table[$rowCode], 2) ?></td>
+									</tr>
+				<?php endif;?>
+			<?php endforeach;?>
+			<?php if ($incomeStatement->captions[$groupCode] && $incomeStatement->table[$groupCode]) :?>
+									<tr><td colspan="2">&nbsp;</td></tr>
+			<?php endif;?>
+		<?php endforeach;?>
+								</tbody>
+								<tfoot>
+		<?php if ($incomeStatement->captions[$columnCode]) :?>
+									<tr>
+										<td class="column caption"><?php echo $incomeStatement->captions[$columnCode] ?></td>
+										<td class="column value"><?php echo $context->formatFloat($incomeStatement->table[$columnCode], 2) ?></td>
+									</tr>
+		<?php endif;?>
+								</tfoot>
+							</table>
+						</td>
+	<?php endforeach;?>
+					</tr>
+<?php endforeach;?>
+					<tfoot>
+						<tr>
+							<th>
+								<table class="table table-condensed" width="100%">
+									<tr>
+										<td class="group caption" width="80%"><?php echo $this->translate('Gain', 'ppit-accounting', $context->getLocale())?></td>
+										<td class="group value" width="20%"><?php echo ($incomeStatement->gain) ? $context->formatFloat($incomeStatement->gain, 2) : '' ?></td>
+									</tr>
+								</table>
+							</th>
+							<th>
+								<table class="table table-condensed" width="100%">
+									<tr>
+										<td class="group caption"><?php echo $this->translate('Loss', 'ppit-accounting', $context->getLocale())?></td>
+										<td class="group value"><?php echo ($incomeStatement->loss) ? $context->formatFloat($incomeStatement->loss, 2) : '' ?></td>
+									</tr>
+								</table>
+							</th>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+		</div>
+
+<?php if (!$context->isSpaMode()) : ?>
+	</div>
+</div>
+<?php endif;?>
+	

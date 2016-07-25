@@ -1,0 +1,53 @@
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+
+<?php
+$title = $context->getInstance()->specifications['title'][$context->getLocale()];
+$this->headTitle($title);
+echo $context->getHeaderCode();
+?>
+
+<div class="container">
+	
+	<div>&nbsp;</div>
+	
+	<div id="main_menu" >
+	    <div class="col-md-10 col-md-offset-1">
+			<div align="center">
+
+<?php foreach ($menu as $entryId => $entry) : ?>
+	<?php if ($context->isAllowed($entry['route'])) : ?>
+				<button type="button" class="btn btn-default menu-btn" id="<?php echo $entryId ?>-anchor">
+					<?php echo $entry['label'][$context->getLocale()] ?>
+				</button>
+	<?php endif ?>
+<?php endforeach ?>
+
+			</div>
+			<div>&nbsp;</div>
+		</div>
+	</div>
+
+	<!-- Main panel -->
+	<div class="row">
+	    <div class="col-md-6 ppit-panel" id="index_action"></div>
+		<div class="col-md-6 ppit-panel" id="form_action"></div>
+	</div>
+	
+	<!-- Login -->
+	<div class="row">
+	    <div class="col-md-6 col-md-offset-3 ppit-panel" id="login-panel">
+		</div>
+	</div>
+</div>
+
+<script>
+
+<?php
+echo $this->partial('/partials/ppit-journal-scripts');
+echo $this->partial('/partials/ppit-controller') 
+?>
+
+activateJournal();
+
+</script>

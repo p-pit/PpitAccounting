@@ -1,0 +1,40 @@
+<div class="panel panel-default">
+	<div class="panel-heading" style="background:  <?php echo $context->getInstance()->specifications['styleSheet']['panelHeadingBackground'] ?>; color: <?php echo $context->getInstance()->specifications['styleSheet']['panelHeadingColor'] ?>">
+		<strong><?php echo $context->getInstance()->specifications['ppitAccounting']['journal/detail']['title']['fr_FR'] ?></strong>
+ 		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-default" title="<?php echo $this->translate('Return to list', 'ppit-core', $context->getLocale()) ?>" id="remove-anchor">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+ 		 </div>
+	</div>
+	<div class="panel-body">
+
+<?php if ($context->getInstance()->specifications['ppitAccounting']['journal/detail']['displayAudit'] && $entry->id) : ?>
+<!-- Display the audit -->
+		<?php echo $this->translate('History', 'ppit-core', $context->getLocale()) ?> (<a id="audit-label" href="#"><?php echo $this->translate('Show', 'ppit-core', $context->getLocale()) ?></a>)
+		<div id="audit-panel" class="panel panel-default">
+			<div class="panel-body">
+	<?php foreach ($entry->audit as $comment) : ?>
+				<div class="row">
+					<div class="col-md-12">
+						<strong><?php echo $context->decodeDate(substr($comment['time'], 0, 10)).substr($comment['time'], 10) ?>:</strong>&nbsp;
+						<?php echo $context->getInstance()->specifications['ppitAccounting']['journal_statuses'][$comment['status']]['labels'][$context->getLocale()] ?>&nbsp;
+						(<?php echo $comment['n_fn'] ?>)
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-2" align="right">&nbsp;</div>
+					<div class="col-md-10"><em><?php echo $comment['comment'] ?></em></div>
+				</div>
+	<?php endforeach;?>
+			</div>
+		</div>
+		<div>&nbsp;</div>
+		<div>
+<?php endif;?>
+
+		<div id="journal-bank-list-panel"></div>
+		<hr>
+		<div id="journal-update-panel"></div>
+	</div>
+	

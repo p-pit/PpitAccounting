@@ -1,0 +1,87 @@
+<table class="table table-striped ppit_index">
+	<tr>
+		<th>&nbsp;</th>
+
+<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/list'] as $propertyId => $rendering) : ?>
+		<th align="center">
+	<?php $label = $context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['labels'][$context->getLocale()] ?>
+	<?php if ($label) : ?>
+			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="<?php echo $propertyId ?>-anchor">
+				<span><?php echo $label ?></span>
+<?php if ($major == $propertyId) : ?>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+<?php endif ?>
+			</button>
+	<?php endif;?>
+		</th>
+<?php endforeach;?>
+
+		<th>&nbsp;</th>
+
+<?php 
+$income = 0;
+foreach ($entries as $entry) if ($entry->direction == -1) $income -= $entry->amount; else $income += $entry->amount;
+?>
+
+	<tr>
+		<td>
+			<button type="button" class="btn btn-default index-btn journal-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="journal-detail-anchor_0">
+				<span class="glyphicon glyphicon-plus" id="add-glyphicon"></span>
+			</button>
+		</td>
+		<td colspan="5" style="text-align: right; font-weight: bold; color: <?php echo ($income < 0) ? 'red' : 'green' ?>;">
+			<?php echo $this->translate('Outcome', 'ppit-accounting', $context->getLocale()) ?>: 
+			<?php echo $context->formatFloat($income, 2) ?>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+	
+<?php foreach ($entries as $entry) : ?>
+	
+	<tr class="journal">
+		<td>
+			<button type="button" class="btn btn-default index-btn journal-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="journal-detail-anchor_<?php echo $entry->id ?>">
+				<span class="glyphicon glyphicon-zoom-in" id="<?php echo $entry->id ?>-glyphicon"></span>
+			</button>
+		</td>
+
+	<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/list'] as $propertyId => $rendering) : ?>
+		
+		<?php $property = $context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId] ?>
+
+		<?php if ($propertyId == 'account') : ?>
+		<?php $accountCaption = $config['ppitAccountingSettings']['accounts'][$entry->account]['caption'] ?>
+		<td><?php echo $accountCaption ?></td>
+			
+		<?php elseif ($propertyId == 'operation_date') : ?>
+		<td><?php echo $context->decodeDate($entry->operation_date) ?></td>
+	
+		<?php elseif ($propertyId == 'caption') : ?>
+		<td><?php echo $entry->caption ?></td>
+	
+		<?php elseif ($propertyId == 'direction') : ?>
+		<td><?php echo $property['modalities'][$entry->direction]['fr_FR'] ?></td>
+	
+		<?php elseif ($propertyId == 'amount') : ?>
+		<td style="text-align: right"><?php echo $context->formatFloat($entry->amount, 2) ?></td>
+		
+		<?php endif;?>
+		
+	<?php endforeach;?>
+						<td>
+<?php if ($entry->proof_id) : ?>
+							<a class="glyphicon glyphicon-cloud-download" title="<?php echo $this->translate('Download', 'ppit-core', $context->getLocale()) ?>" href="<?php echo $this->url('document/download', array('id' => $entry->proof_id)) ?>"></a>
+<?php else : ?>
+							&nbsp;
+<?php endif;?>
+						</td>
+	</tr>
+	
+	<tr>
+		<td>&nbsp;</td>
+		<td colspan="5"><?php echo $entry->caption ?></td>
+	</tr>
+	
+<?php endforeach; ?>
+
+</table>

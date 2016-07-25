@@ -1,0 +1,32 @@
+
+		<table class="table table-striped ppit">
+			<tr>
+				<th><?php echo $this->translate('Operation date', 'ppit-accounting', $context->getLocale()) ?></th>
+				<th><?php echo $this->translate('Accounting date', 'ppit-accounting', $context->getLocale()) ?></th>
+				<th><?php echo $this->translate('Reference', 'ppit-accounting', $context->getLocale()) ?></th>
+				<th><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale()) ?></th>
+				<th><?php echo $this->translate('Debit', 'ppit-accounting', $context->getLocale()) ?></th>
+				<th><?php echo $this->translate('Credit', 'ppit-accounting', $context->getLocale()) ?></th>
+			</tr>
+<?php
+$debitSum = 0;
+$creditSum = 0;
+foreach ($journal->availableBankJournalEntries as $entry) : 
+	if ($entry->direction < 0) $debitSum += $entry->amount;
+	else $creditSum += $entry->amount;
+?>
+			<tr>
+				<td><?php echo $context->decodeDate($entry->operation_date) ?></td>
+				<td><?php echo $context->decodeDate($entry->accounting_date) ?></td>
+				<td><?php echo $entry->reference ?></td>
+				<td><?php echo $entry->caption ?></td>
+				<td style="text-align: right"><?php echo ($entry->direction < 0) ? $context->formatFloat($entry->amount, 2) : '&nbsp;' ?></td>
+				<td style="text-align: right"><?php echo ($entry->direction >= 0) ? $context->formatFloat($entry->amount, 2) : '&nbsp;' ?></td>
+			</tr>
+<?php endforeach ?>
+			<tr>
+				<td colspan="4" style="text-align: right"><?php echo $this->translate('Sum', 'ppit-accounting', $context->getLocale()) ?></td>
+				<td style="text-align: right"><?php echo $context->formatFloat($debitSum, 2) ?></td>
+				<td style="text-align: right"><?php echo $context->formatFloat($creditSum, 2) ?></td>
+			</tr>
+		</table>

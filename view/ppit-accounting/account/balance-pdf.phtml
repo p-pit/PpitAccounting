@@ -1,0 +1,125 @@
+<style>
+
+@page  
+{ 
+    size: auto;   /* auto is the initial value */ 
+
+    /* this affects the margin in the printer settings */ 
+    margin: 5mm 25mm 5mm 25mm;  
+}
+
+.panel-default .panel-heading {
+	font-size: 18px;
+	text-align: center;
+}
+.panel-default .front-page {
+	background-color: #006179;
+	color: #FFF;
+	font-size: 18px;
+	text-align: center;
+}
+
+div.footer {
+	font-size: 0.6em;
+}
+
+table.account {
+	font-family: sans-serif;
+	color: #006179;
+	font-size:0.6em; 
+	border-width:1px; 
+ 	border-style:solid; 
+	border-color:gray;
+}
+table.account caption { 
+	padding:1em 0 0.5em 1em;
+}
+table.account th {
+	font-weight: bold;
+	border-width:1px; 
+ 	border-style:solid; 
+	border-color:gray;
+	background-color:#DDD;
+	text-align: center;
+}
+
+table.account td.value {
+	text-align: right;
+}
+
+</style>
+
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <title>$this->translate('Expense reports', 'ppit-expense', $context->getLocale());</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<link href="<?php echo $this->basePath('css/bootstrap.min.css') ?>" media="screen" rel="stylesheet" type="text/css">
+		<link href="<?php echo $this->basePath('css/bootstrap-theme.min.css') ?>" media="screen" rel="stylesheet" type="text/css">
+		<link href="<?php echo $this->basePath('css/style.css') ?>" media="screen" rel="stylesheet" type="text/css">
+		<link href="<?php echo $this->basePath('img/favicon.ico') ?>" rel="shortcut icon" type="image/vnd.microsoft.icon">
+		<script type="text/javascript" src="<?php echo $this->basePath('js/jquery.min.js') ?>"></script>
+		<script type="text/javascript" src="<?php echo $this->basePath('js/bootstrap.min.js') ?>"></script>
+	</head>
+<body>
+<?php echo $context->getPdfHeaderCode() ?>
+
+<div class="row">
+    <div class="col-md-12">
+
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<strong><?php echo $this->translate('Account balance', 'ppit-accounting', $context->getLocale());?>
+			</div>
+			<div class="panel-body">
+				<table class="table table-condensed">
+					<tr>
+						<td class="ppit-header-caption"><?php echo $this->translate('Accounting year', 'ppit-accounting', $context->getLocale());?></td>
+						<td><?php echo $balance->year ?></td>
+					</tr>
+				</table>
+				<table class="table table-striped account">
+					<thead>
+						<tr>
+							<th width="10%"><?php echo $this->translate('Account', 'ppit-accounting', $context->getLocale())?></th>
+							<th width="20%"><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale())?></th>
+							<th width="10%"><?php echo $this->translate('Debit', 'ppit-accounting', $context->getLocale())?></th>
+							<th width="10%"><?php echo $this->translate('Credit', 'ppit-accounting', $context->getLocale())?></th>
+							<th width="10%"><?php echo $this->translate('Debit balance', 'ppit-accounting', $context->getLocale())?></th>
+							<th width="10%"><?php echo $this->translate('Credit balance', 'ppit-accounting', $context->getLocale())?></th>
+						</tr>
+					</thead>
+<?php foreach ($balance->rows as $row) : ?>
+					<tr>
+						<td><?php echo $row->account ?></td>
+						<td><?php echo $row->account_caption ?></td>
+						<td class="value"><?php echo $context->formatFLoat($row->debit_amount, 2) ?></td>
+						<td class="value"><?php echo $context->formatFLoat($row->credit_amount, 2) ?></td>
+						<td class="value"><?php echo ($row->debit_amount > $row->credit_amount) ? $context->formatFLoat($row->debit_amount - $row->credit_amount, 2) : 0 ?></td>
+						<td class="value"><?php echo ($row->debit_amount <= $row->credit_amount) ? $context->formatFLoat($row->credit_amount - $row->debit_amount, 2) : 0 ?></td>
+					</tr>
+<?php endforeach;?>
+					<tfoot>
+					<tr>
+						<td colspan="2" style="text-align: right"><?php echo $this->translate('Sum', 'ppit-accounting', $context->getLocale()) ?></td>
+						<td class="value"><?php echo $context->formatFLoat($balance->debit_sum, 2) ?></td>
+						<td class="value"><?php echo $context->formatFLoat($balance->credit_sum, 2) ?></td>
+						<td class="value"><?php echo ($balance->debit_sum > $balance->credit_sum) ? $context->formatFLoat($balance->debit_sum - $balance->credit_sum, 2) : 0 ?></td>
+						<td class="value"><?php echo ($balance->debit_sum <= $balance->credit_sum) ? $context->formatFLoat($balance->credit_sum - $balance->debit_sum, 2) : 0 ?></td>
+					</tr>
+					</tfoot>
+				</table>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+				<div class="ppit footer">
+					P-PIT – SAS au capital de 10 000 € - R.C.S PARIS 804 199 594<br>
+					14, rue Charles V – 75004 PARIS
+				</div>
+	</body>
+</html>
