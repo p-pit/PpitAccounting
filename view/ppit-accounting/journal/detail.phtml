@@ -1,5 +1,5 @@
 <div class="panel panel-default">
-	<div class="panel-heading" style="background:  <?php echo $context->getInstance()->specifications['styleSheet']['panelHeadingBackground'] ?>; color: <?php echo $context->getInstance()->specifications['styleSheet']['panelHeadingColor'] ?>">
+	<div class="panel-heading" style="background:  <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
 		<strong><?php echo $context->getInstance()->specifications['ppitAccounting']['journal/detail']['title']['fr_FR'] ?></strong>
  		<div class="btn-group pull-right">
 			<button type="button" class="btn btn-default" title="<?php echo $this->translate('Return to list', 'ppit-core', $context->getLocale()) ?>" id="remove-anchor">

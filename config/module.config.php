@@ -246,6 +246,7 @@ return array(
 				array('route' => 'journal/export', 'roles' => array('user')),
 				array('route' => 'journal/update', 'roles' => array('admin')),
 				array('route' => 'journal/delete', 'roles' => array('admin')),
+				array('route' => 'journal/bankList', 'roles' => array('admin')),
 				array('route' => 'journal/bankStatement', 'roles' => array('admin')),
 				array('route' => 'journal/nextStep', 'roles' => array('admin')),
             	array('route' => 'journal/previousStep', 'roles' => array('admin')),
@@ -652,5 +653,8 @@ return array(
 	            'pattern'  => 'fr/Zend_Validate.php',
 	        ),
 		),
+	),
+	'journal/index' => array(
+			'title' => array('en_US' => 'P-PIT Accounting', 'fr_FR' => 'P-PIT Finances'),
 	),
 );

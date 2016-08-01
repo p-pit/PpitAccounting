@@ -11,7 +11,7 @@ class SsmlJournalViewHelper
 		$context = Context::getCurrent();
 		$translator = $context->getServiceManager()->get('translator');
 
-		$title = $context->getInstance()->specifications['ppitCommitment']['account/search']['title'][$context->getLocale()];
+		$title = $context->getConfig('commitmentAccount/search')['title'][$context->getLocale()];
 		
 		// Set document properties
 		$workbook->getProperties()->setCreator('P-PIT')

@@ -1,5 +1,5 @@
 <div class="panel panel-default">
-	<div class="panel-heading" style="background:  <?php echo $context->getInstance()->specifications['styleSheet']['panelHeadingBackground'] ?>; color: <?php echo $context->getInstance()->specifications['styleSheet']['panelHeadingColor'] ?>">
+	<div class="panel-heading" style="background:  <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
 		<strong>
 			<?php 
 			$title = $context->getInstance()->specifications['ppitAccounting']['journal/search']['title']['fr_FR'];

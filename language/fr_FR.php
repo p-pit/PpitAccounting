@@ -22,6 +22,8 @@
 		'Products' => 'Produits',
 		'Proof' => 'Justificatif',
 		'Reference' => 'Référence',
+		'Schema' => 'Schéma',
+		'Select a schema' => 'Choisir un schéma',
 		'Sequence' => 'Séquence',
 		'Sub-account' => 'Sous-compte',
 		'Sum' => 'Total',

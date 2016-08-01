@@ -2,7 +2,7 @@
 <?php echo $this->partial('/partials/common-form-js.phtml'); ?>
 
 <?php
-$title = $context->getInstance()->specifications['title'][$context->getLocale()];
+$title = $context->getConfig('journal/index')['title'][$context->getLocale()];
 $this->headTitle($title);
 echo $context->getHeaderCode();
 ?>

@@ -20,7 +20,7 @@ class JournalController extends AbstractActionController
 
 		$instance_id = $context->getInstanceId();
 
-		$menu = $context->getInstance()->specifications['menu'];
+		$menu = $context->getconfig('menu');
 		$currentEntry = $this->params()->fromQuery('entry', 'journal');
 
     	return new ViewModel(array(
