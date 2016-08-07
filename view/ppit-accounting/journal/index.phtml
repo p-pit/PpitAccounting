@@ -4,7 +4,7 @@
 <?php
 $title = $context->getConfig('journal/index')['title'][$context->getLocale()];
 $this->headTitle($title);
-echo $context->getHeaderCode();
+echo $this->partial('/partials/header');
 ?>
 
 <div class="container">
