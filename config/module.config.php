@@ -657,4 +657,20 @@ return array(
 	'journal/index' => array(
 			'title' => array('en_US' => 'P-PIT Accounting', 'fr_FR' => 'P-PIT Finances'),
 	),
+
+
+	'menus' => array(
+			'p-pit-finance' => array(
+					'journal' => array(
+							'action' => 'Journal',
+							'route' => 'journal/index',
+							'params' => array(),
+							'urlParams' => array(),
+							'label' => array(
+									'en_US' => 'Journal',
+									'fr_FR' => 'Journal',
+							),
+					),
+			),
+	),
 );
