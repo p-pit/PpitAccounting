@@ -657,8 +657,10 @@ return array(
 	'journal/index' => array(
 			'title' => array('en_US' => 'P-PIT Accounting', 'fr_FR' => 'P-PIT Finances'),
 	),
-
-
+	'ppitRoles' => array(
+			'PpitAccounting' => array(
+			),
+	),
 	'menus' => array(
 			'p-pit-finance' => array(
 					'journal' => array(
