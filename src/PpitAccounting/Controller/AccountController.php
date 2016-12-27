@@ -30,7 +30,6 @@ class AccountController extends AbstractActionController
 				'config' => $context->getconfig(),
 				'account' => $account,
 		));
-//		if ($context->isSpaMode()) $view->setTerminal(true);
 		return $view;
 	}
 
@@ -48,7 +47,6 @@ class AccountController extends AbstractActionController
 				'config' => $context->getconfig(),
 				'balance' => $balance,
 		));
-//		if ($context->isSpaMode()) $view->setTerminal(true);
 		return $view;
 	}
 
@@ -85,7 +83,7 @@ class AccountController extends AbstractActionController
 				'config' => $context->getconfig(),
 				'incomeStatement' => $incomeStatement,
 		));
-		if ($context->isSpaMode()) $view->setTerminal(true);
+		$view->setTerminal(true);
 		return $view;
 	}
 
@@ -101,7 +99,6 @@ class AccountController extends AbstractActionController
 				'config' => $context->getconfig(),
 				'assessment' => $assessment,
 		));
-		//		if ($context->isSpaMode()) $view->setTerminal(true);
 		return $view;
 	}
 	

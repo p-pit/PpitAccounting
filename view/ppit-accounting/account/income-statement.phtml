@@ -38,14 +38,6 @@ table.income_statement td.value {
 	text-align: right;
 }
 </style>
-
-<!-- Display header on MPA mode -->
-<?php if (!$context->isSpaMode()) : ?>
-<?php echo $this->partial('/partials/menu'); ?>
-<div class="row">
-    <div class="col-md-8 col-md-offset-2">
-<?php endif;?>
-
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<strong><?php echo $this->translate('Income statement', 'ppit-accounting', $context->getLocale());?> -
@@ -123,9 +115,3 @@ table.income_statement td.value {
 				</table>
 			</div>
 		</div>
-
-<?php if (!$context->isSpaMode()) : ?>
-	</div>
-</div>
-<?php endif;?>
-	

@@ -2,7 +2,6 @@
 namespace PpitAccounting\Model;
 
 use PpitAccounting\Model\AccountingYear;
-use PpitContact\Model\Community;
 use PpitCore\Model\Context;
 use PpitDocument\Model\Document;
 use Zend\Db\Sql\Where;
