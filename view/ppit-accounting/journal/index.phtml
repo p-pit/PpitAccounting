@@ -15,13 +15,16 @@ echo $this->partial('/partials/header');
 	    <div class="col-md-10 col-md-offset-1">
 			<div align="center">
 
-<?php foreach ($menu as $entryId => $entry) : ?>
-	<?php if ($context->isAllowed($entry['route'])) : ?>
+<?php foreach ($context->getConfig('menus')['p-pit-finance'] as $entryId => $entryDef) : ?>
+	<?php if ($context->isAllowed($entryDef['route'])) : ?>
 				<button type="button" class="btn btn-default menu-btn" id="<?php echo $entryId ?>-anchor">
-					<?php echo $entry['label'][$context->getLocale()] ?>
+		<?php if (array_key_exists('glyphicon', $entryDef)) : ?>
+					<span class="glyphicon <?php echo $entryDef['glyphicon'] ?>"></span>
+		<?php endif;?>
+					<?php echo $entryDef['label'][$context->getLocale()] ?>
 				</button>
 	<?php endif ?>
-<?php endforeach ?>
+<?php endforeach;?>
 
 			</div>
 			<div>&nbsp;</div>
@@ -47,6 +50,10 @@ echo $this->partial('/partials/header');
 echo $this->partial('/partials/ppit-journal-scripts');
 echo $this->partial('/partials/ppit-controller') 
 ?>
+
+<?php foreach ($context->getConfig('menus')['p-pit-finance'] as $entryId => $entryDef) : ?>
+$('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route']) ?>'); });
+<?php endforeach;?>
 
 activateJournal();
 

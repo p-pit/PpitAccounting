@@ -663,11 +663,21 @@ return array(
 	),
 	'menus' => array(
 			'p-pit-finance' => array(
+					'expense' => array(
+							'route' => 'expense/index',
+							'params' => array(),
+							'glyphicon' => 'glyphicon-piggy-bank',
+							'label' => array(
+									'en_US' => 'Expenses',
+									'fr_FR' => 'Dépenses',
+							),
+					),
 					'journal' => array(
 							'action' => 'Journal',
 							'route' => 'journal/index',
 							'params' => array(),
 							'urlParams' => array(),
+							'glyphicon' => 'glyphicon-book',
 							'label' => array(
 									'en_US' => 'Journal',
 									'fr_FR' => 'Journal',
