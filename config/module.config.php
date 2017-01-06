@@ -119,7 +119,16 @@ return array(
         										),
         								),
         						),
-        						'bankList' => array(
+        						'dropboxLink' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/dropbox-link[/:document]',
+        										'defaults' => array(
+        												'action' => 'dropboxLink',
+        										),
+        								),
+        						),
+            					'bankList' => array(
         								'type' => 'segment',
         								'options' => array(
         										'route' => '/bank-list',
@@ -242,6 +251,7 @@ return array(
 				array('route' => 'journal/index', 'roles' => array('user')),
 				array('route' => 'journal/search', 'roles' => array('user')),
             	array('route' => 'journal/list', 'roles' => array('user')),
+            	array('route' => 'journal/dropboxLink', 'roles' => array('user')),
 				array('route' => 'journal/detail', 'roles' => array('user')),
 				array('route' => 'journal/export', 'roles' => array('user')),
 				array('route' => 'journal/update', 'roles' => array('admin')),
@@ -625,6 +635,7 @@ return array(
 				2184 => 1123,
 		),*/
 	),
+		
     'view_manager' => array(
         'display_not_found_reason' => true,
         'display_exceptions'       => true,
@@ -654,13 +665,12 @@ return array(
 	        ),
 		),
 	),
-	'journal/index' => array(
-			'title' => array('en_US' => 'P-PIT Accounting', 'fr_FR' => 'P-PIT Finances'),
-	),
+
 	'ppitRoles' => array(
 			'PpitAccounting' => array(
 			),
 	),
+	
 	'menus' => array(
 			'p-pit-finance' => array(
 					'expense' => array(
@@ -677,12 +687,147 @@ return array(
 							'route' => 'journal/index',
 							'params' => array(),
 							'urlParams' => array(),
-							'glyphicon' => 'glyphicon-book',
+							'glyphicon' => 'glyphicon-list-alt',
 							'label' => array(
 									'en_US' => 'Journal',
 									'fr_FR' => 'Journal',
 							),
 					),
 			),
+	),
+		
+	'journal' => array(
+			'accountingChart' => array(
+					'expense/transport' => array(
+							'6251' => array(
+									'direction' => -1,
+									'source' => 'excluding_tax',
+							),
+							'44566' => array(
+									'direction' => -1,
+									'source' => 'tax_amount',
+							),
+							'401' => array(
+									'direction' => 1,
+									'source' => 'tax_inclusive',
+							),
+					),
+					'expense/meal' => array(
+							'6251' => array(
+									'direction' => -1,
+									'source' => 'excluding_tax',
+							),
+							'44566' => array(
+									'direction' => -1,
+									'source' => 'tax_amount',
+							),
+							'401' => array(
+									'direction' => 1,
+									'source' => 'tax_inclusive',
+							),
+					),
+					'expense/phone' => array(
+							'626' => array(
+									'direction' => -1,
+									'source' => 'excluding_tax',
+							),
+							'44566' => array(
+									'direction' => -1,
+									'source' => 'tax_amount',
+							),
+							'401' => array(
+									'direction' => 1,
+									'source' => 'tax_inclusive',
+							),
+					),
+					'expense/mail' => array(
+							'626' => array(
+									'direction' => -1,
+									'source' => 'excluding_tax',
+							),
+							'44566' => array(
+									'direction' => -1,
+									'source' => 'tax_amount',
+							),
+							'401' => array(
+									'direction' => 1,
+									'source' => 'tax_inclusive',
+							),
+					),
+					'expense/office' => array(
+							'6063' => array(
+									'direction' => -1,
+									'source' => 'excluding_tax',
+							),
+							'44566' => array(
+									'direction' => -1,
+									'source' => 'tax_amount',
+							),
+							'401' => array(
+									'direction' => 1,
+									'source' => 'tax_inclusive',
+							),
+					),
+					'expense/library' => array(
+							'6181' => array(
+									'direction' => -1,
+									'source' => 'excluding_tax',
+							),
+							'44566' => array(
+									'direction' => -1,
+									'source' => 'tax_amount',
+							),
+							'401' => array(
+									'direction' => 1,
+									'source' => 'tax_inclusive',
+							),
+					),
+					'expense/invitation' => array(
+							'6234' => array(
+									'direction' => -1,
+									'source' => 'excluding_tax',
+							),
+							'44566' => array(
+									'direction' => -1,
+									'source' => 'tax_amount',
+							),
+							'401' => array(
+									'direction' => 1,
+									'source' => 'tax_inclusive',
+							),
+					),
+					'expense/gift' => array(
+							'6234' => array(
+									'direction' => -1,
+									'source' => 'excluding_tax',
+							),
+							'44566' => array(
+									'direction' => -1,
+									'source' => 'tax_amount',
+							),
+							'401' => array(
+									'direction' => 1,
+									'source' => 'tax_inclusive',
+							),
+					),
+					'expense/miscellaneous' => array(
+							'6185' => array(
+									'direction' => -1,
+									'source' => 'excluding_tax',
+							),
+							'44566' => array(
+									'direction' => -1,
+									'source' => 'tax_amount',
+							),
+							'401' => array(
+									'direction' => 1,
+									'source' => 'tax_inclusive',
+							),
+					),
+			)
+	),
+
+	'journal/index' => array(
+			'title' => array('en_US' => 'P-PIT Accounting', 'fr_FR' => 'P-PIT Finances'),
 	),
 );

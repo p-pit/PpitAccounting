@@ -27,4 +27,6 @@
 		'Sequence' => 'Séquence',
 		'Sub-account' => 'Sous-compte',
 		'Sum' => 'Total',
+		'The expense has been recorded and cannot been updated' => 'La dépense a été comptabilisée et ne peut plus être modifiée',
+		'The expense has been recorded and cannot been deleted' => 'La dépense a été comptabilisée et ne peut plus être supprimée',
 	);

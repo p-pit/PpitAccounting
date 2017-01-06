@@ -29,7 +29,7 @@ foreach ($entries as $entry) if ($entry->direction == -1) $income -= $entry->amo
 				<span class="glyphicon glyphicon-plus" id="add-glyphicon"></span>
 			</button>
 		</td>
-		<td colspan="5" style="text-align: right; font-weight: bold; color: <?php echo ($income < 0) ? 'red' : 'green' ?>;">
+		<td colspan="4" style="text-align: right; font-weight: bold; color: <?php echo ($income < 0) ? 'red' : 'green' ?>;">
 			<?php echo $this->translate('Outcome', 'ppit-accounting', $context->getLocale()) ?>: 
 			<?php echo $context->formatFloat($income, 2) ?>
 		</td>
@@ -71,6 +71,9 @@ foreach ($entries as $entry) if ($entry->direction == -1) $income -= $entry->amo
 						<td>
 <?php if ($entry->proof_id) : ?>
 							<a class="glyphicon glyphicon-cloud-download" title="<?php echo $this->translate('Download', 'ppit-core', $context->getLocale()) ?>" href="<?php echo $this->url('document/download', array('id' => $entry->proof_id)) ?>"></a>
+<?php elseif ($entry->proof_url) : ?>
+	<?php $dropbox = $context->getConfig('ppitDocument')['dropbox'] ?>
+							<a class="glyphicon glyphicon-paperclip" href="<?php echo $this->url('journal/dropboxLink', array('document' => $entry->proof_url)) ?>" title="<?php echo $this->translate('Attachment', 'ppit-document', $context->getLocale()) ?>" target=".blank" />
 <?php else : ?>
 							&nbsp;
 <?php endif;?>

@@ -89,7 +89,7 @@ class JournalController extends AbstractActionController
     
     	// Retrieve the list
     	$entries = Journal::getList($params, $major, $dir, $mode);
-
+    	
     	// Return the link list
     	$view = new ViewModel(array(
     			'context' => $context,
@@ -107,6 +107,17 @@ class JournalController extends AbstractActionController
     public function listAction()
     {
     	return $this->getList();
+    }
+    
+    public function dropboxLinkAction()
+    {
+    	$context = Context::getCurrent();
+    	$document = $this->params()->fromRoute('document', 0);
+    	require_once "vendor/dropbox/dropbox-sdk/lib/Dropbox/autoload.php";
+    	$dropbox = $context->getConfig('ppitDocument')['dropbox'];
+    	$dropboxClient = new \Dropbox\Client($dropbox['credential'], $dropbox['clientIdentifier']);
+    	$link = $dropboxClient->createTemporaryDirectLink($dropbox['folders']['expenses'].'/'.$document);
+    	return $this->redirect()->toUrl($link[0]);
     }
     
     public function exportAction()

@@ -27,6 +27,7 @@ class AccountBalance
 class Journal implements InputFilterAwareInterface
 {
     public $id;
+    public $status;
     public $year;
     public $sequence;
     public $journal_code;
@@ -41,7 +42,9 @@ class Journal implements InputFilterAwareInterface
     public $currency;
     public $account;
     public $sub_account;
-	public $update_time;
+    public $expense_id;
+    public $commitment_id;
+    public $update_time;
 
     // Transient properties
     public $rows = array();
@@ -63,6 +66,7 @@ class Journal implements InputFilterAwareInterface
     public function exchangeArray($data)
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
+        $this->status = (isset($data['status'])) ? $data['status'] : null;
         $this->year = (isset($data['year'])) ? $data['year'] : null;
         $this->sequence = (isset($data['sequence'])) ? $data['sequence'] : null;
         $this->journal_code = (isset($data['journal_code'])) ? $data['journal_code'] : null;
@@ -77,12 +81,15 @@ class Journal implements InputFilterAwareInterface
         $this->currency = (isset($data['currency'])) ? $data['currency'] : null;
         $this->account = (isset($data['account'])) ? $data['account'] : null;
         $this->sub_account = (isset($data['sub_account'])) ? $data['sub_account'] : null;
+        $this->expense_id = (isset($data['expense_id'])) ? $data['expense_id'] : null;
+        $this->commitment_id = (isset($data['commitment_id'])) ? $data['commitment_id'] : null;
         $this->update_time = (isset($data['update_time'])) ? $data['update_time'] : null;
     }
 
     public function toArray() {
     	$data = array();
     	$data['id'] = (int) $this->id;
+    	$data['status'] = (int) $this->status;
     	$data['year'] = $this->year;
     	$data['sequence'] = (int) $this->sequence;
     	$data['journal_code'] = $this->journal_code;
@@ -97,6 +104,8 @@ class Journal implements InputFilterAwareInterface
     	$data['currency'] = $this->currency;
     	$data['account'] = $this->account;
     	$data['sub_account'] = $this->sub_account;
+    	$data['expense_id'] = $this->expense_id;
+    	$data['commitment_id'] = $this->commitment_id;
     	return $data;
     }
 
@@ -153,16 +162,47 @@ class Journal implements InputFilterAwareInterface
     	return $entry;
     }
     
-	public function loadData($data, $files)
+    public static function instanciate()
+    {
+    	$journalEntry = new Journal;
+    	return $journalEntry;
+    }
+    
+	public function loadData($data, $files = null)
 	{
-		$this->operation_date = $data['operation_date'];
-		$this->reference = $data['reference'];
-		$this->caption = $data['caption'];
+		if (array_key_exists('status', $data)) {
+    		$this->status = trim(strip_tags($data['status']));
+    		if (!$this->status || strlen($this->status) > 255) return 'Integrity';
+		}
+		if (array_key_exists('operation_date', $data)) {
+    		$this->operation_date = trim(strip_tags($data['operation_date']));
+    		if ($this->operation_date && !checkdate(substr($this->operation_date, 5, 2), substr($this->operation_date, 8, 2), substr($this->operation_date, 0, 4))) return 'Integrity';
+		}
+		if (array_key_exists('reference', $data)) {
+			$this->reference = trim(strip_tags($data['reference']));
+    		if (strlen($this->reference) > 255) return 'Integrity';
+		}
+		if (array_key_exists('caption', $data)) {
+			$this->caption = trim(strip_tags($data['caption']));
+    		if (!$this->caption || strlen($this->caption) > 255) return 'Integrity';
+		}
+		if (array_key_exists('proof_url', $data)) {
+			$this->proof_url = trim(strip_tags($data['proof_url']));
+    		if (strlen($this->proof_url) > 255) return 'Integrity';
+		}
 		$this->files = $files;
-		$this->bank_journal_reference = $data['bank_journal_reference'];
+		if (array_key_exists('bank_journal_reference', $data)) {
+			$this->bank_journal_reference = (int) $data['bank_journal_reference'];
+		}
 		$this->rows = array();
 		foreach ($data['rows'] as $row) {
 			$this->rows[] = $row;
+		}
+		if (array_key_exists('expense_id', $data)) {
+			$this->expense_id = (int) $data['expense_id'];
+		}
+		if (array_key_exists('commitment_id', $data)) {
+			$this->commitment_id = (int) $data['commitment_id'];
 		}
 		return 'OK';
 	}
