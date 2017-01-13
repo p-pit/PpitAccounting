@@ -50,7 +50,6 @@ class Journal implements InputFilterAwareInterface
     public $rows = array();
     public $availableBankJournalEntries;
     public $bank_journal_reference;
-    public $files;
     public $properties;
     
     protected $inputFilter;
@@ -130,7 +129,8 @@ class Journal implements InputFilterAwareInterface
     	
     	// Todo list vs search modes
     	if ($mode == 'todo') {
-    		$where->equalTo('year', date('Y'));
+			$accountingYear = AccountingYear::getCurrent();
+    		$where->equalTo('year', $accountingYear->year);
     		$where->greaterThanOrEqualTo('accounting_journal.account', '6');
     		$where->lessThanOrEqualTo('accounting_journal.account', '799999');
     	}
@@ -168,7 +168,7 @@ class Journal implements InputFilterAwareInterface
     	return $journalEntry;
     }
     
-	public function loadData($data, $files = null)
+	public function loadData($data)
 	{
 		if (array_key_exists('status', $data)) {
     		$this->status = trim(strip_tags($data['status']));
@@ -190,7 +190,6 @@ class Journal implements InputFilterAwareInterface
 			$this->proof_url = trim(strip_tags($data['proof_url']));
     		if (strlen($this->proof_url) > 255) return 'Integrity';
 		}
-		$this->files = $files;
 		if (array_key_exists('bank_journal_reference', $data)) {
 			$this->bank_journal_reference = (int) $data['bank_journal_reference'];
 		}
@@ -221,23 +220,13 @@ class Journal implements InputFilterAwareInterface
 			$row['amount'] = $request->getPost('amount_'.$i);
 			$data['rows'][] = $row;
 		}
-
-    	// Retrieve the order form
-    	$files = $request->getFiles()->toArray();
 		
-    	if ($this->loadData($data, $files) != 'OK') throw new \Exception('Client error');
+    	if ($this->loadData($data) != 'OK') throw new \Exception('Client error');
 	}
 
 	public function add()
 	{
 		$context = Context::getCurrent();
-	    if ($this->files) {
-			$root_id = $context->getConfig()['ppitAccountingSettings']['accountingFolderId']; 
-    		$document = Document::instanciate($root_id);
-    		$document->files = $this->files;
-    		$document->saveFile(true, '/P-PIT Finance/');
-    		$this->proof_id = $document->save();
-    	}
 		$accountingYear = AccountingYear::getCurrent();
 		$this->year = $accountingYear->year;
 		$this->sequence = $accountingYear->next_value;

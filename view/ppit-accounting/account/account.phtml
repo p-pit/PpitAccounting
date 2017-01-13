@@ -30,70 +30,112 @@ table.account tfoot {
 	background-color:#EEE;
 }
 </style>
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
 
-<div class="row">
-    <div class="col-md-12">
+<?php
+$title = $context->getConfig('journal/index')['title'][$context->getLocale()];
+$this->headTitle($title);
+echo $this->partial('/partials/header');
+?>
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<strong>
-					<?php echo $this->translate('General ledger', 'ppit-accounting', $context->getLocale()).' '.$account->year ?>  -
-					<?php echo $config['ppitAccountingSettings']['accounts'][$account->account]['caption']?>
-					(<?php echo $account->account ?>)
-				</strong>
-			</div>
-			<div class="panel-body">
-				<table class="table table-striped account">
-					<thead>
-						<tr>
-							<th><?php echo $this->translate('Journal', 'ppit-accounting', $context->getLocale())?></th>
-							<th><?php echo $this->translate('Sequence', 'ppit-accounting', $context->getLocale())?></th>
-							<th><?php echo $this->translate('Operation date', 'ppit-accounting', $context->getLocale())?></th>
-							<th><?php echo $this->translate('Accounting date', 'ppit-accounting', $context->getLocale())?></th>
-							<th><?php echo $this->translate('Reference', 'ppit-accounting', $context->getLocale())?></th>
-							<th><?php echo $this->translate('Caption', 'ppit-accounting', $context->getLocale())?></th>
-							<th><?php echo $this->translate('Debit', 'ppit-accounting', $context->getLocale())?></th>
-							<th><?php echo $this->translate('Credit', 'ppit-accounting', $context->getLocale())?></th>
-							<th>&nbsp;</th>
-							<th>&nbsp;</th>
-						</tr>
-					</thead>
-<?php foreach ($account->rows as $row) : ?>
-					<tr>
-						<td><?php echo $row->journal_code ?></td>
-						<td class="value"><?php echo $row->sequence ?></td>
-						<td><?php echo $context->decodeDate($row->operation_date) ?></td>
-						<td><?php echo $context->decodeDate($row->accounting_date) ?></td>
-						<td><?php echo $row->reference ?></td>
-						<td><?php echo $row->caption ?></td>
-						<td class="value"><?php echo $context->formatFLoat($row->debit_amount, 2) ?></td>
-						<td class="value"><?php echo $context->formatFLoat($row->credit_amount, 2) ?></td>
-						<td><input type="checkbox" /></td>
-						<td>
-	<?php if ($row->proof_id) : ?>
-							<a class="glyphicon glyphicon-cloud-download" href="<?php echo $this->url('document/download', array('id' => $row->proof_id)) ?>" target="_blank" title="<?php echo $this->translate('Proof', 'ppit-accounting', $context->getLocale()) ?>"/>
-	<?php endif; ?>
-						</td>
-					</tr>
+<div class="container">
+	
+	<div>&nbsp;</div>
+	
+	<div id="main_menu" >
+	    <div class="col-md-10 col-md-offset-1">
+			<div align="center">
+
+<?php foreach ($context->getConfig('menus')['p-pit-finance'] as $entryId => $entryDef) : ?>
+	<?php if ($context->isAllowed($entryDef['route'])) : ?>
+				<button type="button" class="btn btn-default menu-btn" id="<?php echo $entryId ?>-anchor">
+		<?php if (array_key_exists('glyphicon', $entryDef)) : ?>
+					<span class="glyphicon <?php echo $entryDef['glyphicon'] ?>"></span>
+		<?php endif;?>
+					<?php echo $entryDef['label'][$context->getLocale()] ?>
+				</button>
+	<?php endif ?>
 <?php endforeach;?>
-					<tfoot>
-						<tr>
-							<td colspan="6" style="text-align: right"><?php echo $this->translate('Sum', 'ppit-accounting', $context->getLocale()) ?></td>
-							<td class="value"><?php echo $context->formatFLoat($account->debit_sum, 2) ?></td>
-							<td class="value"><?php echo $context->formatFLoat($account->credit_sum, 2) ?></td>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
-						</tr>
-						<tr>
-							<td colspan="6" style="text-align: right"><?php echo $this->translate('Balance', 'ppit-accounting', $context->getLocale()) ?></td>
-							<td class="value"><?php echo $context->formatFLoat($account->debit_balance, 2) ?></td>
-							<td class="value"><?php echo $context->formatFLoat($account->credit_balance, 2) ?></td>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
-						</tr>
-					</tfoot>
-				</table>
 
+			</div>
+			<div>&nbsp;</div>
+		</div>
+	</div>
+	
+	<div class="row">
+	    <div class="col-md-12">
+	
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<strong>
+						<?php echo $this->translate('General ledger', 'ppit-accounting', $context->getLocale()).' '.$account->year ?>  -
+						<?php echo $config['ppitAccountingSettings']['accounts'][$account->account]['caption']?>
+						(<?php echo $account->account ?>)
+					</strong>
+				</div>
+				<div class="panel-body">
+					<table class="table table-striped account">
+						<thead>
+							<tr>
+								<th><?php echo $this->translate('Journal', 'ppit-accounting', $context->getLocale())?></th>
+								<th><?php echo $this->translate('Sequence', 'ppit-accounting', $context->getLocale())?></th>
+								<th><?php echo $this->translate('Operation date', 'ppit-accounting', $context->getLocale())?></th>
+								<th><?php echo $this->translate('Accounting date', 'ppit-accounting', $context->getLocale())?></th>
+								<th><?php echo $this->translate('Reference', 'ppit-accounting', $context->getLocale())?></th>
+								<th><?php echo $this->translate('Caption', 'ppit-accounting', $context->getLocale())?></th>
+								<th><?php echo $this->translate('Debit', 'ppit-accounting', $context->getLocale())?></th>
+								<th><?php echo $this->translate('Credit', 'ppit-accounting', $context->getLocale())?></th>
+								<th>&nbsp;</th>
+								<th>&nbsp;</th>
+							</tr>
+						</thead>
+	<?php foreach ($account->rows as $row) : ?>
+						<tr>
+							<td><?php echo $row->journal_code ?></td>
+							<td class="value"><?php echo $row->sequence ?></td>
+							<td><?php echo $context->decodeDate($row->operation_date) ?></td>
+							<td><?php echo $context->decodeDate($row->accounting_date) ?></td>
+							<td><?php echo $row->reference ?></td>
+							<td><?php echo $row->caption ?></td>
+							<td class="value"><?php echo $context->formatFLoat($row->debit_amount, 2) ?></td>
+							<td class="value"><?php echo $context->formatFLoat($row->credit_amount, 2) ?></td>
+							<td><input type="checkbox" /></td>
+							<td>
+		<?php if ($row->proof_id) : ?>
+								<a class="glyphicon glyphicon-cloud-download" href="<?php echo $this->url('document/download', array('id' => $row->proof_id)) ?>" target="_blank" title="<?php echo $this->translate('Proof', 'ppit-accounting', $context->getLocale()) ?>"/>
+		<?php endif; ?>
+							</td>
+						</tr>
+	<?php endforeach;?>
+						<tfoot>
+							<tr>
+								<td colspan="6" style="text-align: right"><?php echo $this->translate('Sum', 'ppit-accounting', $context->getLocale()) ?></td>
+								<td class="value"><?php echo $context->formatFLoat($account->debit_sum, 2) ?></td>
+								<td class="value"><?php echo $context->formatFLoat($account->credit_sum, 2) ?></td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td colspan="6" style="text-align: right"><?php echo $this->translate('Balance', 'ppit-accounting', $context->getLocale()) ?></td>
+								<td class="value"><?php echo $context->formatFLoat($account->debit_balance, 2) ?></td>
+								<td class="value"><?php echo $context->formatFLoat($account->credit_balance, 2) ?></td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+							</tr>
+						</tfoot>
+					</table>
+	
+				</div>
 			</div>
 		</div>
-	
+	</div>
+</div>
+
+<script>
+
+<?php foreach ($context->getConfig('menus')['p-pit-finance'] as $entryId => $entryDef) : ?>
+$('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route']) ?>'); });
+<?php endforeach;?>
+
+</script>

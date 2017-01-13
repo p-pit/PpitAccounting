@@ -24,54 +24,95 @@ table.account td.value {
 }
 </style>
 
-<div class="row">
-    <div class="col-md-12">
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<strong><?php echo $this->translate('Account balance', 'ppit-accounting', $context->getLocale());?> -
-			</div>
-			<div class="panel-body">
-				<table class="table table-condensed">
-					<tr>
-						<td class="ppit-header-caption"><?php echo $this->translate('Accounting year', 'ppit-accounting', $context->getLocale());?></td>
-						<td><?php echo $balance->year ?></td>
-					</tr>
-				</table>
-				<table class="table table-striped account">
-					<thead>
-						<tr>
-							<th width="10%"><?php echo $this->translate('Account', 'ppit-accounting', $context->getLocale())?></th>
-							<th width="20%"><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale())?></th>
-							<th width="10%"><?php echo $this->translate('Debit', 'ppit-accounting', $context->getLocale())?></th>
-							<th width="10%"><?php echo $this->translate('Credit', 'ppit-accounting', $context->getLocale())?></th>
-							<th width="10%"><?php echo $this->translate('Debit balance', 'ppit-accounting', $context->getLocale())?></th>
-							<th width="10%"><?php echo $this->translate('Credit balance', 'ppit-accounting', $context->getLocale())?></th>
-						</tr>
-					</thead>
-<?php foreach ($balance->rows as $row) : ?>
-					<tr>
-						<td><?php echo $row->account ?></td>
-						<td><?php echo $row->account_caption ?></td>
-						<td class="value"><?php echo $context->formatFLoat($row->debit_amount, 2) ?></td>
-						<td class="value"><?php echo $context->formatFLoat($row->credit_amount, 2) ?></td>
-						<td class="value"><?php echo ($row->debit_amount > $row->credit_amount) ? $context->formatFLoat($row->debit_amount - $row->credit_amount, 2) : 0 ?></td>
-						<td class="value"><?php echo ($row->debit_amount <= $row->credit_amount) ? $context->formatFLoat($row->credit_amount - $row->debit_amount, 2) : 0 ?></td>
-					</tr>
+<?php
+$title = $context->getConfig('journal/index')['title'][$context->getLocale()];
+$this->headTitle($title);
+echo $this->partial('/partials/header');
+?>
+
+<div class="container">
+	
+	<div>&nbsp;</div>
+	
+	<div id="main_menu" >
+	    <div class="col-md-10 col-md-offset-1">
+			<div align="center">
+
+<?php foreach ($context->getConfig('menus')['p-pit-finance'] as $entryId => $entryDef) : ?>
+	<?php if ($context->isAllowed($entryDef['route'])) : ?>
+				<button type="button" class="btn btn-default menu-btn" id="<?php echo $entryId ?>-anchor">
+		<?php if (array_key_exists('glyphicon', $entryDef)) : ?>
+					<span class="glyphicon <?php echo $entryDef['glyphicon'] ?>"></span>
+		<?php endif;?>
+					<?php echo $entryDef['label'][$context->getLocale()] ?>
+				</button>
+	<?php endif ?>
 <?php endforeach;?>
-					<tfoot>
-					<tr>
-						<td colspan="2" style="text-align: right"><?php echo $this->translate('Sum', 'ppit-core', $context->getLocale()) ?></td>
-						<td class="value"><?php echo $context->formatFLoat($balance->debit_sum, 2) ?></td>
-						<td class="value"><?php echo $context->formatFLoat($balance->credit_sum, 2) ?></td>
-						<td class="value"><?php echo ($balance->debit_sum > $balance->credit_sum) ? $context->formatFLoat($balance->debit_sum - $balance->credit_sum, 2) : 0 ?></td>
-						<td class="value"><?php echo ($balance->debit_sum <= $balance->credit_sum) ? $context->formatFLoat($balance->credit_sum - $balance->debit_sum, 2) : 0 ?></td>
-					</tr>
-					</tfoot>
-				</table>
 
+			</div>
+			<div>&nbsp;</div>
+		</div>
+	</div>
+	
+	<div class="row">
+	    <div class="col-md-12">
+	
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<strong><?php echo $this->translate('Account balance', 'ppit-accounting', $context->getLocale());?> -
+				</div>
+				<div class="panel-body">
+					<table class="table table-condensed">
+						<tr>
+							<td class="ppit-header-caption"><?php echo $this->translate('Accounting year', 'ppit-accounting', $context->getLocale());?></td>
+							<td><?php echo $balance->year ?></td>
+						</tr>
+					</table>
+					<table class="table table-striped account">
+						<thead>
+							<tr>
+								<th width="10%"><?php echo $this->translate('Account', 'ppit-accounting', $context->getLocale())?></th>
+								<th width="20%"><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale())?></th>
+								<th width="10%"><?php echo $this->translate('Debit', 'ppit-accounting', $context->getLocale())?></th>
+								<th width="10%"><?php echo $this->translate('Credit', 'ppit-accounting', $context->getLocale())?></th>
+								<th width="10%"><?php echo $this->translate('Debit balance', 'ppit-accounting', $context->getLocale())?></th>
+								<th width="10%"><?php echo $this->translate('Credit balance', 'ppit-accounting', $context->getLocale())?></th>
+							</tr>
+						</thead>
+	<?php foreach ($balance->rows as $row) : ?>
+						<tr>
+							<td><?php echo $row->account ?></td>
+							<td><a href="<?php echo $this->url('account/account') ?>?year=<?php echo $year ?>&account=<?php echo $row->account ?>"><?php echo $row->account_caption ?></a></td>
+							<td class="value"><?php echo $context->formatFLoat($row->debit_amount, 2) ?></td>
+							<td class="value"><?php echo $context->formatFLoat($row->credit_amount, 2) ?></td>
+							<td class="value"><?php echo ($row->debit_amount > $row->credit_amount) ? $context->formatFLoat($row->debit_amount - $row->credit_amount, 2) : 0 ?></td>
+							<td class="value"><?php echo ($row->debit_amount <= $row->credit_amount) ? $context->formatFLoat($row->credit_amount - $row->debit_amount, 2) : 0 ?></td>
+						</tr>
+	<?php endforeach;?>
+						<tfoot>
+						<tr>
+							<td colspan="2" style="text-align: right"><?php echo $this->translate('Sum', 'ppit-core', $context->getLocale()) ?></td>
+							<td class="value"><?php echo $context->formatFLoat($balance->debit_sum, 2) ?></td>
+							<td class="value"><?php echo $context->formatFLoat($balance->credit_sum, 2) ?></td>
+							<td class="value"><?php echo ($balance->debit_sum > $balance->credit_sum) ? $context->formatFLoat($balance->debit_sum - $balance->credit_sum, 2) : 0 ?></td>
+							<td class="value"><?php echo ($balance->debit_sum <= $balance->credit_sum) ? $context->formatFLoat($balance->credit_sum - $balance->debit_sum, 2) : 0 ?></td>
+						</tr>
+						</tfoot>
+					</table>
+	
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
-	
+
+<script>
+
+<?php foreach ($context->getConfig('menus')['p-pit-finance'] as $entryId => $entryDef) : ?>
+$('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route']) ?>'); });
+<?php endforeach;?>
+
+</script>

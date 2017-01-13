@@ -693,138 +693,146 @@ return array(
 									'fr_FR' => 'Journal',
 							),
 					),
+					'balance' => array(
+							'action' => 'Balance',
+							'route' => 'account/balance',
+							'params' => array(),
+							'urlParams' => array(),
+							'label' => array(
+									'en_US' => 'Balance',
+									'fr_FR' => 'Balance',
+							),
+					),
 			),
 	),
 		
-	'journal' => array(
-			'accountingChart' => array(
-					'expense/transport' => array(
-							'6251' => array(
-									'direction' => -1,
-									'source' => 'excluding_tax',
-							),
-							'44566' => array(
-									'direction' => -1,
-									'source' => 'tax_amount',
-							),
-							'401' => array(
-									'direction' => 1,
-									'source' => 'tax_inclusive',
-							),
+	'journal/accountingChart/expense' => array(
+			'transport' => array(
+					'6251' => array(
+							'direction' => -1,
+							'source' => 'excluding_tax',
 					),
-					'expense/meal' => array(
-							'6251' => array(
-									'direction' => -1,
-									'source' => 'excluding_tax',
-							),
-							'44566' => array(
-									'direction' => -1,
-									'source' => 'tax_amount',
-							),
-							'401' => array(
-									'direction' => 1,
-									'source' => 'tax_inclusive',
-							),
+					'44566' => array(
+							'direction' => -1,
+							'source' => 'tax_amount',
 					),
-					'expense/phone' => array(
-							'626' => array(
-									'direction' => -1,
-									'source' => 'excluding_tax',
-							),
-							'44566' => array(
-									'direction' => -1,
-									'source' => 'tax_amount',
-							),
-							'401' => array(
-									'direction' => 1,
-									'source' => 'tax_inclusive',
-							),
+					'401' => array(
+							'direction' => 1,
+							'source' => 'tax_inclusive',
 					),
-					'expense/mail' => array(
-							'626' => array(
-									'direction' => -1,
-									'source' => 'excluding_tax',
-							),
-							'44566' => array(
-									'direction' => -1,
-									'source' => 'tax_amount',
-							),
-							'401' => array(
-									'direction' => 1,
-									'source' => 'tax_inclusive',
-							),
+			),
+			'meal' => array(
+					'6251' => array(
+							'direction' => -1,
+							'source' => 'excluding_tax',
 					),
-					'expense/office' => array(
-							'6063' => array(
-									'direction' => -1,
-									'source' => 'excluding_tax',
-							),
-							'44566' => array(
-									'direction' => -1,
-									'source' => 'tax_amount',
-							),
-							'401' => array(
-									'direction' => 1,
-									'source' => 'tax_inclusive',
-							),
+					'44566' => array(
+							'direction' => -1,
+							'source' => 'tax_amount',
 					),
-					'expense/library' => array(
-							'6181' => array(
-									'direction' => -1,
-									'source' => 'excluding_tax',
-							),
-							'44566' => array(
-									'direction' => -1,
-									'source' => 'tax_amount',
-							),
-							'401' => array(
-									'direction' => 1,
-									'source' => 'tax_inclusive',
-							),
+					'401' => array(
+							'direction' => 1,
+							'source' => 'tax_inclusive',
 					),
-					'expense/invitation' => array(
-							'6234' => array(
-									'direction' => -1,
-									'source' => 'excluding_tax',
-							),
-							'44566' => array(
-									'direction' => -1,
-									'source' => 'tax_amount',
-							),
-							'401' => array(
-									'direction' => 1,
-									'source' => 'tax_inclusive',
-							),
+			),
+			'phone' => array(
+					'626' => array(
+							'direction' => -1,
+							'source' => 'excluding_tax',
 					),
-					'expense/gift' => array(
-							'6234' => array(
-									'direction' => -1,
-									'source' => 'excluding_tax',
-							),
-							'44566' => array(
-									'direction' => -1,
-									'source' => 'tax_amount',
-							),
-							'401' => array(
-									'direction' => 1,
-									'source' => 'tax_inclusive',
-							),
+					'44566' => array(
+							'direction' => -1,
+							'source' => 'tax_amount',
 					),
-					'expense/miscellaneous' => array(
-							'6185' => array(
-									'direction' => -1,
-									'source' => 'excluding_tax',
-							),
-							'44566' => array(
-									'direction' => -1,
-									'source' => 'tax_amount',
-							),
-							'401' => array(
-									'direction' => 1,
-									'source' => 'tax_inclusive',
-							),
+					'401' => array(
+							'direction' => 1,
+							'source' => 'tax_inclusive',
 					),
-			)
+			),
+			'mail' => array(
+					'626' => array(
+							'direction' => -1,
+							'source' => 'excluding_tax',
+					),
+					'44566' => array(
+							'direction' => -1,
+							'source' => 'tax_amount',
+					),
+					'401' => array(
+							'direction' => 1,
+							'source' => 'tax_inclusive',
+					),
+			),
+			'office' => array(
+					'6063' => array(
+							'direction' => -1,
+							'source' => 'excluding_tax',
+					),
+					'44566' => array(
+							'direction' => -1,
+							'source' => 'tax_amount',
+					),
+					'401' => array(
+							'direction' => 1,
+							'source' => 'tax_inclusive',
+					),
+			),
+			'library' => array(
+					'6181' => array(
+							'direction' => -1,
+							'source' => 'excluding_tax',
+					),
+					'44566' => array(
+							'direction' => -1,
+							'source' => 'tax_amount',
+					),
+					'401' => array(
+							'direction' => 1,
+							'source' => 'tax_inclusive',
+					),
+			),
+			'invitation' => array(
+					'6234' => array(
+							'direction' => -1,
+							'source' => 'excluding_tax',
+					),
+					'44566' => array(
+							'direction' => -1,
+							'source' => 'tax_amount',
+					),
+					'401' => array(
+							'direction' => 1,
+							'source' => 'tax_inclusive',
+					),
+			),
+			'gift' => array(
+					'6234' => array(
+							'direction' => -1,
+							'source' => 'excluding_tax',
+					),
+					'44566' => array(
+							'direction' => -1,
+							'source' => 'tax_amount',
+					),
+					'401' => array(
+							'direction' => 1,
+							'source' => 'tax_inclusive',
+					),
+			),
+			'miscellaneous' => array(
+					'6185' => array(
+							'direction' => -1,
+							'source' => 'excluding_tax',
+					),
+					'44566' => array(
+							'direction' => -1,
+							'source' => 'tax_amount',
+					),
+					'401' => array(
+							'direction' => 1,
+							'source' => 'tax_inclusive',
+					),
+			),
 	),
 
 	'journal/index' => array(

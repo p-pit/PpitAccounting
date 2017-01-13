@@ -3,6 +3,7 @@ namespace PpitAccounting\Controller;
 
 use DOMPDFModule\View\Model\PdfModel;
 use PpitAccounting\Model\Account;
+use PpitAccounting\Model\AccountingYear;
 use PpitAccounting\Model\Assessment;
 use PpitAccounting\Model\Balance;
 use PpitAccounting\Model\IncomeStatement;
@@ -23,7 +24,7 @@ class AccountController extends AbstractActionController
 		$context = Context::getCurrent();
 
     	$year = $this->params()->fromQuery('year', date('Y'));
-    	$account = $this->params()->fromQuery('account', date('Y'));
+    	$account = $this->params()->fromQuery('account');
     	$account = new Account($year, $account);
 		$view = new ViewModel(array(
 				'context' => $context,
@@ -37,14 +38,15 @@ class AccountController extends AbstractActionController
 	{
 		// Retrieve the context
 		$context = Context::getCurrent();
-
-    	$year = $this->params()->fromQuery('year', date('Y'));
+		$accountingYear = AccountingYear::getCurrent();
+		$year = $this->params()->fromQuery('year', $accountingYear->year);
     	$month = $this->params()->fromQuery('month', null);
     	$includes_closing = $this->params()->fromQuery('includes_closing', false);
     	$balance = new Balance($year, $month, $includes_closing);
 		$view = new ViewModel(array(
 				'context' => $context,
 				'config' => $context->getconfig(),
+				'year' => $year,
 				'balance' => $balance,
 		));
 		return $view;
@@ -54,8 +56,8 @@ class AccountController extends AbstractActionController
 	{
 		// Retrieve the context
 		$context = Context::getCurrent();
-	
-		$year = $this->params()->fromQuery('year', date('Y'));
+		$accountingYear = AccountingYear::getCurrent();
+		$year = $this->params()->fromQuery('year', $accountingYear->year);
 		$month = $this->params()->fromQuery('month', null);
 		$includes_closing = $this->params()->fromQuery('includes_closing', false);
 		$balance = new Balance($year, $month, $includes_closing);
