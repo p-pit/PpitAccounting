@@ -114,8 +114,7 @@ class AccountController extends AbstractActionController
 
     	$params = array();
     	$params['year'] = $year;
-    	$params['journal_code'] = $journal_code;
-    	$rows = Journal::getList($params, 'sequence', 'DESC');
+    	$rows = Journal::getList($journal_code, $params, 'sequence', 'DESC');
     	$view = new ViewModel(array(
     			'context' => $context,
 				'config' => $context->getconfig(),

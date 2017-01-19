@@ -50,6 +50,7 @@ class Journal implements InputFilterAwareInterface
     public $rows = array();
     public $availableBankJournalEntries;
     public $bank_journal_reference;
+    public $bank_journal_entry;
     public $properties;
     
     protected $inputFilter;
@@ -120,13 +121,14 @@ class Journal implements InputFilterAwareInterface
     	return $entries;
     }
 
-    public static function getList($params, $major, $dir, $mode = 'todo')
+    public static function getList($journal_code, $params, $major, $dir, $mode = 'todo')
     {
     	$select = Journal::getTable()->getSelect()
     		->order(array($major.' '.$dir, 'sequence DESC', 'id'));
     	 
     	$where = new Where;
-    	
+    	$where->equalTo('journal_code', $journal_code);
+
     	// Todo list vs search modes
     	if ($mode == 'todo') {
 			$accountingYear = AccountingYear::getCurrent();
@@ -160,6 +162,29 @@ class Journal implements InputFilterAwareInterface
     	$entry = Journal::getTable()->get($id, $column);
     	if (!$entry) return null;
     	return $entry;
+    }
+    
+    public static function retrieve($id)
+    {
+    	$journal = Journal::getTable()->get($id);
+    	$select = Journal::getTable()->getSelect()->where(array('year' => $journal->year, 'sequence' => $journal->sequence));
+    	$cursor = Journal::getTable()->selectWith($select);
+    	$rows = array();
+    	foreach ($cursor as $entry) {
+    		if ($entry->journal_code == 'general') {
+	    		$row = array();
+	    		$row['account'] = $entry->account;
+	    		$row['direction'] = $entry->direction;
+	    		$row['amount'] = $entry->amount;
+	    		$rows[] = $row;
+    		}
+    		elseif ($entry->journal_code == 'bank') {
+    			$journal->bank_journal_reference = $entry->id;
+    			$journal->bank_journal_entry = $entry;
+    		}
+    	}
+    	$journal->rows = $rows;
+    	return $journal;
     }
     
     public static function instanciate()
@@ -206,24 +231,6 @@ class Journal implements InputFilterAwareInterface
 		return 'OK';
 	}
 
-	public function loadDataFromRequest($request) {
-		$data = array();
-		$data['operation_date'] = $request->getPost('operation_date');
-		$data['reference'] = $request->getPost('reference');
-		$data['caption'] = $request->getPost('caption');
-		$data['bank_journal_reference'] = $request->getPost('bank_journal_reference');
-		$data['rows'] = array();
-		for ($i = 0; $i < 10; $i++) {
-			$row = array();
-			$row['account'] = $request->getPost('account_'.$i);
-			$row['direction'] = $request->getPost('direction_'.$i);
-			$row['amount'] = $request->getPost('amount_'.$i);
-			$data['rows'][] = $row;
-		}
-		
-    	if ($this->loadData($data) != 'OK') throw new \Exception('Client error');
-	}
-
 	public function add()
 	{
 		$context = Context::getCurrent();
@@ -252,6 +259,40 @@ class Journal implements InputFilterAwareInterface
 		}
 	}
 
+	public function update($update_time)
+	{
+		$context = Context::getCurrent();
+		
+		// Delete the link from the bank journal to this entry
+		$journalEntry = Journal::getTable()->get($this->id);
+		if ($journalEntry->bank_journal_reference) {
+			$bankJournalEntry = Journal::getTable()->get($journalEntry->bank_journal_reference);
+			$bankJournalEntry->sequence = null;
+			Journal::getTable()->save($bankJournalEntry);
+		}
+
+		Journal::getTable()->multipleDelete(array('journal_code' => 'general', 'year' => $this->year, 'sequence' => $this->sequence));
+		
+		$this->accounting_date = date('Y-m-d');
+		$this->currency = 'EUR';
+		foreach ($this->rows as $row) {
+			if ($row['account']) {
+				$this->id = 0;
+				$this->account = $row['account'];
+				$this->direction = $row['direction'];
+				$this->amount = $row['amount'];
+				Journal::getTable()->save($this);
+			}
+		}
+	
+		// Add the link from the bank journal to this entry
+		if ($this->bank_journal_reference) {
+			$bankJournalEntry = Journal::getTable()->get($this->bank_journal_reference);
+			$bankJournalEntry->sequence = $this->sequence;
+			Journal::getTable()->save($bankJournalEntry);
+		}
+	}
+	
 	public function addBankStatementEntry()
 	{
 		$accountingYear = AccountingYear::getCurrent();

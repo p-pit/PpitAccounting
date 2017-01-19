@@ -2,7 +2,7 @@
 	<div class="panel-heading" style="background:  <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
 		<strong>
 			<?php 
-			$title = $context->getInstance()->specifications['ppitAccounting']['journal/search']['title']['fr_FR'];
+			$title = $context->getConfig('journal/search')['title']['fr_FR'];
 			echo $title;
 			?>
 			(<span id="mode-text"></span>)
@@ -21,8 +21,8 @@
 			</div>
 		</div>
 		
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['main'] as $propertyId => $rendering) : ?>
-	<?php $label = $context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['labels'][$context->getLocale()] ?>
+<?php foreach ($context->getConfig('journal/search')['main'] as $propertyId => $rendering) : ?>
+	<?php $label = $context->getConfig('journal_properties')[$propertyId]['labels'][$context->getLocale()] ?>
 	
 	<?php if ($rendering == 'contains') : ?>
 		<div class="form-group">
@@ -52,7 +52,7 @@
 
 		<?php
 		$modalities = array();
-		foreach ($context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['modalities'] as $modalityId => $modality) {
+		foreach ($context->getConfig('journal_properties')[$propertyId]['modalities'] as $modalityId => $modality) {
 			$modalities[$modalityId] = $modality[$context->getLocale()];
 		} 
 		?>
@@ -74,8 +74,8 @@
 		<div><a id="add-criteria" href="#"><?php echo $this->translate('More criteria', 'ppit-core', $context->getLocale())?></a></div>
 		<div id="search-area">
 		
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['more'] as $propertyId => $rendering) : ?>
-	<?php $label = $context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['labels'][$context->getLocale()] ?>
+<?php foreach ($context->getConfig('journal/search')['more'] as $propertyId => $rendering) : ?>
+	<?php $label = $context->getConfig('journal_properties')[$propertyId]['labels'][$context->getLocale()] ?>
 	
 	<?php if ($rendering == 'contains') : ?>
 			<div class="form-group">
@@ -105,7 +105,7 @@
 
 		<?php
 		$modalities = array();
-		foreach ($context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['modalities'] as $modalityId => $modality) {
+		foreach ($context->getConfig('journal_properties')[$propertyId]['modalities'] as $modalityId => $modality) {
 			$modalities[$modalityId] = $modality[$context->getLocale()];
 		} 
 		?>

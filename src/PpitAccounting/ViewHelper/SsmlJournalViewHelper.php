@@ -27,7 +27,7 @@ class SsmlJournalViewHelper
 		$i = 0;
 		$colNames = array(1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E', 6 => 'F', 7 => 'G', 8 => 'H', 9 => 'I', 10 => 'J');
 		
-		foreach($context->getInstance()->specifications['ppitAccounting']['journal_properties'] as $propertyId => $property) {
+		foreach($context->getConfig('journal_properties') as $propertyId => $property) {
 			$i++;
 			$sheet->setCellValue($colNames[$i].'1', $property['labels'][$context->getLocale()]);
 		}
@@ -36,7 +36,7 @@ class SsmlJournalViewHelper
 		foreach ($view->entries as $entry) {
 			$j++;
 			$i = 0;
-			foreach($context->getInstance()->specifications['ppitAccounting']['journal_properties'] as $propertyId => $property) {
+			foreach($context->getConfig('journal_properties') as $propertyId => $property) {
 				$i++;
 				if ($property['type'] == 'date') $sheet->setCellValue($colNames[$i].$j, $context->decodeDate($entry->properties[$propertyId]));
 				elseif ($property['type'] == 'number') $sheet->setCellValue($colNames[$i].$j, $context->formatFloat($entry->properties[$propertyId], 2));
@@ -44,7 +44,7 @@ class SsmlJournalViewHelper
 			}
 		}
 		$i = 0;
-		foreach($context->getInstance()->specifications['ppitAccounting']['journal_properties'] as $propertyId => $property) {
+		foreach($context->getConfig('journal_properties') as $propertyId => $property) {
 			$i++;
 			$sheet->getColumnDimension($colNames[$i])->setAutoSize(true);
 		}

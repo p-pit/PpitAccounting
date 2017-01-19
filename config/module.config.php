@@ -682,6 +682,17 @@ return array(
 									'fr_FR' => 'Dépenses',
 							),
 					),
+					'bank-statement' => array(
+							'action' => 'Journal',
+							'route' => 'journal/bankStatement',
+							'params' => array(),
+							'urlParams' => array(),
+							'glyphicon' => 'glyphicon-ok',
+							'label' => array(
+									'en_US' => 'Bank statement',
+									'fr_FR' => 'Relevé bancaire',
+							),
+					),
 					'journal' => array(
 							'action' => 'Journal',
 							'route' => 'journal/index',
@@ -698,9 +709,10 @@ return array(
 							'route' => 'account/balance',
 							'params' => array(),
 							'urlParams' => array(),
+							'glyphicon' => 'glyphicon-book',
 							'label' => array(
-									'en_US' => 'Balance',
-									'fr_FR' => 'Balance',
+									'en_US' => 'General ledger',
+									'fr_FR' => 'Grand livre',
 							),
 					),
 			),
@@ -837,5 +849,157 @@ return array(
 
 	'journal/index' => array(
 			'title' => array('en_US' => 'P-PIT Accounting', 'fr_FR' => 'P-PIT Finances'),
+	),
+	'journal_statuses' => array(),
+	'journal_actions' => array(),
+	'journal_properties' => array(
+			'year' => array(
+					'type' => 'select',
+					'modalities' => array(
+							'2015' => array(
+									'en_US' => '2015',
+									'fr_FR' => '2015',
+							),
+							'2016' => array(
+									'en_US' => '2016',
+									'fr_FR' => '2016',
+							),
+					),
+					'labels' => array(
+							'en_US' => 'Year',
+							'fr_FR' => 'Année',
+					),
+			),
+			'journal_code' => array(
+					'type' => 'select',
+					'modalities' => array(
+							'general' => array(
+									'en_US' => 'General',
+									'fr_FR' => 'Général',
+							),
+							'bank' => array(
+									'en_US' => 'Bank',
+									'fr_FR' => 'Banque',
+							),
+							'closing' => array(
+									'en_US' => 'Closing',
+									'fr_FR' => 'Clôture',
+							),
+					),
+					'labels' => array(
+							'en_US' => 'Journal',
+							'fr_FR' => 'Journal',
+					),
+			),
+			'operation_date' => array(
+					'type' => 'date',
+					'labels' => array(
+							'en_US' => 'Operation date',
+							'fr_FR' => 'Date d\'opération',
+					),
+			),
+			'accounting_date' => array(
+					'type' => 'date',
+					'labels' => array(
+							'en_US' => 'Accounting date',
+							'fr_FR' => 'Date comptable',
+					),
+			),
+			'reference' => array(
+					'type' => 'input',
+					'labels' => array(
+							'en_US' => 'Reference',
+							'fr_FR' => 'Référence',
+					),
+			),
+			'caption' => array(
+					'type' => 'input',
+					'labels' => array(
+							'en_US' => 'Caption',
+							'fr_FR' => 'Libellé',
+					),
+			),
+			'direction' => array(
+					'type' => 'select',
+					'modalities' => array(
+							'-1' => array(
+									'en_US' => 'Debit',
+									'fr_FR' => 'Débit',
+							),
+							'1' => array(
+									'en_US' => 'Credit',
+									'fr_FR' => 'Crédit',
+							),
+					),
+					'labels' => array(
+							'en_US' => 'Direction',
+							'fr_FR' => 'Sens',
+					),
+			),
+			'amount' => array(
+					'type' => 'number',
+					'labels' => array(
+							'en_US' => 'Amount',
+							'fr_FR' => 'Montant',
+					),
+			),
+			'account' => array(
+					'type' => 'select',
+					'modalities' => array(),
+					'labels' => array(
+							'en_US' => 'Account',
+							'fr_FR' => 'Compte',
+					),
+			),
+	),
+	'journal/search' => array(
+			'title' => array('en_US' => 'Operations', 'fr_FR' => 'Opérations'),
+			'todoTitle' => array('en_US' => 'current', 'fr_FR' => 'en cours'),
+			'searchTitle' => array('en_US' => 'current', 'fr_FR' => 'recherche'),
+			'main' => array(
+					'year' => 'select',
+					'account' => 'range',
+			),
+			'more' => array(
+					'operation_date' => 'range',
+					'accounting_date' => 'range',
+					'reference' => 'contains',
+					'caption' => 'contains',
+					'direction' => 'select',
+					'amount' => 'range',
+			),
+	),
+	'journal/list' => array(
+			'account' => 'text',
+			'operation_date' => 'text',
+			'direction' => 'text',
+			'amount' => 'text',
+	),
+	'journal/detail' => array(
+			'title' => array('en_US' => 'Student sheet:', 'fr_FR' => 'Opération'),
+			'displayAudit' => false,
+	),
+	'schemas' => array(
+			'prestation' => array(
+					'labels' => array(
+							'en_US' => 'Prestation',
+							'fr_FR' => 'Prestation',
+					),
+					'amounts' => array(
+							'tax_excluded_amount' => array(
+									'en_US' => 'Tax excluded amount',
+									'fr_FR' => 'Montant HT',
+							),
+							'tax_amount' => array(
+									'en_US' => 'Tax amount',
+									'fr_FR' => 'Montant TVA',
+							),
+					),
+					'ventilation' => array(
+							'706' => array('C', 'tax_excluded_amount'),
+							'44571' => array('C', 'tax_amount'),
+							'411' => array('D', 'tax_excluded_amount', 'tax_amount'),
+					),
+			),
 	),
 );

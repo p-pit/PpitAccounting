@@ -38,7 +38,7 @@ class JournalController extends AbstractActionController
     	// Retrieve the query parameters
     	$filters = array();
 
-    	foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['main'] as $propertyId => $rendering) {
+    	foreach ($context->getConfig('journal/search')['main'] as $propertyId => $rendering) {
     
     		$property = ($params()->fromQuery($propertyId, null));
     		if ($property) $filters[$propertyId] = $property;
@@ -48,7 +48,7 @@ class JournalController extends AbstractActionController
     		if ($max_property) $filters['max_'.$propertyId] = $max_property;
     	}
 
-    	foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['more'] as $propertyId => $rendering) {
+    	foreach ($context->getConfig('journal/search')['more'] as $propertyId => $rendering) {
     	
     		$property = ($params()->fromQuery($propertyId, null));
     		if ($property) $filters[$propertyId] = $property;
@@ -79,17 +79,17 @@ class JournalController extends AbstractActionController
     {
     	// Retrieve the context
     	$context = Context::getCurrent();
-    
+
     	$params = $this->getFilters($this->params());
-    
+
     	$major = ($this->params()->fromQuery('major', 'sequence'));
     	$dir = ($this->params()->fromQuery('dir', 'DESC'));
-    
+
     	if (count($params) == 0) $mode = 'todo'; else $mode = 'search';
-    
+
     	// Retrieve the list
-    	$entries = Journal::getList($params, $major, $dir, $mode);
-    	
+    	$entries = Journal::getList('general', $params, $major, $dir, $mode);
+
     	// Return the link list
     	$view = new ViewModel(array(
     			'context' => $context,
@@ -174,12 +174,13 @@ class JournalController extends AbstractActionController
 	{
 		// Retrieve the context
 		$context = Context::getCurrent();
-	
+
 		// Retrieve the book entry
 		$id = (int) $this->params()->fromRoute('id', 0);
-/*		if ($id) $instance = Instance::getTable()->get($id);
-		else */ $journal = new Journal;
+		if ($id) $journal = Journal::retrieve($id);
+		else $journal = new Journal;
 		$journal->availableBankJournalEntries = Journal::getAvailableBankJournalEntries();
+		$journal->availableBankJournalEntries[] = $journal->bank_journal_entry;
 		
 		// Instanciate the csrf form
 		$csrfForm = new CsrfForm();
@@ -188,14 +189,26 @@ class JournalController extends AbstractActionController
 		$error = null;
 		$request = $this->getRequest();
 		if ($request->isPost()) {
-	
+
 			$csrfForm->setInputFilter((new Csrf('csrf'))->getInputFilter());
 			$csrfForm->setData($request->getPost());
 	
 			if ($csrfForm->isValid()) { // CSRF check
-	
-				$journal->loadDataFromRequest($request);
-	
+				$data = array();
+				$data['operation_date'] = $request->getPost('operation_date');
+				$data['reference'] = $request->getPost('reference');
+				$data['caption'] = $request->getPost('caption');
+				$data['bank_journal_reference'] = $request->getPost('bank_journal_reference');
+				$data['rows'] = array();
+				for ($i = 0; $i < 10; $i++) {
+					$row = array();
+					$row['account'] = $request->getPost('account_'.$i);
+					$row['direction'] = $request->getPost('direction_'.$i);
+					$row['amount'] = $request->getPost('amount_'.$i);
+					$data['rows'][] = $row;
+				}
+				if ($journal->loadData($data) != 'OK') throw new \Exception('Client error');
+
 				// Atomically save
 				try {
 					$connection = Journal::getTable()->getAdapter()->getDriver()->getConnection();
@@ -223,59 +236,6 @@ class JournalController extends AbstractActionController
 		$view->setTerminal(true);
 		return $view;
 	}
-
-	public function updateOldAction()
-	{
-		// Retrieve the context
-		$context = Context::getCurrent();
-	
-		// Retrieve the book entry
-		$id = (int) $this->params()->fromRoute('id', 0);
-		/*		if ($id) $instance = Instance::getTable()->get($id);
-			else */ $journal = new Journal;
-		$journal->availableBankJournalEntries = Journal::getAvailableBankJournalEntries();
-	
-		// Instanciate the csrf form
-		$csrfForm = new CsrfForm();
-		$csrfForm->addCsrfElement('csrf');
-		$message = null;
-		$error = null;
-		$request = $this->getRequest();
-		if ($request->isPost()) {
-	
-			$csrfForm->setInputFilter((new Csrf('csrf'))->getInputFilter());
-			$csrfForm->setData($request->getPost());
-	
-			if ($csrfForm->isValid()) { // CSRF check
-	
-				$journal->loadDataFromRequest($request);
-	
-				// Atomically save
-				try {
-					$connection = Journal::getTable()->getAdapter()->getDriver()->getConnection();
-					$connection->beginTransaction();
-					if ($journal->id) $journal->update($request->getPost('update_time'));
-					else $journal->add();
-					$connection->commit();
-					$message = 'OK';
-				}
-				catch (Exception $e) {
-					$connection->rollback();
-					throw $e;
-				}
-			}
-		}
-		$view = new ViewModel(array(
-				'context' => $context,
-				'config' => $context->getconfig(),
-				'journal' => $journal,
-				'id' => $id,
-				'csrfForm' => $csrfForm,
-				'message' => $message,
-				'error' => $error,
-		));
-		return $view;
-	}
 	
 	public function bankStatementAction()
 	{
@@ -298,9 +258,19 @@ class JournalController extends AbstractActionController
 			$csrfForm->setData($request->getPost());
 	
 			if ($csrfForm->isValid()) { // CSRF check
-	
-				$journal->loadDataFromRequest($request);
-	
+				$data = array();
+				$data['operation_date'] = $request->getPost('operation_date');
+				$data['reference'] = $request->getPost('reference');
+				$data['caption'] = $request->getPost('caption');
+				$data['bank_journal_reference'] = $request->getPost('bank_journal_reference');
+				$data['rows'] = array();
+				$row = array();
+				$row['account'] = $request->getPost('account_0');
+				$row['direction'] = $request->getPost('direction_0');
+				$row['amount'] = $request->getPost('amount_0');
+				$data['rows'][] = $row;
+				if ($journal->loadData($data) != 'OK') throw new \Exception('Client error');
+				
 				// Atomically save
 				try {
 					$connection = Journal::getTable()->getAdapter()->getDriver()->getConnection();
@@ -364,27 +334,4 @@ class JournalController extends AbstractActionController
 			throw $e;
 		}
 	}
-/*	
-	public function exportAction()
-    {
-    	// Retrieve the current user
-    	$context = Context::getCurrent();
-
-    	$year = $this->params()->fromQuery('year', date('Y'));
-    	$journal_code = $this->params()->fromQuery('journal_code', 'general');
-
-    	$params = array();
-    	$params['year'] = $year;
-    	$params['journal_code'] = $journal_code;
-    	$rows = Journal::getList($params, 'sequence', 'DESC');
-    	$view = new ViewModel(array(
-    			'context' => $context,
-				'config' => $context->getconfig(),
-    			'year' => $year,
-    			'journal_code' => $journal_code,
-    			'rows' => $rows,
-    	));
-    	$view->setTerminal(true);
-    	return $view;
-    }*/
 }

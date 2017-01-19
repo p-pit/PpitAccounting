@@ -2,9 +2,9 @@
 	<tr>
 		<th>&nbsp;</th>
 
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/list'] as $propertyId => $rendering) : ?>
+<?php foreach ($context->getConfig('journal/list') as $propertyId => $rendering) : ?>
 		<th align="center">
-	<?php $label = $context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['labels'][$context->getLocale()] ?>
+	<?php $label = $context->getConfig('journal_properties')[$propertyId]['labels'][$context->getLocale()] ?>
 	<?php if ($label) : ?>
 			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="<?php echo $propertyId ?>-anchor">
 				<span><?php echo $label ?></span>
@@ -45,9 +45,9 @@ foreach ($entries as $entry) if ($entry->direction == -1) $income -= $entry->amo
 			</button>
 		</td>
 
-	<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/list'] as $propertyId => $rendering) : ?>
+	<?php foreach ($context->getConfig('journal/list') as $propertyId => $rendering) : ?>
 		
-		<?php $property = $context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId] ?>
+		<?php $property = $context->getConfig('journal_properties')[$propertyId] ?>
 
 		<?php if ($propertyId == 'account') : ?>
 		<?php $accountCaption = $config['ppitAccountingSettings']['accounts'][$entry->account]['caption'] ?>

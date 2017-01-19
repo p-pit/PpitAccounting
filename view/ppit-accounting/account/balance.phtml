@@ -61,7 +61,7 @@ echo $this->partial('/partials/header');
 	    <div class="col-md-12">
 	
 			<div class="panel panel-default">
-				<div class="panel-heading">
+				<div class="panel-heading" style="background: <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
 					<strong><?php echo $this->translate('Account balance', 'ppit-accounting', $context->getLocale());?> -
 				</div>
 				<div class="panel-body">

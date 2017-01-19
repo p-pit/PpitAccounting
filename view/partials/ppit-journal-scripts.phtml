@@ -12,10 +12,10 @@ function getParams() {
 	// Create a new FormData object.
 	var params = '?', todo = true;
 
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['main'] as $propertyId => $rendering) : ?>
+<?php foreach ($context->getConfig('journal/search')['main'] as $propertyId => $rendering) : ?>
 
 	<?php if ($rendering == 'range') : ?>
-		<?php $property = $context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId] ?>
+		<?php $property = $context->getConfig('journal_properties')[$propertyId] ?>
 	
 	var min_<?php echo $propertyId ?> = document.getElementById('search_min_<?php echo $propertyId ?>').value;
 	var max_<?php echo $propertyId ?> = document.getElementById('search_max_<?php echo $propertyId ?>').value;
@@ -45,10 +45,10 @@ function getParams() {
 
 <?php endforeach;?>
 
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['more'] as $propertyId => $rendering) : ?>
+<?php foreach ($context->getConfig('journal/search')['more'] as $propertyId => $rendering) : ?>
 
 	<?php if ($rendering == 'range') : ?>
-		<?php $property = $context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId] ?>
+		<?php $property = $context->getConfig('journal_properties')[$propertyId] ?>
 	
 	var min_<?php echo $propertyId ?> = document.getElementById('search_min_<?php echo $propertyId ?>').value;
 	var max_<?php echo $propertyId ?> = document.getElementById('search_max_<?php echo $propertyId ?>').value;
@@ -79,8 +79,8 @@ function getParams() {
 <?php endforeach;?>
 
 	<?php
-	$todoTitle = $context->getInstance()->specifications['ppitAccounting']['journal/search']['todoTitle']['fr_FR'];
-	$searchTitle = $context->getInstance()->specifications['ppitAccounting']['journal/search']['searchTitle']['fr_FR'];
+	$todoTitle = $context->getConfig('journal/search')['todoTitle']['fr_FR'];
+	$searchTitle = $context->getConfig('journal/search')['searchTitle']['fr_FR'];
 	?>
 	$('#mode-text').text((todo) ? '<?php echo $todoTitle ?>' : '<?php echo $searchTitle ?>');
 
@@ -96,7 +96,7 @@ function exportJournalList() {
 
 function eraseJournalSearch() {
 
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['main'] as $propertyId => $rendering) : ?>
+<?php foreach ($context->getConfig('journal/search')['main'] as $propertyId => $rendering) : ?>
 
 	<?php if ($rendering == 'range') : ?>
 	$('#search_min_<?php echo $propertyId ?>').val('');
@@ -109,7 +109,7 @@ function eraseJournalSearch() {
 
 <?php endforeach;?>
 
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['more'] as $propertyId => $rendering) : ?>
+<?php foreach ($context->getConfig('journal/search')['more'] as $propertyId => $rendering) : ?>
 
 	<?php if ($rendering == 'range') : ?>
 	$('#search_min_<?php echo $propertyId ?>').val('');
@@ -160,13 +160,13 @@ function connectJournalSearchInputs() {
 	$('#erase-button').unbind();
 	$('#erase-button').click(function () { eraseJournalSearch(); });
 
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['main'] as $propertyId => $rendering) : ?>
+<?php foreach ($context->getConfig('journal/search')['main'] as $propertyId => $rendering) : ?>
 
 	<?php if ($rendering == 'range') : ?>
 	$('#search_min_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
 	$('#search_max_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
 
-		<?php if ($context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['type'] == 'date') : ?>
+		<?php if ($context->getConfig('journal_properties')[$propertyId]['type'] == 'date') : ?>
 	$("#search_min_<?php echo $propertyId ?>").datepicker();
 	$("#search_max_<?php echo $propertyId ?>").datepicker();
 	$('#search_min_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
@@ -179,7 +179,7 @@ function connectJournalSearchInputs() {
 	<?php else : ?>
 		$('#search_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
 
-		<?php if ($context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['type'] == 'date') : ?>
+		<?php if ($context->getConfig('journal_properties')[$propertyId]['type'] == 'date') : ?>
 	$("#search_<?php echo $propertyId ?>").datepicker();
 	$('#search_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
 		<?php endif;?>
@@ -188,13 +188,13 @@ function connectJournalSearchInputs() {
 
 <?php endforeach;?>
 
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal/search']['more'] as $propertyId => $rendering) : ?>
+<?php foreach ($context->getConfig('journal/search')['more'] as $propertyId => $rendering) : ?>
 
 	<?php if ($rendering == 'range') : ?>
 	$('#search_min_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
 	$('#search_max_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
 
-		<?php if ($context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['type'] == 'date') : ?>
+		<?php if ($context->getConfig('journal_properties')[$propertyId]['type'] == 'date') : ?>
 	$("#search_min_<?php echo $propertyId ?>").datepicker();
 	$("#search_max_<?php echo $propertyId ?>").datepicker();
 	$('#search_min_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
@@ -207,7 +207,7 @@ function connectJournalSearchInputs() {
 	<?php else : ?>
 		$('#search_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
 
-		<?php if ($context->getInstance()->specifications['ppitAccounting']['journal_properties'][$propertyId]['type'] == 'date') : ?>
+		<?php if ($context->getConfig('journal_properties')[$propertyId]['type'] == 'date') : ?>
 	$("#search_<?php echo $propertyId ?>").datepicker();
 	$('#search_<?php echo $propertyId ?>').change(function () { filterJournalList(); });
 		<?php endif;?>
@@ -271,7 +271,7 @@ function connectAuditPanel()
 
 function connectJournalUpdateForm(id, action)
 {
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal_properties'] as $propertyId => $property) : ?>
+<?php foreach ($context->getConfig('journal_properties') as $propertyId => $property) : ?>
 	<?php if ($property['type'] == 'date') : ?>
 		$('#input_<?php echo $propertyId ?>').datepicker();
 	<?php endif;?>
@@ -291,7 +291,7 @@ function connectJournalUpdateForm(id, action)
 			var formData = new FormData();
 			
 			// Get the properties values
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal_properties'] as $propertyId => $property) : ?>
+<?php foreach ($context->getConfig('journal_properties') as $propertyId => $property) : ?>
 
 	<?php if ($property['type'] == 'input' || $property['type'] == 'date' || $property['type'] == 'textarea' || $property['type'] == 'select' || $property['type'] == 'number' || $property['type'] == 'email' || $property['type'] == 'phone' || $property['type'] == 'hidden') : ?>
 				formData.append('<?php echo $propertyId ?>', document.getElementById('<?php echo $propertyId ?>').value);
@@ -486,7 +486,7 @@ function getJournalDetail(id) {
 			connectRemoveIcon('remove-anchor', 'form_action');
 			getBankList();
 			getJournalUpdate(id);
-<?php foreach ($context->getInstance()->specifications['ppitAccounting']['journal_actions'] as $actionId => $action) : ?>
+<?php foreach ($context->getConfig('journal_actions') as $actionId => $action) : ?>
 			if (id) $('#<?php echo $actionId ?>-anchor').click(function () { connectJournalAnchors(type, id, '<?php echo $actionId ?>'); });
 <?php endforeach;?>
 	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
@@ -511,7 +511,7 @@ function activateJournal() {
 	$(journalAnchor).removeClass("btn-default").addClass("btn-primary");
 
 	<?php
-	$todoTitle = $context->getInstance()->specifications['ppitAccounting']['journal/search']['todoTitle']['fr_FR'];
+	$todoTitle = $context->getConfig('journal/search')['todoTitle']['fr_FR'];
 	?>
 	$('#mode-text').text('<?php echo $todoTitle ?>');
 		
