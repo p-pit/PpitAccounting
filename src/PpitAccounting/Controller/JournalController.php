@@ -180,7 +180,7 @@ class JournalController extends AbstractActionController
 		if ($id) $journal = Journal::retrieve($id);
 		else $journal = new Journal;
 		$journal->availableBankJournalEntries = Journal::getAvailableBankJournalEntries();
-		$journal->availableBankJournalEntries[] = $journal->bank_journal_entry;
+		if ($journal->bank_journal_entry) $journal->availableBankJournalEntries[] = $journal->bank_journal_entry;
 		
 		// Instanciate the csrf form
 		$csrfForm = new CsrfForm();
