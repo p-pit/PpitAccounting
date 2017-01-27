@@ -529,7 +529,7 @@ class Journal implements InputFilterAwareInterface
 
     	$select = Journal::getTable()->getSelect()->where(array('journal_code' => 'general', 'year' => $year, 'account' => $account))->order(array('operation_date'));
     	$cursor = Journal::getTable()->selectWith($select);
-		$datetime1 = strtotime('01/01/'.'2014');
+		$datetime1 = strtotime('01/01/'.$year);
 		$sum = 0;
 		$interval = 0;
     	foreach ($cursor as $operation) {
