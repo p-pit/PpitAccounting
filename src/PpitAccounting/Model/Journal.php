@@ -522,6 +522,58 @@ class Journal implements InputFilterAwareInterface
     	return 'OK';
     }
 
+    public static function computeInterests($year, $account)
+    {
+    	$context = Context::getCurrent();
+    	Journal::getTable()->multipleDelete(array('journal_code' => 'general', 'year' => $year, 'reference' => $context->getConfig('journal/legalInterest')[$context->getLocale()]));
+
+    	$select = Journal::getTable()->getSelect()->where(array('journal_code' => 'general', 'year' => $year, 'account' => $account))->order(array('operation_date'));
+    	$cursor = Journal::getTable()->selectWith($select);
+		$datetime1 = strtotime('01/01/'.'2014');
+		$sum = 0;
+		$interval = 0;
+    	foreach ($cursor as $operation) {
+    		if ($operation->direction == 1) $sum += $operation->amount;
+    		else $sum -= $operation->amount;
+			
+    		$datetime2 = strtotime(substr($operation->operation_date, 5, 2).'/'.substr($operation->operation_date, 8, 2).'/'.substr($operation->operation_date, 0, 4));
+			$interval = round(($datetime2 - $datetime1) / 86400, 0);
+			if ($sum > 0 && $interval > 0) {
+
+				$journalEntry = Journal::instanciate();
+				$data = array();
+				$data['operation_date'] = $operation->operation_date;
+				$data['reference'] = $context->getConfig('journal/legalInterest')[$context->getLocale()];
+				$data['caption'] = $operation->operation_date.': '.$sum.' * '.($context->getConfig('journal/legalInterest')['rate']*100).' % * '.$interval.' / 365';
+				$data['rows'] = array();
+				$amount = round($sum * $context->getConfig('journal/legalInterest')['rate'] * $interval / 365, 2);
+				
+				$row = array();
+				$row['account'] = '455';
+				$row['direction'] = 1;
+				$row['amount'] = $amount;
+				$data['rows'][] = $row;
+
+				$row = array();
+				$row['account'] = '6615';
+				$row['direction'] = -1;
+				$row['amount'] = $amount;
+				$data['rows'][] = $row;
+				
+				$journalEntry->loadData($data);
+				$journalEntry->add();
+			}
+
+			echo $sum.' - '.$interval." days ";
+			if ($interval > 0) echo $amount;
+			echo '<br>';
+
+			$datetime1 = $datetime2;
+    	}
+    	
+    	return 'OK';
+    }
+    
     public function setInputFilter(InputFilterInterface $inputFilter)
     {
         throw new \Exception("Not used");

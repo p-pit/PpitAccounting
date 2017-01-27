@@ -334,4 +334,24 @@ class JournalController extends AbstractActionController
 			throw $e;
 		}
 	}
+	
+	public function computeInterestsAction()
+	{
+    	// Retrieve the current user
+    	$context = Context::getCurrent();
+    	$year = $this->params()->fromQuery('year', date('Y'));
+    	$account = $this->params()->fromQuery('account');
+    	try {
+			$connection = Journal::getTable()->getAdapter()->getDriver()->getConnection();
+			$connection->beginTransaction();
+	    	if (Journal::computeInterests($year, $account) != 'OK') throw new \Exception('View error');
+			$connection->commit();
+			$message = 'OK';
+		}
+		catch (Exception $e) {
+			$connection->rollback();
+			throw $e;
+		}
+		return $this->response;
+	}
 }

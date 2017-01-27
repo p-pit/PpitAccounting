@@ -224,6 +224,15 @@ return array(
             							),
             					),
             			),
+            			'computeInterests' => array(
+            					'type' => 'segment',
+            					'options' => array(
+            							'route' => '/compute-interests',
+            							'defaults' => array(
+            									'action' => 'computeInterests',
+            							),
+            					),
+            			),
             			'export' => array(
             					'type' => 'segment',
             					'options' => array(
@@ -260,6 +269,7 @@ return array(
 				array('route' => 'journal/bankStatement', 'roles' => array('admin')),
 				array('route' => 'journal/nextStep', 'roles' => array('admin')),
             	array('route' => 'journal/previousStep', 'roles' => array('admin')),
+            	array('route' => 'journal/computeInterests', 'roles' => array('admin')),
 			)
 		)
 	),
@@ -307,6 +317,7 @@ return array(
 			6413 => array('caption' => 'Primes et gratifications', 'class' => 6),
 			6511 => array('caption' => 'Redevances pour concessions, brevets, licences, marques, procédés, logiciels', 'class' => 6),
 			658 => array('caption' => 'Charges diverses de gestion courante', 'class' => 6),
+			6615 => array('caption' => 'Intérêts des comptes courants et des dépôts créditeurs', 'class' => 6),
 			706 => array('caption' => 'Prestations de services', 'class' => 7),
 			758 => array('caption' => 'Produits divers de gestion courante', 'class' => 7),
 		),
@@ -468,6 +479,8 @@ return array(
 			65 => 6,
 			6511 => 65,
 			658 => 65,
+			66 => 6,
+			6615 => 66,
 			7 => null,
 			70 => 7,
 			706 => 70,
@@ -575,6 +588,7 @@ return array(
 			6413 => 1121,
 			6511 => 1112,
 			658 => 1151,
+			6615 => 2111,
 			63511 => 1131,
 			706 => 1211,
 			758 => 1212,
@@ -718,6 +732,12 @@ return array(
 			),
 	),
 		
+	'journal/legalInterest' => array(
+			'rate' => 0.0203,
+			'en_US' => 'Legal interests computation',
+			'fr_FR' => 'Calcul des intérêts légaux',
+	),
+							
 	'journal/accountingChart/expense' => array(
 			'transport' => array(
 					'6251' => array(
