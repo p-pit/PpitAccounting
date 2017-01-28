@@ -41,7 +41,7 @@ class Account
 		// Read the journal
     	$select = Journal::getTable()->getSelect()
     		->where(array('year' => $year, 'journal_code' => 'general', 'account' => $account))
-    		->order('sequence');
+    		->order(array('operation_date', 'sequence'));
     	$cursor = Journal::getTable()->selectWith($select);
     	$this->rows = array();
     	$this->debit_sum = 0;

@@ -544,9 +544,9 @@ class Journal implements InputFilterAwareInterface
 				$data = array();
 				$data['operation_date'] = $operation->operation_date;
 				$data['reference'] = $context->getConfig('journal/legalInterest')[$context->getLocale()];
-				$data['caption'] = $operation->operation_date.': '.$sum.' * '.($context->getConfig('journal/legalInterest')['rate']*100).' % * '.$interval.' / 365';
+				$data['caption'] = $operation->operation_date.': '.($sum - 10000).' * '.($context->getConfig('journal/legalInterest')['rate']*100).' % * '.$interval.' / 365';
 				$data['rows'] = array();
-				$amount = round($sum * $context->getConfig('journal/legalInterest')['rate'] * $interval / 365, 2);
+				$amount = round(($sum - 10000) * $context->getConfig('journal/legalInterest')['rate'] * $interval / 365, 2);
 				
 				$row = array();
 				$row['account'] = '455';
@@ -562,15 +562,49 @@ class Journal implements InputFilterAwareInterface
 				
 				$journalEntry->loadData($data);
 				$journalEntry->add();
-			}
 
-			echo $sum.' - '.$interval." days ";
-			if ($interval > 0) echo $amount;
-			echo '<br>';
+				echo $sum.' - '.$interval." days ";
+				if ($interval > 0) echo $amount;
+				echo '<br>';
+				
+				$sum += $amount;
+			}
 
 			$datetime1 = $datetime2;
     	}
+
+    	$datetime2 = strtotime('12/31/'.$year);
+    	$interval = round(($datetime2 - $datetime1) / 86400, 0);
+    	if ($sum > 0 && $interval > 0) {
     	
+    		$journalEntry = Journal::instanciate();
+    		$data = array();
+    		$data['operation_date'] = $year.'-12-31';
+    		$data['reference'] = $context->getConfig('journal/legalInterest')[$context->getLocale()];
+    		$data['caption'] = $year.'-12-31: '.($sum - 10000).' * '.($context->getConfig('journal/legalInterest')['rate']*100).' % * '.$interval.' / 365';
+    		$data['rows'] = array();
+    		$amount = round(($sum - 10000) * $context->getConfig('journal/legalInterest')['rate'] * $interval / 365, 2);
+    	
+    		$row = array();
+    		$row['account'] = '455';
+    		$row['direction'] = 1;
+    		$row['amount'] = $amount;
+    		$data['rows'][] = $row;
+    	
+    		$row = array();
+    		$row['account'] = '6615';
+    		$row['direction'] = -1;
+    		$row['amount'] = $amount;
+    		$data['rows'][] = $row;
+    	
+    		$journalEntry->loadData($data);
+    		$journalEntry->add();
+    	}
+    	
+    	echo $sum.' - '.$interval." days ";
+    	if ($interval > 0) echo $amount;
+    	echo '<br>';
+    	 
     	return 'OK';
     }
     
