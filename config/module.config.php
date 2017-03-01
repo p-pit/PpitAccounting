@@ -95,7 +95,7 @@ return array(
         						'index' => array(
         								'type' => 'segment',
         								'options' => array(
-        										'route' => '/index',
+        										'route' => '/index[/:journal_code]',
         										'defaults' => array(
         												'action' => 'index',
         										),
@@ -104,7 +104,7 @@ return array(
         						'search' => array(
         								'type' => 'segment',
         								'options' => array(
-        										'route' => '/search',
+        										'route' => '/search[/:journal_code]',
         										'defaults' => array(
         												'action' => 'search',
         										),
@@ -113,7 +113,7 @@ return array(
         						'list' => array(
         								'type' => 'segment',
         								'options' => array(
-        										'route' => '/list',
+        										'route' => '/list[/:journal_code]',
         										'defaults' => array(
         												'action' => 'list',
         										),
@@ -206,6 +206,18 @@ return array(
             							),
             					),
             			),
+            			'bankUpdate' => array(
+            					'type' => 'segment',
+            					'options' => array(
+            							'route' => '/bank-update[/:id][/:act]',
+            							'constraints' => array(
+            										'id'     => '[0-9]*',
+               							),
+            							'defaults' => array(
+            									'action' => 'bankUpdate',
+            							),
+            					),
+            			),
             			'nextStep' => array(
             					'type' => 'segment',
             					'options' => array(
@@ -267,6 +279,7 @@ return array(
 				array('route' => 'journal/delete', 'roles' => array('admin')),
 				array('route' => 'journal/bankList', 'roles' => array('admin')),
 				array('route' => 'journal/bankStatement', 'roles' => array('admin')),
+				array('route' => 'journal/bankUpdate', 'roles' => array('admin')),
 				array('route' => 'journal/nextStep', 'roles' => array('admin')),
             	array('route' => 'journal/previousStep', 'roles' => array('admin')),
             	array('route' => 'journal/computeInterests', 'roles' => array('admin')),
@@ -680,6 +693,9 @@ return array(
 		),
 	),
 
+	'ppitAccountingDependencies' => array(
+	),
+
 	'ppitRoles' => array(
 			'PpitAccounting' => array(
 			),
@@ -698,8 +714,8 @@ return array(
 					),
 					'bank-statement' => array(
 							'action' => 'Journal',
-							'route' => 'journal/bankStatement',
-							'params' => array(),
+							'route' => 'journal/index',
+							'params' => array('journal_code' => 'bank'),
 							'urlParams' => array(),
 							'glyphicon' => 'glyphicon-ok',
 							'label' => array(
@@ -958,6 +974,8 @@ return array(
 			),
 			'amount' => array(
 					'type' => 'number',
+					'minValue' => 0,
+					'maxValue' => 99999999,
 					'labels' => array(
 							'en_US' => 'Amount',
 							'fr_FR' => 'Montant',
@@ -977,6 +995,7 @@ return array(
 			'todoTitle' => array('en_US' => 'current', 'fr_FR' => 'en cours'),
 			'searchTitle' => array('en_US' => 'current', 'fr_FR' => 'recherche'),
 			'main' => array(
+					'journal_code' => 'select',
 					'year' => 'select',
 					'account' => 'range',
 			),
@@ -998,6 +1017,13 @@ return array(
 	'journal/detail' => array(
 			'title' => array('en_US' => 'Student sheet:', 'fr_FR' => 'Opération'),
 			'displayAudit' => false,
+	),
+	'journal/bankUpdate' => array(
+			'operation_date' => array('mandatory' => true),
+			'reference' => array('mandatory' => false),
+			'caption' => array('mandatory' => true),
+			'direction' => array('mandatory' => true),
+			'amount' => array('mandatory' => true),
 	),
 	'schemas' => array(
 			'prestation' => array(

@@ -6,6 +6,7 @@
 		'Accounting year' => 'Exercice comptable',
 		'Amount' => 'Montant',
 		'Balance' => 'Solde',
+		'Bank statement' => 'Relevé bancaire',
 		'Caption' => 'Libellé',
 		'Charges' => 'Charges',
 		'Credit balance' => 'Solde créditeur',

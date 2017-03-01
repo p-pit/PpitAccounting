@@ -3,7 +3,7 @@ function connectRemoveIcon(id, target)
 {
 	$('#' + id).click(function () {
 		$('#' + target).hide();
-		filterJournalList();
+//		filterJournalList();
 	});
 }
 
@@ -162,7 +162,12 @@ function connectJournalSearchInputs() {
 
 <?php foreach ($context->getConfig('journal/search')['main'] as $propertyId => $rendering) : ?>
 
-	<?php if ($rendering == 'range') : ?>
+	<?php if ($propertyId == 'journal_code') : ?>
+		$('#search_<?php echo $propertyId ?>').change(function () { 
+			document.location.href = '<?php echo $this->url('journal/index') ?>/' + $('#search_journal_code').val(); 
+		});
+
+	<?php elseif ($rendering == 'range') : ?>
 	$('#search_min_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
 	$('#search_max_<?php echo $propertyId ?>').keyup(function () { filterJournalList(); });
 
@@ -221,7 +226,7 @@ function connectJournalSearchInputs() {
 function getJournalList(params, major, dir) {		
 
 	// Execute the ajax request
-	route = '<?php echo $this->url('journal/list') ?>' + params + '&major=' + major + ((dir =='ASC') ? '&dir=ASC' : '&dir=DESC');
+	route = '<?php echo $this->url('journal/list', array('journal_code' => $journal_code)) ?>' + params + '&major=' + major + ((dir =='ASC') ? '&dir=ASC' : '&dir=DESC');
 
 	xhttp = new XMLHttpRequest();
 	xhttp.open("GET", route, true);
@@ -243,7 +248,11 @@ function getJournalList(params, major, dir) {
 			// Connect the detail anchors
 			$('.journal-detail-anchor').each(function () {
 				$(this).click(function () {
+<?php if ($journal_code == 'bank') : ?>
+					getJournalBankUpdate($(this).attr('id').split('_')[1], '');
+<?php else : ?>
 					getJournalDetail($(this).attr('id').split('_')[1]);
+<?php endif;?>
 				});
 			});
 	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
@@ -346,10 +355,6 @@ function getBankList() {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState == 4 <?php if (!$config['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
 			document.getElementById('journal-bank-list-panel').innerHTML = xhttp.responseText;
-<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
-			console.log('journal-bank-list-panel, route = ' + route);
-			console.log(xhttp.responseText);
-<?php endif;?>
 		}
 	}
 	xhttp.send();
@@ -449,15 +454,126 @@ function getJournalUpdate(id) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState == 4 <?php if (!$config['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
 			document.getElementById('journal-update-panel').innerHTML = xhttp.responseText;
-<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
-			console.log('journal-update-panel, route = ' + route);
-			console.log(xhttp.responseText);
-<?php endif;?>
-
 			connectJournalUpdateForm(id);
 		}
 	}
 	xhttp.send();
+}
+
+<?php 
+$properties = array();
+
+foreach ($context->getConfig('journal/bankUpdate') as $propertyId => $options) {
+	$property = $context->getConfig('journal_properties')[$propertyId];
+	if ($property['type'] == 'number') $properties[$propertyId] = array('type' => $property['type'], 'mandatory' => $options['mandatory'], 'minValue' => $property['minValue'], 'maxValue' => $property['maxValue']);
+	else $properties[$propertyId] = array('type' => $property['type'], 'mandatory' => $options['mandatory'], 'maxSize' => ($property['type'] == 'textarea') ? 2047 : 255);
+}
+
+$properties['journal_update_time'] = array('type' => 'hidden');
+
+echo $this->partial('/partials/check-update-properties', array('entity' => 'BankJournal', 'context' => $context, 'properties' => $properties)) 
+?>
+
+function connectJournalBankUpdateForm(id, action)
+{
+
+<?php foreach ($properties as $propertyId => $property) : ?>
+	<?php if ($property['type'] == 'date') : ?>
+		$('#input_<?php echo $propertyId ?>').datepicker();
+	<?php endif;?>
+<?php endforeach ?>
+
+	var form = document.getElementById('ppit-form');
+	form.onsubmit = function(event) {
+		
+		event.preventDefault();
+	
+		// Check validity
+		var validity = checkBankJournalUpdateProperties(id);
+		if (validity) {
+		
+			// Create a new FormData object.
+			var formData = new FormData();
+
+			// Get the properties values
+<?php foreach ($properties as $propertyId => $property) : ?>
+	<?php if ($property['type'] == 'input' || $property['type'] == 'date' || $property['type'] == 'textarea' || $property['type'] == 'select' || $property['type'] == 'repository' || $property['type'] == 'number' || $property['type'] == 'email' || $property['type'] == 'phone' || $property['type'] == 'dropbox' || $property['type'] == 'hidden') : ?>
+				formData.append('<?php echo $propertyId ?>', document.getElementById('<?php echo $propertyId ?>').value);
+
+	<?php elseif ($property['type'] == 'checkbox') : ?>
+				formData.append('<?php echo $propertyId ?>', ((document.getElementById('<?php echo $propertyId ?>').checked) ? 1 : 0));
+
+	<?php elseif ($property['type'] == 'attachment') : ?>
+				var fileSelect = document.getElementById('<?php echo $propertyId ?>');
+				if (fileSelect) {
+					var files = fileSelect.files;
+					for (var i = 0; i < files.length; i++) {
+						var file = files[i];
+						formData.append('<?php echo $propertyId ?>', file, file.name);
+					}
+				}
+
+	<?php endif ?>
+
+<?php endforeach ?>
+
+			var xhttp = new XMLHttpRequest();
+			var route;
+			route = '<?php echo $this->url('journal/bankUpdate') ?>/' + id;
+			if (action) route += '/' + action;
+			xhttp.open('POST', route, true);
+			// Set up a handler for when the request finishes.
+			xhttp.onload = function () {
+				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+					document.getElementById('form_action').innerHTML = xhttp.responseText;
+	//				filterJournalList();
+					connectJournalBankUpdateForm(id, action, target);
+					$('.action-btn').removeClass('btn-primary').addClass('btn-default');
+				}
+			};
+			xhttp.send(formData);
+		}
+		else return false;
+	}
+}
+
+function getJournalBankUpdate(id, action) {
+	// Ensure the target is displayed
+	$('#form_action').show();
+
+	// Anchor to the new panel
+	$(location).attr('hash', 'form_action');
+
+	var xhttp = new XMLHttpRequest();
+	var route = '<?php echo $this->url('journal/bankUpdate') ?>/' + id;
+	if (action) route += '/' + action;
+
+	xhttp.open('GET', route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
+		if (xhttp.readyState == 4) {
+	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			if (xhttp.status == 200) {
+	<?php endif;?>
+			document.getElementById('form_action').innerHTML = xhttp.responseText;
+			connectRemoveIcon('remove-anchor', 'form_action');
+
+			if (id) {
+				$('#journal-bank-update-anchor').click(function () { getJournalBankUpdate(id, 'update'); });
+				$('#journal-bank-delete-anchor').click(function () { getJournalBankUpdate(id, 'delete'); });
+			}
+			else $('#journal-bank-add-anchor').click(function () { getJournalBankUpdate(id, 'add'); });
+			connectJournalBankUpdateForm(id, action);
+<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			}
+<?php endif;?>
+		}
+	}
+	xhttp.send();
+
+	// Highlight the clicked button (and only it in its class)
+	$('.index-btn').removeClass("btn-primary").addClass("btn-default");
+	$('#journal-detail-anchor_' + id).removeClass("btn-default").addClass("btn-primary");
 }
 
 // Load the detail panel
@@ -482,7 +598,6 @@ function getJournalDetail(id) {
 	<?php endif;?>
 			document.getElementById('form_action').innerHTML = xhttp.responseText;
 
-//			connectAuditPanel();
 			connectRemoveIcon('remove-anchor', 'form_action');
 			getBankList();
 			getJournalUpdate(id);
@@ -504,7 +619,7 @@ function getJournalDetail(id) {
 function activateJournal() {
 
 	// Load the search panel and highlight the menu entry
-	loadPanel('index_action', '<?php echo $this->url('journal/search') ?>');
+	loadPanel('index_action', '<?php echo $this->url('journal/search', array('journal_code' => $journal_code)) ?>');
 	$('.menu-btn').removeClass("btn-primary").addClass("btn-default");
 	var journalAnchor;
 	journalAnchor = '#journal-anchor';

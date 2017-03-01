@@ -28,7 +28,7 @@
 		<div class="form-group">
 			<label class="col-sm-5 control-label"><?php echo $label ?></label>
 			<div class="col-sm-7">
-				<input class="form-control" type="text" id="search_<?php echo $propertyId ?>" placeholder="<?php echo $this->translate('Contains', 'ppit-core', $context->getLocale()) ?>" />
+				<input class="form-control" type="text" id="search_<?php echo $propertyId ?>" placeholder="<?php echo $this->translate('Contains', 'ppit-core', $context->getLocale()) ?>"/>
 			</div>
 		</div>
 
@@ -62,7 +62,7 @@
 				<select id="search_<?php echo $propertyId ?>" class="form-control">
 					<option value=""></option>
 		<?php foreach ($modalities as $modalityId => $modalityLabel) : ?>
-		    		<option value="<?php echo $modalityId ?>"><?php echo $modalityLabel ?></option>
+		    		<option value="<?php echo $modalityId ?>" <?php if ($propertyId == 'journal_code' && $modalityId == $journal_code) echo 'selected="selected"' ?>><?php echo $modalityLabel ?></option>
 		<?php endforeach;?>
 		    	</select>
 			</div>

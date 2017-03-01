@@ -133,8 +133,11 @@ class Journal implements InputFilterAwareInterface
     	if ($mode == 'todo') {
 			$accountingYear = AccountingYear::getCurrent();
     		$where->equalTo('year', $accountingYear->year);
-    		$where->greaterThanOrEqualTo('accounting_journal.account', '6');
-    		$where->lessThanOrEqualTo('accounting_journal.account', '799999');
+    		if ($journal_code == 'general') {
+	    		$where->greaterThanOrEqualTo('accounting_journal.account', '6');
+	    		$where->lessThanOrEqualTo('accounting_journal.account', '799999');
+    		}
+    		elseif ($journal_code == 'bank') $where->equalTo('sequence', 0);
     	}
     	else {
     	
@@ -309,6 +312,25 @@ class Journal implements InputFilterAwareInterface
 				Journal::getTable()->save($this);
 			}
 		}
+		return 'OK';
+	}
+
+	public function updateBankStatementEntry($updateTime)
+	{
+		$accountingYear = AccountingYear::getCurrent();
+		$this->year = $accountingYear->year;
+		$this->journal_code = 'bank';
+		$this->accounting_date = date('Y-m-d');
+		$this->currency = 'EUR';
+		foreach ($this->rows as $row) {
+			if ($row['account']) {
+				$this->account = $row['account'];
+				$this->direction = $row['direction'];
+				$this->amount = $row['amount'];
+				Journal::getTable()->save($this);
+			}
+		}
+		return 'OK';
 	}
 	
     public static function closeProductsCharges($year, $operation_date, $accountingYear)
@@ -606,6 +628,20 @@ class Journal implements InputFilterAwareInterface
     	echo '<br>';
     	 
     	return 'OK';
+    }
+
+    public function isDeletable()
+    {
+    	$context = Context::getCurrent();
+    
+    	// Check dependencies
+    	$config = $context->getConfig();
+    	foreach($config['ppitAccountingDependencies'] as $dependency) {
+    		if ($dependency->isUsed($this)) return false;
+    	}
+    
+    	if ($this->journal_code == 'bank' && $this->sequence) return false;
+    	return true;
     }
     
     public function setInputFilter(InputFilterInterface $inputFilter)

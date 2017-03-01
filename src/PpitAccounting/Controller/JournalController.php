@@ -17,7 +17,8 @@ class JournalController extends AbstractActionController
     {
     	$context = Context::getCurrent();
 		if (!$context->isAuthenticated()) $this->redirect()->toRoute('home');
-
+		$journal_code = $this->params()->fromRoute('journal_code', 'general');
+		
 		$instance_id = $context->getInstanceId();
 
 		$menu = Context::getCurrent()->getConfig('menus')['p-pit-finance'];
@@ -26,6 +27,7 @@ class JournalController extends AbstractActionController
     	return new ViewModel(array(
     			'context' => $context,
     			'config' => $context->getConfig(),
+    			'journal_code' => $journal_code,
     			'menu' => $menu,
     			'currentEntry' => $currentEntry,
     	));
@@ -65,11 +67,13 @@ class JournalController extends AbstractActionController
     {
     	// Retrieve the context
     	$context = Context::getCurrent();
-    
+    	$journal_code = $this->params()->fromRoute('journal_code', 'general');
+
     	// Return the link list
     	$view = new ViewModel(array(
     			'context' => $context,
     			'config' => $context->getconfig(),
+    			'journal_code' => $journal_code,
     	));
     	$view->setTerminal(true);
     	return $view;
@@ -79,16 +83,16 @@ class JournalController extends AbstractActionController
     {
     	// Retrieve the context
     	$context = Context::getCurrent();
+		$journal_code = $this->params()->fromRoute('journal_code', 'general');
 
     	$params = $this->getFilters($this->params());
-
     	$major = ($this->params()->fromQuery('major', 'sequence'));
     	$dir = ($this->params()->fromQuery('dir', 'DESC'));
 
     	if (count($params) == 0) $mode = 'todo'; else $mode = 'search';
 
     	// Retrieve the list
-    	$entries = Journal::getList('general', $params, $major, $dir, $mode);
+    	$entries = Journal::getList($journal_code, $params, $major, $dir, $mode);
 
     	// Return the link list
     	$view = new ViewModel(array(
@@ -295,7 +299,82 @@ class JournalController extends AbstractActionController
 				'message' => $message,
 				'error' => $error,
 		));
-		//		$view->setTerminal(true);
+		$view->setTerminal(true);
+		return $view;
+	}
+
+	public function bankUpdateAction()
+	{
+		// Retrieve the context
+		$context = Context::getCurrent();
+	
+		$id = (int) $this->params()->fromRoute('id', 0);
+		if ($id) $journal = Journal::get($id);
+		else $journal = Journal::instanciate();
+		$action = $this->params()->fromRoute('act', null);
+	
+		// Instanciate the csrf form
+		$csrfForm = new CsrfForm();
+		$csrfForm->addCsrfElement('csrf');
+		$error = null;
+		if ($action == 'delete') $message = 'confirm-delete';
+		elseif ($action) $message =  'confirm-update';
+		else $message = null;
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			$message = null;
+			$csrfForm->setInputFilter((new Csrf('csrf'))->getInputFilter());
+			$csrfForm->setData($request->getPost());
+			 
+			if ($csrfForm->isValid()) { // CSRF check
+	
+				// Load the input data
+				$data = array();
+				foreach($context->getConfig('journal/bankUpdate') as $propertyId => $unused) {
+					$data[$propertyId] = $request->getPost(($propertyId));
+				}
+				$data['rows'] = array();
+				$row = array();
+				$row['account'] = '512';
+				$row['direction'] = $request->getPost('direction');
+				$row['amount'] = $request->getPost('amount');
+				$data['rows'][] = $row;
+				if ($journal->loadData($data) != 'OK') throw new \Exception('View error');
+				
+				// Atomically save
+				$connection = Journal::getTable()->getAdapter()->getDriver()->getConnection();
+				$connection->beginTransaction();
+				try {
+					if (!$journal->id) $rc = $journal->addBankStatementEntry();
+					elseif ($action == 'delete') $rc = $journal->delete($request->getPost('journal_update_time'));
+					else $rc = $journal->updateBankStatementEntry($request->getPost('update_time'));
+					if ($rc != 'OK') $error = $rc;
+					if ($error) $connection->rollback();
+					else {
+						$connection->commit();
+						$message = 'OK';
+					}
+				}
+				catch (\Exception $e) {
+					$connection->rollback();
+					throw $e;
+				}
+				$action = null;
+			}
+		}
+		$journal->properties = $journal->toArray();
+	
+		$view = new ViewModel(array(
+				'context' => $context,
+				'config' => $context->getconfig(),
+				'id' => $id,
+				'action' => $action,
+				'journal' => $journal,
+				'csrfForm' => $csrfForm,
+				'error' => $error,
+				'message' => $message
+		));
+		$view->setTerminal(true);
 		return $view;
 	}
 

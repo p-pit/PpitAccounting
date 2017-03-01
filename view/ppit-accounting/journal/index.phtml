@@ -52,7 +52,7 @@ echo $this->partial('/partials/ppit-controller')
 ?>
 
 <?php foreach ($context->getConfig('menus')['p-pit-finance'] as $entryId => $entryDef) : ?>
-$('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route']) ?>'); });
+$('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route'], $entryDef['params']) ?>'); });
 <?php endforeach;?>
 
 activateJournal();
