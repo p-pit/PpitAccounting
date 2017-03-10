@@ -8,7 +8,23 @@ return array(
         	'PpitAccounting\Controller\Journal' => 'PpitAccounting\Controller\JournalController',
         ),
     ),
- 
+
+	'console' => array(
+			'router' => array(
+					'routes' => array(
+							'repair' => array(
+									'options' => array(
+											'route'    => 'journal repair <year>',
+											'defaults' => array(
+													'controller' => 'PpitAccounting\Controller\Journal',
+													'action'     => 'repair'
+											)
+									)
+							),
+					),
+			),
+	),
+		
     // The following section is new and should be added to your file
     'router' => array(
         'routes' => array(
@@ -140,7 +156,7 @@ return array(
             					'export' => array(
         								'type' => 'segment',
         								'options' => array(
-        										'route' => '/export',
+        										'route' => '/export[/:journal_code]',
         										'defaults' => array(
         												'action' => 'export',
         										),
@@ -242,15 +258,6 @@ return array(
             							'route' => '/compute-interests',
             							'defaults' => array(
             									'action' => 'computeInterests',
-            							),
-            					),
-            			),
-            			'export' => array(
-            					'type' => 'segment',
-            					'options' => array(
-            							'route' => '/export',
-            							'defaults' => array(
-            									'action' => 'export',
             							),
             					),
             			),
@@ -906,6 +913,13 @@ return array(
 							'fr_FR' => 'Année',
 					),
 			),
+			'sequence' => array(
+					'type' => 'input',
+					'labels' => array(
+							'en_US' => 'Sequence',
+							'fr_FR' => 'Séquence',
+					),
+			),
 			'journal_code' => array(
 					'type' => 'select',
 					'modalities' => array(
@@ -987,6 +1001,13 @@ return array(
 					'labels' => array(
 							'en_US' => 'Account',
 							'fr_FR' => 'Compte',
+					),
+			),
+			'account_caption' => array(
+					'type' => 'input',
+					'labels' => array(
+							'en_US' => 'Account caption',
+							'fr_FR' => 'Libellé du compte',
 					),
 			),
 	),

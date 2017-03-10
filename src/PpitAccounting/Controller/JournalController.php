@@ -79,15 +79,14 @@ class JournalController extends AbstractActionController
     	return $view;
     }
 
-    public function getList()
+    public function getList($dir = 'DESC')
     {
     	// Retrieve the context
     	$context = Context::getCurrent();
 		$journal_code = $this->params()->fromRoute('journal_code', 'general');
-
     	$params = $this->getFilters($this->params());
     	$major = ($this->params()->fromQuery('major', 'sequence'));
-    	$dir = ($this->params()->fromQuery('dir', 'DESC'));
+    	$dir = ($this->params()->fromQuery('dir', $dir));
 
     	if (count($params) == 0) $mode = 'todo'; else $mode = 'search';
 
@@ -126,7 +125,7 @@ class JournalController extends AbstractActionController
     
     public function exportAction()
     {
-    	$view = $this->getList();
+    	$view = $this->getList('ASC');
 
    		include 'public/PHPExcel_1/Classes/PHPExcel.php';
    		include 'public/PHPExcel_1/Classes/PHPExcel/Writer/Excel2007.php';
@@ -138,6 +137,8 @@ class JournalController extends AbstractActionController
 		header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		header('Content-Disposition:inline;filename=Fichier.xlsx ');
 		$writer->save('php://output');
+
+		return $this->response;
     }
 
     public function detailAction()
@@ -420,9 +421,9 @@ class JournalController extends AbstractActionController
     	$context = Context::getCurrent();
     	$year = $this->params()->fromQuery('year', date('Y'));
     	$account = $this->params()->fromQuery('account');
+		$connection = Journal::getTable()->getAdapter()->getDriver()->getConnection();
+		$connection->beginTransaction();
     	try {
-			$connection = Journal::getTable()->getAdapter()->getDriver()->getConnection();
-			$connection->beginTransaction();
 	    	if (Journal::computeInterests($year, $account) != 'OK') throw new \Exception('View error');
 			$connection->commit();
 			$message = 'OK';
@@ -433,4 +434,38 @@ class JournalController extends AbstractActionController
 		}
 		return $this->response;
 	}
+    
+    public function repairAction()
+    {
+    	$request = $this->getRequest();
+    	$year = $request->getParam('year', null);
+    	$rows = Journal::getList('general', array('year' => $year), 'sequence', 'ASC', 'search');
+    	$oldSequence = -1;
+    	$newSequence = 0;
+    	$connection = Journal::getTable()->getAdapter()->getDriver()->getConnection();
+    	$connection->beginTransaction();
+    	try {
+	    	foreach($rows as $row){
+	    		if ($row->sequence != $oldSequence) {
+					echo $row->sequence.' => '.$newSequence."\n";
+	    			$oldSequence = $row->sequence;
+	    			$newSequence++;
+	    		}
+				$select = Journal::getTable()->getSelect()->where(array('journal_code' => 'bank', 'sequence' => $row->sequence));
+				$cursor = Journal::getTable()->selectWith($select);
+				foreach ($cursor as $bankJournalEntry) {
+					$bankJournalEntry->sequence = $newSequence;
+					Journal::getTable()->save($bankJournalEntry);
+				}
+	    		$row->sequence = $newSequence;
+				Journal::getTable()->save($row);
+	    	}
+			$connection->commit();
+    	}
+		catch (Exception $e) {
+			$connection->rollback();
+			throw $e;
+		}
+	    return $this->response;
+    }
 }

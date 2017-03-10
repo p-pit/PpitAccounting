@@ -25,11 +25,15 @@ class SsmlJournalViewHelper
 		$sheet = $workbook->getActiveSheet();
 		
 		$i = 0;
-		$colNames = array(1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E', 6 => 'F', 7 => 'G', 8 => 'H', 9 => 'I', 10 => 'J');
+		$colNames = array(1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E', 6 => 'F', 7 => 'G', 8 => 'H', 9 => 'I', 10 => 'J', 11 => 'K');
 		
 		foreach($context->getConfig('journal_properties') as $propertyId => $property) {
 			$i++;
 			$sheet->setCellValue($colNames[$i].'1', $property['labels'][$context->getLocale()]);
+			$sheet->getStyle($colNames[$i].'1')->getFont()->getColor()->setRGB(substr($context->getConfig('styleSheet')['panelHeadingColor'], 1, 6));
+			$sheet->getStyle($colNames[$i].'1')->getFill()->setFillType(\PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB(substr($context->getConfig('styleSheet')['panelHeadingBackground'], 1, 6));
+			$sheet->getStyle($colNames[$i].'1')->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			$sheet->getStyle($colNames[$i].'1')->getFont()->setBold(true);
 		}
 
 		$j = 1;
@@ -39,7 +43,7 @@ class SsmlJournalViewHelper
 			foreach($context->getConfig('journal_properties') as $propertyId => $property) {
 				$i++;
 				if ($property['type'] == 'date') $sheet->setCellValue($colNames[$i].$j, $context->decodeDate($entry->properties[$propertyId]));
-				elseif ($property['type'] == 'number') $sheet->setCellValue($colNames[$i].$j, $context->formatFloat($entry->properties[$propertyId], 2));
+				elseif ($property['type'] == 'number') $sheet->setCellValue($colNames[$i].$j, $entry->properties[$propertyId]);
 				else $sheet->setCellValue($colNames[$i].$j, $entry->properties[$propertyId]);
 			}
 		}

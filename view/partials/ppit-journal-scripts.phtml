@@ -91,7 +91,7 @@ function getParams() {
 function exportJournalList() {
 
 	var params = getParams();
-	document.location.href = '<?php echo $this->url('journal/export') ?>' + params;
+	document.location.href = '<?php echo $this->url('journal/export', array('journal_code' => $journal_code)) ?>' + params;
 }
 
 function eraseJournalSearch() {
@@ -621,9 +621,11 @@ function activateJournal() {
 	// Load the search panel and highlight the menu entry
 	loadPanel('index_action', '<?php echo $this->url('journal/search', array('journal_code' => $journal_code)) ?>');
 	$('.menu-btn').removeClass("btn-primary").addClass("btn-default");
-	var journalAnchor;
-	journalAnchor = '#journal-anchor';
-	$(journalAnchor).removeClass("btn-default").addClass("btn-primary");
+<?php if ($journal_code == 'bank') : ?>
+	$('#bank-statement-anchor').removeClass("btn-default").addClass("btn-primary");
+<?php else : ?>
+	$('#journal-anchor').removeClass("btn-default").addClass("btn-primary");
+<?php endif;?>
 
 	<?php
 	$todoTitle = $context->getConfig('journal/search')['todoTitle']['fr_FR'];

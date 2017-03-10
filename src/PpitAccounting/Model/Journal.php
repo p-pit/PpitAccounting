@@ -86,7 +86,9 @@ class Journal implements InputFilterAwareInterface
         $this->update_time = (isset($data['update_time'])) ? $data['update_time'] : null;
     }
 
-    public function toArray() {
+    public function getProperties() {
+    	$context = Context::getCurrent();
+    	
     	$data = array();
     	$data['id'] = (int) $this->id;
     	$data['status'] = (int) $this->status;
@@ -106,6 +108,15 @@ class Journal implements InputFilterAwareInterface
     	$data['sub_account'] = $this->sub_account;
     	$data['expense_id'] = $this->expense_id;
     	$data['commitment_id'] = $this->commitment_id;
+
+    	$data['account_caption'] = $context->getConfig('ppitAccountingSettings')['accounts'][$this->account]['caption'];
+    	
+    	return $data;
+    }
+
+    public function toArray() {
+    	$data = $this->getProperties();
+    	unset($data['account_caption']);
     	return $data;
     }
 
@@ -137,7 +148,7 @@ class Journal implements InputFilterAwareInterface
 	    		$where->greaterThanOrEqualTo('accounting_journal.account', '6');
 	    		$where->lessThanOrEqualTo('accounting_journal.account', '799999');
     		}
-    		elseif ($journal_code == 'bank') $where->equalTo('sequence', 0);
+//    		elseif ($journal_code == 'bank') $where->equalTo('sequence', 0);
     	}
     	else {
     	
@@ -154,7 +165,7 @@ class Journal implements InputFilterAwareInterface
     	$cursor = Journal::getTable()->selectWith($select);
     	$entries = array();
     	foreach($cursor as $entry) {
-    		$entry->properties = $entry->toArray();
+    		$entry->properties = $entry->getProperties();
     		$entries[] = $entry;
     	}
     	return $entries;

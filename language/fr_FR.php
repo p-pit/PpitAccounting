@@ -6,6 +6,7 @@
 		'Accounting year' => 'Exercice comptable',
 		'Amount' => 'Montant',
 		'Balance' => 'Solde',
+		'Bank journal reference' => 'Dénotage relevé bancaire',
 		'Bank statement' => 'Relevé bancaire',
 		'Caption' => 'Libellé',
 		'Charges' => 'Charges',
