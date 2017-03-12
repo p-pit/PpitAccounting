@@ -7,6 +7,7 @@ use PpitCore\Form\CsrfForm;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
 use PpitLearning\Model\Evaluation;
+use Zend\Db\Sql\Where;
 use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -439,7 +440,14 @@ class JournalController extends AbstractActionController
     {
     	$request = $this->getRequest();
     	$year = $request->getParam('year', null);
-    	$rows = Journal::getList('general', array('year' => $year), 'sequence', 'ASC', 'search');
+    	$select = Journal::getTable()->getSelect()->order(array('sequence ASC', 'id'));
+    	$where = new Where;
+    	$where->equalTo('year', $year);
+    	$select->where($where);
+    	$cursor = Journal::getTable()->selectWith($select);
+    	$rows = array();
+    	foreach($cursor as $row) $rows[] = $row;
+
     	$oldSequence = -1;
     	$newSequence = 0;
     	$connection = Journal::getTable()->getAdapter()->getDriver()->getConnection();
@@ -447,14 +455,14 @@ class JournalController extends AbstractActionController
     	try {
 	    	foreach($rows as $row){
 	    		if ($row->sequence != $oldSequence) {
-	    			if ($oldSequence != -1) {
+/*	    			if ($oldSequence != -1) {
 	    				$select = Journal::getTable()->getSelect()->where(array('journal_code' => 'bank', 'sequence' => $oldSequence));
 	    				$cursor = Journal::getTable()->selectWith($select);
 	    				foreach ($cursor as $bankJournalEntry) {
 	    					$bankJournalEntry->sequence = $newSequence;
 	    					Journal::getTable()->save($bankJournalEntry);
 	    				}
-	    			}
+	    			}*/
 					echo $row->sequence.' => '.$newSequence."\n";
 	    			$oldSequence = $row->sequence;
 	    			$newSequence++;
