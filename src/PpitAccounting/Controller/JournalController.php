@@ -447,16 +447,18 @@ class JournalController extends AbstractActionController
     	try {
 	    	foreach($rows as $row){
 	    		if ($row->sequence != $oldSequence) {
+	    			if ($oldSequence != -1) {
+	    				$select = Journal::getTable()->getSelect()->where(array('journal_code' => 'bank', 'sequence' => $oldSequence));
+	    				$cursor = Journal::getTable()->selectWith($select);
+	    				foreach ($cursor as $bankJournalEntry) {
+	    					$bankJournalEntry->sequence = $newSequence;
+	    					Journal::getTable()->save($bankJournalEntry);
+	    				}
+	    			}
 					echo $row->sequence.' => '.$newSequence."\n";
 	    			$oldSequence = $row->sequence;
 	    			$newSequence++;
 	    		}
-				$select = Journal::getTable()->getSelect()->where(array('journal_code' => 'bank', 'sequence' => $row->sequence));
-				$cursor = Journal::getTable()->selectWith($select);
-				foreach ($cursor as $bankJournalEntry) {
-					$bankJournalEntry->sequence = $newSequence;
-					Journal::getTable()->save($bankJournalEntry);
-				}
 	    		$row->sequence = $newSequence;
 				Journal::getTable()->save($row);
 	    	}
