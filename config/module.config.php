@@ -311,6 +311,7 @@ return array(
 			44567 => array('caption' => 'Crédit de TVA', 'class' => 4),
 			44571 => array('caption' => 'TVA collectée', 'class' => 4),
 			44572 => array('caption' => 'TVA déductible sur immobilisations', 'class' => 4),
+			444 => array('caption' => 'Etat, impôt sur les bénéfices', 'class' => 4),
 			447 => array('caption' => 'Autres impôts, taxes et versements assimilés', 'class' => 4),
 			455 => array('caption' => 'Sociétaires - Comptes courants', 'class' => 4),
 			4561 => array('caption' => 'Associés – Compte d\'apport en société', 'class' => 4),
@@ -338,6 +339,7 @@ return array(
 			6511 => array('caption' => 'Redevances pour concessions, brevets, licences, marques, procédés, logiciels', 'class' => 6),
 			658 => array('caption' => 'Charges diverses de gestion courante', 'class' => 6),
 			6615 => array('caption' => 'Intérêts des comptes courants et des dépôts créditeurs', 'class' => 6),
+			695 => array('caption' => 'Impôt sur les bénéfices', 'class' => 6),
 			706 => array('caption' => 'Prestations de services', 'class' => 7),
 			758 => array('caption' => 'Produits divers de gestion courante', 'class' => 7),
 		),
@@ -703,8 +705,20 @@ return array(
 	'ppitAccountingDependencies' => array(
 	),
 
-	'ppitRoles' => array(
-			'PpitAccounting' => array(
+	'ppitApplications' => array(
+			'p-pit-finance' => array(
+    				'labels' => array('fr_FR' => 'P-Pit Finance', 'en_US' => 'Finance by 2Pit'),
+    				'route' => 'expense',
+    				'params' => array(),
+					'roles' => array(
+							'accountant' => array(
+									'show' => true,
+									'labels' => array(
+											'en_US' => 'Accountant',
+											'fr_FR' => 'Comptable',
+									),
+							),
+					),
 			),
 	),
 	
