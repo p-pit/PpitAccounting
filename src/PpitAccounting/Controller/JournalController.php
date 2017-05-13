@@ -6,6 +6,7 @@ use PpitAccounting\ViewHelper\SsmlJournalViewHelper;
 use PpitCore\Form\CsrfForm;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
+use PpitCore\Model\Place;
 use PpitLearning\Model\Evaluation;
 use Zend\Db\Sql\Where;
 use Zend\Session\Container;
@@ -18,6 +19,7 @@ class JournalController extends AbstractActionController
     {
     	$context = Context::getCurrent();
 		if (!$context->isAuthenticated()) $this->redirect()->toRoute('home');
+		$place = Place::get($context->getPlaceId());
 		$journal_code = $this->params()->fromRoute('journal_code', 'general');
 		
 		$instance_id = $context->getInstanceId();
@@ -28,6 +30,7 @@ class JournalController extends AbstractActionController
     	return new ViewModel(array(
     			'context' => $context,
     			'config' => $context->getConfig(),
+    			'place' => $place,
     			'journal_code' => $journal_code,
     			'menu' => $menu,
     			'currentEntry' => $currentEntry,

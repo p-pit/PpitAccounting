@@ -233,7 +233,7 @@ function getJournalList(params, major, dir) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
 		if (xhttp.readyState == 4) {
-	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if (!$config['isTraceActive']) : ?>
 			if (xhttp.status == 200) {
 	<?php endif;?>
 			document.getElementById('journal-list-panel').innerHTML = xhttp.responseText;
@@ -255,7 +255,7 @@ function getJournalList(params, major, dir) {
 <?php endif;?>
 				});
 			});
-	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if (!$config['isTraceActive']) : ?>
 			}
 	<?php endif;?>
 		}
@@ -329,9 +329,9 @@ function connectJournalUpdateForm(id, action)
 			xhttp.open('POST', route, true);
 			// Set up a handler for when the request finishes.
 			xhttp.onload = function () {
-				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
 
-<?php if ($context->getConfig()['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if ($context->getConfig()['isTraceActive']) : ?>
 					console.log('post, route = ' + route);
 					console.log(xhttp.responseText);
 <?php endif;?>
@@ -353,7 +353,7 @@ function getBankList() {
 
 	xhttp.open('GET', route, true);
 	xhttp.onreadystatechange = function() {
-		if (xhttp.readyState == 4 <?php if (!$config['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+		if (xhttp.readyState == 4 <?php if (!$config['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
 			document.getElementById('journal-bank-list-panel').innerHTML = xhttp.responseText;
 		}
 	}
@@ -428,9 +428,9 @@ function connectJournalUpdateForm(id, action)
 			xhttp.open('POST', route, true);
 			// Set up a handler for when the request finishes.
 			xhttp.onload = function () {
-				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
 
-<?php if ($context->getConfig()['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if ($context->getConfig()['isTraceActive']) : ?>
 					console.log('post, route = ' + route);
 					console.log(xhttp.responseText);
 <?php endif;?>
@@ -452,7 +452,7 @@ function getJournalUpdate(id) {
 
 	xhttp.open('GET', route, true);
 	xhttp.onreadystatechange = function() {
-		if (xhttp.readyState == 4 <?php if (!$config['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+		if (xhttp.readyState == 4 <?php if (!$config['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
 			document.getElementById('journal-update-panel').innerHTML = xhttp.responseText;
 			connectJournalUpdateForm(id);
 		}
@@ -524,7 +524,7 @@ function connectJournalBankUpdateForm(id, action)
 			xhttp.open('POST', route, true);
 			// Set up a handler for when the request finishes.
 			xhttp.onload = function () {
-				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
 					document.getElementById('form_action').innerHTML = xhttp.responseText;
 	//				filterJournalList();
 					connectJournalBankUpdateForm(id, action, target);
@@ -552,7 +552,7 @@ function getJournalBankUpdate(id, action) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
 		if (xhttp.readyState == 4) {
-	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if (!$config['isTraceActive']) : ?>
 			if (xhttp.status == 200) {
 	<?php endif;?>
 			document.getElementById('form_action').innerHTML = xhttp.responseText;
@@ -564,7 +564,7 @@ function getJournalBankUpdate(id, action) {
 			}
 			else $('#journal-bank-add-anchor').click(function () { getJournalBankUpdate(id, 'add'); });
 			connectJournalBankUpdateForm(id, action);
-<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if (!$config['isTraceActive']) : ?>
 			}
 <?php endif;?>
 		}
@@ -593,7 +593,7 @@ function getJournalDetail(id) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
 		if (xhttp.readyState == 4) {
-	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if (!$config['isTraceActive']) : ?>
 			if (xhttp.status == 200) {
 	<?php endif;?>
 			document.getElementById('form_action').innerHTML = xhttp.responseText;
@@ -604,7 +604,7 @@ function getJournalDetail(id) {
 <?php foreach ($context->getConfig('journal_actions') as $actionId => $action) : ?>
 			if (id) $('#<?php echo $actionId ?>-anchor').click(function () { connectJournalAnchors(type, id, '<?php echo $actionId ?>'); });
 <?php endforeach;?>
-	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if (!$config['isTraceActive']) : ?>
 			}
 	<?php endif;?>
 		}

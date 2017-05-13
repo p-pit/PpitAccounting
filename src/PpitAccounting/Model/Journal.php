@@ -109,7 +109,9 @@ class Journal implements InputFilterAwareInterface
     	$data['expense_id'] = $this->expense_id;
     	$data['commitment_id'] = $this->commitment_id;
 
-    	$data['account_caption'] = $context->getConfig('ppitAccountingSettings')['accounts'][$this->account]['caption'];
+    	if (array_key_exists($this->account, $context->getConfig('ppitAccountingSettings')['accounts'])) {
+    		$data['account_caption'] = $context->getConfig('ppitAccountingSettings')['accounts'][$this->account]['caption'];
+    	}
     	
     	return $data;
     }

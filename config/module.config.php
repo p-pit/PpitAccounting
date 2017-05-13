@@ -28,17 +28,6 @@ return array(
     // The following section is new and should be added to your file
     'router' => array(
         'routes' => array(
-            'index' => array(
-                'type' => 'Zend\Mvc\Router\Http\Literal',
-                'options' => array(
-                    'route'    => '/',
-                    'defaults' => array(
-                        '__NAMESPACE__' => 'PpitAccounting\Controller',
-                        'controller' => 'Journal',
-                        'action'     => 'index',
-                    ),
-                ),
-            ),
         	'account' => array(
                 'type'    => 'literal',
                 'options' => array(
@@ -299,6 +288,8 @@ return array(
 			1012 => array('caption' => 'Capital souscrit, appelé, non versé', 'class' => 1),
 			1013 => array('caption' => 'Capital souscrit, appelé, versé', 'class' => 1),
 			109 => array('caption' => 'Actionnaires – Capital souscrit, non appelé', 'class' => 1),
+			119 => array('caption' => 'Report à nouveau (solde débiteur)', 'class' => 1),
+			120 => array('caption' => 'Résultat de l\'exercice (bénéfice)', 'class' => 1),
 			129 => array('caption' => 'Résultat de l\'exercice (perte)', 'class' => 1),
 			2184 => array('caption' => 'Mobilier', 'class' => 2),
 			2751 => array('caption' => 'Dépôts de garantie', 'class' => 2),

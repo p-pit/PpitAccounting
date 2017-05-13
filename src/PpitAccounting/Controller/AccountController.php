@@ -11,6 +11,7 @@ use PpitAccounting\Model\Journal;
 use PpitCore\Form\CsrfForm;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
+use PpitCore\Model\Place;
 use PpitLearning\Model\Evaluation;
 use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
@@ -22,13 +23,15 @@ class AccountController extends AbstractActionController
 	{
 		// Retrieve the context
 		$context = Context::getCurrent();
-
+		$place = Place::get($context->getPlaceId());
+		
     	$year = $this->params()->fromQuery('year', date('Y'));
     	$account = $this->params()->fromQuery('account');
     	$account = new Account($year, $account);
 		$view = new ViewModel(array(
 				'context' => $context,
 				'config' => $context->getconfig(),
+				'place' => $place,
 				'account' => $account,
 		));
 		return $view;
@@ -38,6 +41,7 @@ class AccountController extends AbstractActionController
 	{
 		// Retrieve the context
 		$context = Context::getCurrent();
+		$place = Place::get($context->getPlaceId());
 		$accountingYear = AccountingYear::getCurrent();
 		$year = $this->params()->fromQuery('year', $accountingYear->year);
     	$month = $this->params()->fromQuery('month', null);
@@ -46,6 +50,7 @@ class AccountController extends AbstractActionController
 		$view = new ViewModel(array(
 				'context' => $context,
 				'config' => $context->getconfig(),
+				'place' => $place,
 				'year' => $year,
 				'balance' => $balance,
 		));
