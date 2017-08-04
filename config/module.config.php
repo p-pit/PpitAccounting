@@ -306,6 +306,7 @@ return array(
 			447 => array('caption' => 'Autres impôts, taxes et versements assimilés', 'class' => 4),
 			455 => array('caption' => 'Sociétaires - Comptes courants', 'class' => 4),
 			4561 => array('caption' => 'Associés – Compte d\'apport en société', 'class' => 4),
+			4567 => array('caption' => 'Associés – Capital à rembourser', 'class' => 4),
 			44587 => array('caption' => 'Taxe sur le chiffre d\'affaire sur facture à établir', 'class' => 4),
 			512 => array('caption' => 'Banque', 'class' => 5),
 			604 => array('caption' => 'Achat d\'études et de prestations', 'class' => 6),

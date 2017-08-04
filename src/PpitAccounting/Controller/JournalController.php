@@ -124,7 +124,8 @@ class JournalController extends AbstractActionController
     	$dropbox = $context->getConfig('ppitDocument')['dropbox'];
     	$dropboxClient = new \Dropbox\Client($dropbox['credential'], $dropbox['clientIdentifier']);
     	$link = $dropboxClient->createTemporaryDirectLink($dropbox['folders']['expenses'].'/'.$document);
-    	return $this->redirect()->toUrl($link[0]);
+    	if ($link[0]) return $this->redirect()->toUrl($link[0]);
+    	else return $this->response;
     }
     
     public function exportAction()
