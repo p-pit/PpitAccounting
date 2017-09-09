@@ -714,8 +714,7 @@ return array(
 			),
 	),
 	
-	'menus' => array(
-			'p-pit-finance' => array(
+	'menus/p-pit-finance' => array(
 					'expense' => array(
 							'route' => 'expense/index',
 							'params' => array(),
@@ -758,7 +757,6 @@ return array(
 									'fr_FR' => 'Grand livre',
 							),
 					),
-			),
 	),
 		
 	'journal/legalInterest' => array(
