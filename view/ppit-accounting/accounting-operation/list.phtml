@@ -1,0 +1,128 @@
+<!-- 
+/**
+ * PpitAccounting V1.0 (https://github.com/p-pit/PpitAccounting)
+ *
+ * @link      https://github.com/p-pit/PpitAccounting
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitAccounting/blob/master/license.txt GNU-GPL license
+ */
+-->
+
+<style>
+{
+    .large
+    {
+        display: none;
+    }
+}
+</style>
+
+<div class="col-md-12">
+
+<!-- Actions -->
+<div>
+    <button type="button" class="btn btn-default" title="<?php echo $this->translate('Export', 'ppit-core', $context->getLocale()) ?>" id="export-button">
+		<span class="glyphicon glyphicon-cloud-download"></span>
+		<span><?php echo $this->translate('Export', 'ppit-core', $context->getLocale())?></span>
+	</button>
+</div>    
+<div>&nbsp;</div>
+
+<div style="overflow-x:auto;">
+	<table class="table table-striped ppit_index">
+	<tr>
+		<th>&nbsp;</th>
+
+<?php foreach ($context->getConfig('accounting_operation/list')['properties'] as $propertyId => $unused) : ?>
+	<?php 
+	$property = $context->getConfig('accounting_operation')['properties'][$propertyId];
+	if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+	?>
+	<?php if ($property) : ?>
+		<th align="center">
+			
+			<?php $label = (array_key_exists('short', $property)) ? $property['short'][$context->getLocale()] : $property['labels'][$context->getLocale()] ?>
+		<?php if ($label) : ?>
+			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="<?php echo $propertyId ?>-anchor">
+				<span><?php echo $label ?></span>
+			<?php if ($major == $propertyId) : ?>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+			<?php endif ?>
+			</button>
+		<?php endif;?>
+		</th>
+	<?php endif;?>
+<?php endforeach;?>
+	</tr>
+
+<?php $i = 0; foreach ($operations as $operation) : ?>
+	
+	<tr class="operation">
+	
+		<td style="text-align: center">
+			<input type="hidden" id="<?php echo $operation->properties['sequence'] ?>-id" value="<?php echo $operation->properties['id'] ?>"/>
+			<button type="button" class="btn btn-default index-btn detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="detail-anchor_<?php echo $operation->properties['sequence'] ?>">
+				<span class="glyphicon glyphicon-zoom-in" id="<?php echo $operation->properties['sequence'] ?>-glyphicon"></span>
+			</button>
+<?php if ($i++ == 0 && $context->isDemoModeActive()) : ?>
+			<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['accounting_operation/list/detail'][$context->getLocale()] ?>">
+			    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+			</a>
+<?php endif;?>
+		</td>
+
+	<?php foreach ($context->getConfig('accounting_operation/list')['properties'] as $propertyId => $unused) : ?>
+		<?php 
+		$property = $context->getConfig('accounting_operation')['properties'][$propertyId];
+		if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+		?>
+		<?php if ($property) : ?>
+	
+			<?php if ($property['type'] == 'date') : ?>
+		<td><?php echo $context->decodeDate($operation->properties[$propertyId]) ?></td>
+
+			<?php elseif ($property['type'] == 'number') : ?>
+		<td style="text-align: right"><?php echo $context->formatFloat($operation->properties[$propertyId], 2) ?></td>
+
+			<?php elseif ($property['type'] =='select') : ?>
+		<td><?php if ($operation->properties[$propertyId]) echo $property['modalities'][$operation->properties[$propertyId]][$context->getLocale()] ?></td>
+
+			<?php else : ?>
+		<td><?php echo $operation->properties[$propertyId] ?></td>
+
+			<?php endif;?>
+
+		<?php endif;?>
+	<?php endforeach;?>
+	</tr>
+	
+	<tr class="detail-row" id="detail-row_<?php echo $operation->properties['sequence'] ?>" rowspan="2"><td colspan="99"><div class="col-md-6 col-md-offset-3 ppit-panel" id="detail-div_<?php echo $operation->properties['sequence'] ?>"></div></td></tr>
+	
+<?php endforeach; ?>
+	<tr>
+		<th colspan="<?php echo count($context->getConfig('accounting_operation/list')['properties']) + 1 ?>" style="text-align: center">
+<?php 
+$property = $context->getConfig('accounting_operation')['properties'][$major];
+if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+?>
+			<?php echo $property['labels'][$context->getLocale()] ?>&nbsp;&nbsp;&nbsp;&nbsp;
+			<?php echo $this->translate('Number', 'ppit-core', $context->getLocale()) ?>: <?php echo $count ?>&nbsp;&nbsp;&nbsp;&nbsp;
+			<?php if ($sum) echo $this->translate('Sum', 'ppit-core', $context->getLocale()).': '.$sum ?>&nbsp;&nbsp;&nbsp;&nbsp;
+			<?php if ($average) echo $this->translate('Average', 'ppit-core', $context->getLocale()).': '.$average ?>
+
+<?php if ($distribution) : ?>
+			<select id="select-distribution">
+	<?php foreach ($distribution as $modality => $value) : ?>
+				<option value="<?php echo $modality ?>"><?php echo $property['modalities'][$modality][$context->getLocale()] ?></option>
+	<?php endforeach;?>
+			</select>
+			&nbsp;&nbsp;
+	<?php foreach ($distribution as $modality => $value) : ?>
+			<span class="distribution" id="distribution_<?php echo $modality ?>"><?php echo $value ?> / <?php echo $count ?> = <?php echo round($value / $count * 100, 1) ?>%</span>
+	<?php endforeach;?>
+<?php endif;?>
+		</th>
+	</tr>
+
+</table>
+	</div>

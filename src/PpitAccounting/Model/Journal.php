@@ -28,6 +28,7 @@ class Journal implements InputFilterAwareInterface
 {
     public $id;
     public $status;
+    public $place_id;
     public $year;
     public $sequence;
     public $journal_code;
@@ -39,6 +40,7 @@ class Journal implements InputFilterAwareInterface
     public $proof_url;
     public $direction;
     public $amount;
+    public $total_amount;
     public $currency;
     public $account;
     public $sub_account;
@@ -46,6 +48,10 @@ class Journal implements InputFilterAwareInterface
     public $commitment_id;
     public $update_time;
 
+    // Joined properties
+    public $place_identifier;
+    public $place_caption;
+    
     // Transient properties
     public $rows = array();
     public $availableBankJournalEntries;
@@ -67,6 +73,7 @@ class Journal implements InputFilterAwareInterface
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
         $this->status = (isset($data['status'])) ? $data['status'] : null;
+        $this->place_id = (isset($data['place_id'])) ? $data['place_id'] : null;
         $this->year = (isset($data['year'])) ? $data['year'] : null;
         $this->sequence = (isset($data['sequence'])) ? $data['sequence'] : null;
         $this->journal_code = (isset($data['journal_code'])) ? $data['journal_code'] : null;
@@ -78,12 +85,17 @@ class Journal implements InputFilterAwareInterface
         $this->proof_url = (isset($data['proof_url'])) ? $data['proof_url'] : null;
         $this->direction = (isset($data['direction'])) ? $data['direction'] : null;
         $this->amount = (isset($data['amount'])) ? $data['amount'] : null;
+        $this->total_amount = (isset($data['total_amount'])) ? $data['total_amount'] : null;
         $this->currency = (isset($data['currency'])) ? $data['currency'] : null;
         $this->account = (isset($data['account'])) ? $data['account'] : null;
         $this->sub_account = (isset($data['sub_account'])) ? $data['sub_account'] : null;
         $this->expense_id = (isset($data['expense_id'])) ? $data['expense_id'] : null;
         $this->commitment_id = (isset($data['commitment_id'])) ? $data['commitment_id'] : null;
         $this->update_time = (isset($data['update_time'])) ? $data['update_time'] : null;
+
+        // Joined properties
+        $this->place_identifier = (isset($data['place_identifier'])) ? $data['place_identifier'] : null;
+        $this->place_caption = (isset($data['place_caption'])) ? $data['place_caption'] : null;
     }
 
     public function getProperties() {
@@ -91,7 +103,8 @@ class Journal implements InputFilterAwareInterface
     	
     	$data = array();
     	$data['id'] = (int) $this->id;
-    	$data['status'] = (int) $this->status;
+    	$data['status'] = $this->status;
+    	$data['place_id'] = (int) $this->place_id;
     	$data['year'] = $this->year;
     	$data['sequence'] = (int) $this->sequence;
     	$data['journal_code'] = $this->journal_code;
@@ -103,6 +116,7 @@ class Journal implements InputFilterAwareInterface
     	$data['proof_url'] = $this->proof_url;
     	$data['direction'] = $this->direction;
     	$data['amount'] = $this->amount;
+    	$data['total_amount'] = $this->total_amount;
     	$data['currency'] = $this->currency;
     	$data['account'] = $this->account;
     	$data['sub_account'] = $this->sub_account;
@@ -134,23 +148,25 @@ class Journal implements InputFilterAwareInterface
     	return $entries;
     }
 
-    public static function getList($journal_code, $params, $major, $dir, $mode = 'todo')
+    public static function getList($year, $journal_code, $params, $major = 'sequence', $dir = 'DESC', $mode = 'todo')
     {
     	$select = Journal::getTable()->getSelect()
-    		->order(array($major.' '.$dir, 'sequence DESC', 'id'));
+    		->order(array($major.' '.$dir, 'sequence DESC', 'journal_code','id'));
     	 
     	$where = new Where;
-    	$where->equalTo('journal_code', $journal_code);
+    	$where->equalTo('year', $year);
+    	if ($journal_code) $where->equalTo('journal_code', $journal_code);
 
     	// Todo list vs search modes
     	if ($mode == 'todo') {
-			$accountingYear = AccountingYear::getCurrent();
-    		$where->equalTo('year', $accountingYear->year);
-    		if ($journal_code == 'general') {
+			if (!$year) $year = AccountingYear::getCurrent()->year;
+    		$where->equalTo('year', $year);
+    		$where->equalTo('status', 'new');
+/*    		if ($journal_code == 'general') {
 	    		$where->greaterThanOrEqualTo('accounting_journal.account', '6');
 	    		$where->lessThanOrEqualTo('accounting_journal.account', '799999');
     		}
-//    		elseif ($journal_code == 'bank') $where->equalTo('sequence', 0);
+    		elseif ($journal_code == 'bank') $where->equalTo('sequence', 0);*/
     	}
     	else {
     	
@@ -206,6 +222,7 @@ class Journal implements InputFilterAwareInterface
     public static function instanciate()
     {
     	$journalEntry = new Journal;
+    	$journalEntry->status = 'new';
     	return $journalEntry;
     }
     
@@ -214,6 +231,10 @@ class Journal implements InputFilterAwareInterface
 		if (array_key_exists('status', $data)) {
     		$this->status = trim(strip_tags($data['status']));
     		if (!$this->status || strlen($this->status) > 255) return 'Integrity';
+		}
+		if (array_key_exists('place_id', $data)) {
+			$place_id = (int) $data['place_id'];
+			if ($this->place_id != $place_id) $auditRow['place_id'] = $this->place_id = $place_id;
 		}
 		if (array_key_exists('operation_date', $data)) {
     		$this->operation_date = trim(strip_tags($data['operation_date']));
@@ -235,7 +256,9 @@ class Journal implements InputFilterAwareInterface
 			$this->bank_journal_reference = (int) $data['bank_journal_reference'];
 		}
 		$this->rows = array();
+		$this->total_amount = 0;
 		foreach ($data['rows'] as $row) {
+			if ($row['direction'] == 1) $this->total_amount += $row['amount'];
 			$this->rows[] = $row;
 		}
 		if (array_key_exists('expense_id', $data)) {

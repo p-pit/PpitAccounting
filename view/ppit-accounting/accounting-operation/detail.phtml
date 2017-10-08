@@ -1,0 +1,53 @@
+<!-- 
+/**
+ * PpitCore V1.0 (https://github.com/p-pit/PpitCore)
+ *
+ * @link      https://github.com/p-pit/PpitCore
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitCore/blob/master/license.txt GNU-GPL license
+ */
+-->
+
+<div class="panel panel-default">
+	<div class="panel-heading" style="background:  <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
+		<strong><?php echo ($event->id) ? $this->translate('Detail', 'ppit-core', $context->getLocale()) : $this->translate('Add', 'ppit-core', $context->getLocale()) ?></strong>
+ 		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-default" title="<?php echo $this->translate('Return to list', 'ppit-core', $context->getLocale()) ?>" id="remove-anchor">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+ 		 </div>
+	</div>
+	<div class="panel-body">
+
+<?php if ($context->getConfig('event/detail'.(($type) ? '/'.$type : ''))['displayAudit'] && $event->id) : ?>
+<!-- Display the audit -->
+		<?php echo $this->translate('History', 'ppit-core', $context->getLocale()) ?> (<a id="audit-label"><?php echo $this->translate('Show', 'ppit-core', $context->getLocale()) ?></a>)
+		<div id="audit-panel" class="panel panel-default">
+			<div class="panel-body">
+	<?php foreach ($event->audit as $auditEvent) : ?>
+				<div class="row">
+					<div class="col-md-12">
+						<strong><?php echo $context->decodeDate(substr($auditEvent['time'], 0, 10)).substr($auditEvent['time'], 10) ?>:</strong>&nbsp;
+						(<?php echo $auditEvent['n_fn'] ?>)
+					</div>
+				</div>
+		<?php foreach ($auditEvent as $propertyId => $property) : ?>
+			<?php if ($propertyId != 'time' && $propertyId != 'n_fn') : ?>
+				<div class="row">
+					<div class="col-md-2" align="right">&nbsp;</div>
+					<div class="col-md-10"><em><?php echo $propertyId.': '.$property ?></em></div>
+				</div>
+			<?php endif;?>
+		<?php endforeach;?>
+	<?php endforeach;?>
+			</div>
+		</div>
+		<div>&nbsp;</div>
+		<div>
+<?php endif;?>
+
+		<div class="tab-content">
+			<div class="tab-pane fade in active" id="event-update-panel"></div>
+		</div>
+	</div>
+	

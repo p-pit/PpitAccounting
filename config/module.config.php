@@ -6,6 +6,7 @@ return array(
         'invokables' => array(
             'PpitAccounting\Controller\Account' => 'PpitAccounting\Controller\AccountController',
         	'PpitAccounting\Controller\Journal' => 'PpitAccounting\Controller\JournalController',
+        	'PpitAccounting\Controller\AccountingOperation' => 'PpitAccounting\Controller\AccountingOperationController',
         ),
     ),
 
@@ -250,8 +251,66 @@ return array(
             							),
             					),
             			),
+            			'reprise' => array(
+            					'type' => 'segment',
+            					'options' => array(
+            							'route' => '/reprise',
+            							'defaults' => array(
+            									'action' => 'reprise',
+            							),
+            					),
+            			),
             	),
            ),
+        	'accountingOperation' => array(
+                'type'    => 'literal',
+                'options' => array(
+                    'route'    => '/accounting-operation',
+                    'defaults' => array(
+                        'controller' => 'PpitAccounting\Controller\AccountingOperation',
+                        'action'     => 'index',
+                    ),
+                ),
+            	'may_terminate' => true,
+            		'child_routes' => array(
+            				'index' => array(
+            						'type' => 'segment',
+            						'options' => array(
+            								'route' => '/index[/:year][/:type]',
+            								'defaults' => array(
+            										'action' => 'index',
+            								),
+            						),
+            				),
+            				'search' => array(
+            						'type' => 'segment',
+            						'options' => array(
+            								'route' => '/search[/:year][/:type]',
+            								'defaults' => array(
+            										'action' => 'search',
+            								),
+            						),
+            				),
+            				'list' => array(
+	        						'type' => 'segment',
+	        						'options' => array(
+	        								'route' => '/list[/:year][/:type]',
+	        								'defaults' => array(
+	        										'action' => 'list',
+	        								),
+	        						),
+	        				),
+            				'detail' => array(
+            						'type' => 'segment',
+            						'options' => array(
+            								'route' => '/detail[/:year][/:type][/:sequence]',
+            								'defaults' => array(
+            										'action' => 'detail',
+            								),
+            						),
+            				),
+            		),
+            ),
         ),
     ),
 	'bjyauthorize' => array(
@@ -264,6 +323,7 @@ return array(
             	array('route' => 'account/balancePdf', 'roles' => array('admin')),
 				array('route' => 'account/incomeStatement', 'roles' => array('admin')),
 				array('route' => 'account/assessment', 'roles' => array('admin')),
+
 				array('route' => 'journal', 'roles' => array('admin')),
 				array('route' => 'journal/index', 'roles' => array('user')),
 				array('route' => 'journal/search', 'roles' => array('user')),
@@ -279,6 +339,13 @@ return array(
 				array('route' => 'journal/nextStep', 'roles' => array('admin')),
             	array('route' => 'journal/previousStep', 'roles' => array('admin')),
             	array('route' => 'journal/computeInterests', 'roles' => array('admin')),
+				array('route' => 'journal/reprise', 'roles' => array('admin')),
+
+				array('route' => 'accountingOperation', 'roles' => array('user')),
+				array('route' => 'accountingOperation/index', 'roles' => array('user')),
+				array('route' => 'accountingOperation/search', 'roles' => array('user')),
+				array('route' => 'accountingOperation/list', 'roles' => array('user')),
+				array('route' => 'accountingOperation/detail', 'roles' => array('user')),
 			)
 		)
 	),
@@ -700,8 +767,7 @@ return array(
 	'ppitApplications' => array(
 			'p-pit-finance' => array(
     				'labels' => array('fr_FR' => 'P-Pit Finance', 'en_US' => 'Finance by 2Pit'),
-    				'route' => 'expense',
-    				'params' => array(),
+    				'default' => 'expense',
 					'roles' => array(
 							'accountant' => array(
 									'show' => true,
@@ -725,29 +791,24 @@ return array(
 							),
 					),
 					'bank-statement' => array(
-							'action' => 'Journal',
 							'route' => 'journal/index',
 							'params' => array('journal_code' => 'bank'),
-							'urlParams' => array(),
 							'glyphicon' => 'glyphicon-ok',
 							'label' => array(
 									'en_US' => 'Bank statement',
 									'fr_FR' => 'Relevé bancaire',
 							),
 					),
-					'journal' => array(
-							'action' => 'Journal',
-							'route' => 'journal/index',
+					'operation' => array(
+							'route' => 'accountingOperation/index',
 							'params' => array(),
-							'urlParams' => array(),
 							'glyphicon' => 'glyphicon-list-alt',
 							'label' => array(
-									'en_US' => 'Journal',
-									'fr_FR' => 'Journal',
+									'en_US' => 'Operations',
+									'fr_FR' => 'Operations',
 							),
 					),
 					'balance' => array(
-							'action' => 'Balance',
 							'route' => 'account/balance',
 							'params' => array(),
 							'urlParams' => array(),
@@ -894,6 +955,180 @@ return array(
 			),
 	),
 
+	// Operation
+
+	'accounting_operation/type' => array(
+			'type' => 'select',
+			'modalities' => array(
+					'general' => array('en_US' => 'General', 'fr_FR' => 'General'),
+					'bank' => array('en_US' => 'Bank', 'fr_FR' => 'Banque'),
+					'sales' => array('en_US' => 'Sales', 'fr_FR' => 'Sales'),
+					'expenses' => array('en_US' => 'Expenses', 'fr_FR' => 'Expenses'),
+					'closing' => array('en_US' => 'Closing', 'fr_FR' => 'Clôture'),
+			),
+			'labels' => array(
+					'en_US' => 'Type',
+					'fr_FR' => 'Type',
+			),
+	),
+	'accounting_operation/status' => array(
+			'type' => 'select',
+			'modalities' => array(
+					'new' => array('en_US' => 'New', 'fr_FR' => 'Nouveau'),
+			),
+			'labels' => array(
+					'en_US' => 'Status',
+					'fr_FR' => 'Statut',
+			),
+	),
+	'accounting_operation/place_identifier' => array(
+			'type' => 'select',
+			'labels' => array(
+					'en_US' => 'Place code',
+					'fr_FR' => 'Code établissement',
+			),
+	),
+	'accounting_operation/place_caption' => array(
+			'type' => 'input',
+			'labels' => array(
+					'en_US' => 'Place',
+					'fr_FR' => 'Etablissement',
+			),
+	),
+	'accounting_operation/year' => array(
+			'type' => 'select',
+			'modalities' => array(
+					'2015' => array('en_US' => '2015', 'fr_FR' => '2015'),
+					'2016' => array('en_US' => '2016', 'fr_FR' => '2016'),
+					'2017' => array('en_US' => '2017', 'fr_FR' => '2017'),
+			),
+			'default' => 2017,
+			'labels' => array(
+					'en_US' => 'Year',
+					'fr_FR' => 'Année',
+			),
+	),
+	'accounting_operation/sequence' => array(
+			'type' => 'input',
+			'labels' => array(
+					'en_US' => 'Sequence',
+					'fr_FR' => 'Séquence',
+			),
+	),
+	'accounting_operation/operation_date' => array(
+			'type' => 'date',
+			'labels' => array(
+					'en_US' => 'Operation date',
+					'fr_FR' => 'Date d\'opération',
+			),
+	),
+	'accounting_operation/accounting_date' => array(
+			'type' => 'date',
+			'labels' => array(
+					'en_US' => 'Accounting date',
+					'fr_FR' => 'Date de comptabilisation',
+			),
+	),
+	'accounting_operation/reference' => array(
+			'type' => 'input',
+			'labels' => array(
+					'en_US' => 'Reference',
+					'fr_FR' => 'Référence',
+			),
+	),
+	'accounting_operation/caption' => array(
+			'type' => 'input',
+			'labels' => array(
+					'en_US' => 'Caption',
+					'fr_FR' => 'Libellé',
+			),
+	),
+	'accounting_operation/total_amount' => array(
+			'type' => 'number',
+			'labels' => array(
+					'en_US' => 'Total amount',
+					'fr_FR' => 'Montant total',
+			),
+	),
+	'accounting_operation/currency' => array(
+			'type' => 'select',
+			'modalities' => array(
+					'EUR' => array('en_US' => '€', 'fr_FR' => '€'),
+			),
+			'labels' => array(
+					'en_US' => 'Currency',
+					'fr_FR' => 'Devise',
+			),
+	),
+	'accounting_operation/update_time' => array(
+			'type' => 'datetime',
+			'labels' => array(
+					'en_US' => 'Update time',
+					'fr_FR' => 'Heure de mise à jour',
+			),
+	),
+		
+	'accounting_operation' => array(
+			'properties' => array(
+					'type' => array('type' => 'specific', 'definition' => 'accounting_operation/type'),
+					'status' => array('type' => 'specific', 'definition' => 'accounting_operation/status'),
+					'place_identifier' => array('type' => 'specific', 'definition' => 'accounting_operation/place_identifier'),
+					'place_caption' => array('type' => 'specific', 'definition' => 'accounting_operation/place_caption'),
+					'year' => array('type' => 'specific', 'definition' => 'accounting_operation/year'),
+					'sequence' => array('type' => 'specific', 'definition' => 'accounting_operation/sequence'),
+					'operation_date' => array('type' => 'specific', 'definition' => 'accounting_operation/operation_date'),
+					'accounting_date' => array('type' => 'specific', 'definition' => 'accounting_operation/accounting_date'),
+					'reference' => array('type' => 'specific', 'definition' => 'accounting_operation/reference'),
+					'caption' => array('type' => 'specific', 'definition' => 'accounting_operation/caption'),
+					'total_amount' => array('type' => 'specific', 'definition' => 'accounting_operation/total_amount'),
+					'currency' => array('type' => 'specific', 'definition' => 'accounting_operation/currency'),
+					'update_time' => array('type' => 'specific', 'definition' => 'accounting_operation/update_time'),
+			),
+	),
+	
+	'accounting_operation/index' => array(
+			'title' => array('en_US' => 'P-Pit Finance', 'fr_FR' => 'P-Pit Finance'),
+	),
+	
+	'accounting_operation/search' => array(
+			'title' => array('en_US' => 'Operations', 'fr_FR' => 'Opérations'),
+			'todoTitle' => array('en_US' => 'to be validated', 'fr_FR' => 'à valider'),
+			'searchTitle' => array('en_US' => 'search', 'fr_FR' => 'recherche'),
+			'properties' => array(
+					'type' => null,
+					'status' => null,
+					'place_identifier' => null,
+					'year' => null,
+					'operation_date' => null,
+					'reference' => null,
+					'caption' => null,
+					'total_amount' => null,
+					'update_time' => null,
+			),
+	),
+	
+	'accounting_operation/list' => array(
+			'properties' => array(
+					'type' => null,
+					'status' => null,
+					'place_caption' => null,
+					'year' => null,
+					'sequence' => null,
+					'operation_date' => null,
+					'reference' => null,
+					'caption' => null,
+					'total_amount' => null,
+					'currency' => null,
+					'update_time' => null,
+			),
+	),
+	
+	'accounting_operation/detail' => array(
+			'title' => array('en_US' => 'Operation detail', 'fr_FR' => 'Détail de l\'opération'),
+			'displayAudit' => true,
+	),
+
+	// Journal rows
 	'journal/index' => array(
 			'title' => array('en_US' => 'P-PIT Accounting', 'fr_FR' => 'P-PIT Finances'),
 	),

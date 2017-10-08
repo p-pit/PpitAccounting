@@ -1,0 +1,56 @@
+<!-- 
+/**
+ * PpitAccounting V1.0 (https://github.com/p-pit/PpitAccounting)
+ *
+ * @link      https://github.com/p-pit/PpitAccounting
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitAccounting/blob/master/license.txt GNU-GPL license
+ */
+-->
+
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+
+<?php
+$title = $context->getConfig('accounting_operation/index')['title'][$context->getLocale()];
+$this->headTitle($title);
+echo $this->partial('/partials/header');
+?>
+	<div>&nbsp;</div>
+	<div class="row" id="main_menu" >
+
+<?php foreach ($context->getConfig('menus/p-pit-finance') as $entryId => $entryDef) : ?>
+	<?php if ($context->isAllowed($entryDef['route'])) : ?>
+		<?php if ($entryId == $type) $color = 'btn-primary'; else $color = 'btn-default' ?>
+		<div class="col-md-2">
+				<button type="button" class="btn menu-btn <?php echo $color ?>" style="width:100%; text-align: left" id="<?php echo $entryId ?>-anchor">
+				<?php if (array_key_exists('glyphicon', $entryDef)) : ?>
+					<span class="glyphicon <?php echo $entryDef['glyphicon'] ?>"></span>
+				<?php endif;?>
+					<?php echo $entryDef['label'][$context->getLocale()] ?>
+				</button>
+		</div>
+	<?php endif ?>
+<?php endforeach;?>
+
+	</div>
+	<div>&nbsp;</div>
+
+	<!-- Main panel -->
+<div class="row">
+	<div class="col-md-12 ppit-panel" id="index_action"></div>
+</div
+
+<div>&nbsp;</div>
+
+<script>
+
+<?php echo $this->partial('/partials/accounting-operation-scripts') ?>
+
+<?php foreach ($context->getConfig('menus/p-pit-finance') as $entryId => $entryDef) : ?>
+$('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route'], $entryDef['params']) ?>'); });
+<?php endforeach;?>
+
+activateOperation();
+
+</script>

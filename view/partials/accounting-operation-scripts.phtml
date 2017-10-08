@@ -1,0 +1,649 @@
+/**
+ * PpitAccounting V1.0 (https://github.com/p-pit/PpitAccounting)
+ *
+ * @link      https://github.com/p-pit/PpitAccounting
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitCore/blob/master/license.txt GNU-GPL license
+ */
+
+function connectRemoveIcon(id, target)
+{
+	$('#' + id).click(function () {
+
+		// Highlight the clicked button (and only it in its class)
+		$('.index-btn').removeClass("btn-primary").addClass("btn-default");
+		$('.index-btn').attr('disabled', false);
+
+		$('#' + target).hide();
+		filterList();
+	});
+}
+
+function getParams() {
+
+	var params = '?', todo = true;
+
+<?php foreach ($context->getConfig('accounting_operation/search')['properties'] as $propertyId => $unused) : ?>
+	<?php 
+	$property = $context->getConfig('accounting_operation')['properties'][$propertyId];
+	if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+	?>
+
+	<?php if (in_array($property['type'], array('date', 'time', 'datetime', 'number'))) : ?>
+
+	if (document.getElementById('search_check_min_<?php echo $propertyId ?>').checked) {
+		var min_<?php echo $propertyId ?> = $('#search_min_<?php echo $propertyId ?>').val();
+		<?php if ($property['type'] == 'date') : ?>
+			if (min_<?php echo $propertyId ?>) min_<?php echo $propertyId ?> = encodeDate(min_<?php echo $propertyId ?>);
+		<?php endif;?>
+		params += 'min_<?php echo $propertyId ?>=' + min_<?php echo $propertyId ?> + '&'; 
+		todo = false;
+	}
+
+	if (document.getElementById('search_check_max_<?php echo $propertyId ?>').checked) {
+		var max_<?php echo $propertyId ?> = $('#search_max_<?php echo $propertyId ?>').val();
+		<?php if ($property['type'] == 'date') : ?>
+			if (max_<?php echo $propertyId ?>) max_<?php echo $propertyId ?> = encodeDate(max_<?php echo $propertyId ?>);
+		<?php endif;?>
+		params += 'max_<?php echo $propertyId ?>=' + max_<?php echo $propertyId ?> + '&'; 
+		todo = false;
+	}
+
+	<?php else : ?>
+	if (document.getElementById('search_check_<?php echo $propertyId ?>').checked) {
+		params += '<?php echo $propertyId ?>=' + $('#search_<?php echo $propertyId ?>').val() + '&'; todo = false;
+	}
+
+	<?php endif;?>
+
+<?php endforeach;?>
+
+	<?php
+	$todoTitle = $context->getConfig('accounting_operation/search')['todoTitle'][$context->getLocale()];
+	$searchTitle = $context->getConfig('accounting_operation/search')['searchTitle'][$context->getLocale()];
+	?>
+	$('#mode-text').text((todo) ? '<?php echo $todoTitle ?>' : '<?php echo $searchTitle ?>');
+
+	return params;
+}
+
+// Export the list
+function exportList() {
+
+	var params = getParams();
+	document.location.href = '<?php echo $this->url('journal/export') ?>' + '<?php echo (($type) ? '/'.$type : '') ?>' + params;
+}
+
+function sortList(criterion) {
+
+	var dir;
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (criterion + '-anchor' == ascCriterion) dir = 'DESC'; else dir = 'ASC';
+	getList(getParams(), criterion, dir);
+}
+
+function maskList(column) {
+
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (ascCriterion) {
+		criterion = ascCriterion.split('-')[0];
+		dir = 'ASC';
+	}
+	else if (descCriterion) {
+		criterion = descCriterion.split('-')[0];
+		dir = 'DESC';
+	}
+	else {
+		criterion = 'update_time';
+		dir = 'DESC';
+	}
+	var params = getParams();
+	params += '&mask=' + column;
+	getList(params, criterion, dir);
+}
+
+function unmaskList(column) {
+
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (ascCriterion) {
+		criterion = ascCriterion.split('-')[0];
+		dir = 'ASC';
+	}
+	else if (descCriterion) {
+		criterion = descCriterion.split('-')[0];
+		dir = 'DESC';
+	}
+	else {
+		criterion = 'update_time';
+		dir = 'DESC';
+	}
+	var params = getParams();
+	params += '&unmask=' + column;
+	getList(params, criterion, dir);
+}
+
+function filterList() {
+
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (ascCriterion) {
+		criterion = ascCriterion.split('-')[0];
+		dir = 'ASC';
+	}
+	else if (descCriterion) {
+		criterion = descCriterion.split('-')[0];
+		dir = 'DESC';
+	}
+	else {
+		criterion = 'update_time';
+		dir = 'DESC';
+	}
+	getList(getParams(), criterion, dir);
+}
+
+function connectSearchInputs() {
+
+	$('#erase-button').click(function () { 
+		$('.search_input').val('');
+		$('.search_check').attr('checked', false);
+		filterList();
+	});
+
+<?php foreach ($context->getConfig('accounting_operation/search')['properties'] as $propertyId => $unused) : ?>
+	<?php
+	$property = $context->getConfig('accounting_operation')['properties'][$propertyId];
+	if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+	?>
+
+	<?php if ($propertyId == 'type') : ?>
+		$('#search_<?php echo $propertyId ?>').change(function () { 
+			document.location.href = '<?php echo $this->url('accountingOperation/index', array('year' => $year)) ?>' + (($('#search_type').val()) ? '/' + $('#search_type').val() : ''); 
+		});
+
+	<?php elseif ($propertyId == 'year') : ?>
+		$('#search_<?php echo $propertyId ?>').change(function () { 
+			document.location.href = '<?php echo $this->url('accountingOperation/index') ?>/' + $('#search_year').val() + '<?php echo ($type) ? '/'.$type : '' ?>';
+		});
+
+	<?php elseif (in_array($property['type'], array('date', 'time', 'datetime', 'number'))) : ?>
+
+	$('#search_check_min_<?php echo $propertyId ?>').change(function () {
+
+		$('#search-button').removeClass('btn-default').addClass('btn-success');
+		$('#search-button').unbind('click');
+		$('#search-button').click(function () { 
+			getList(getParams(), 'update_time', 'DESC');
+		});
+		if (!document.getElementById('search_check_min_<?php echo $propertyId ?>').checked) {
+			$('#search_min_<?php echo $propertyId ?>').val('');
+		}
+	});
+
+	$('#search_min_<?php echo $propertyId ?>').change(function () { 
+		$('#search-button').removeClass('btn-default').addClass('btn-success');
+		$('#search-button').unbind('click');
+		$('#search-button').click(function () { 
+			getList(getParams(), 'update_time', 'DESC');
+		});
+		document.getElementById('search_check_min_<?php echo $propertyId ?>').checked = true;	
+	});
+	$('#search_max_<?php echo $propertyId ?>').change(function () { 
+		$('#search-button').removeClass('btn-default').addClass('btn-success');
+		$('#search-button').unbind('click');
+		$('#search-button').click(function () { 
+			getList(getParams(), 'update_time', 'DESC');
+		});
+		document.getElementById('search_check_max_<?php echo $propertyId ?>').checked = true;	
+	});
+
+		<?php if ($property['type'] == 'date') : ?>
+	$("#search_min_<?php echo $propertyId ?>").datepicker();
+	$("#search_max_<?php echo $propertyId ?>").datepicker();
+		<?php endif;?>
+	
+	<?php else : ?>
+
+	$('#search_check_<?php echo $propertyId ?>').change(function () {
+		$('#search-button').removeClass('btn-default').addClass('btn-success');
+		$('#search-button').unbind('click');
+		$('#search-button').click(function () { 
+			getList(getParams(), 'update_time', 'DESC');
+		});
+		if (!document.getElementById('search_check_<?php echo $propertyId ?>').checked) {
+			$('#search_<?php echo $propertyId ?>').val('');
+		}
+	});
+		
+		<?php if ($property['type'] == 'select') : ?>
+	$('#search_<?php echo $propertyId ?>').change(function () { 
+		$('#search-button').removeClass('btn-default').addClass('btn-success');
+		$('#search-button').unbind('click');
+		$('#search-button').click(function () { 
+			getList(getParams(), 'update_time', 'DESC');
+		});
+		document.getElementById('search_check_<?php echo $propertyId ?>').checked = true;
+	});
+	
+		<?php else : ?>
+	$('#search_<?php echo $propertyId ?>').keyup(function () {
+		$('#search-button').removeClass('btn-default').addClass('btn-success');
+		$('#search-button').unbind('click');
+		$('#search-button').click(function () { 
+			getList(getParams(), 'update_time', 'DESC');
+		});
+		document.getElementById('search_check_<?php echo $propertyId ?>').checked = true;	
+	});
+	
+		<?php endif;?>
+
+		<?php if ($property['type'] == 'date') : ?>
+	$("#search_<?php echo $propertyId ?>").datepicker();
+		<?php endif;?>
+
+	<?php endif;?>
+<?php endforeach;?>
+}
+ 
+function showChart(params) {
+
+	// Execute the ajax request
+	var route = '<?php /*echo $this->url('accountingOperation/distribute')*/ ?>' + '<?php echo (($type) ? '/'.$type : '') ?>' + params;
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
+		if (xhttp.readyState == 4) {
+	<?php if (!$context->getConfig()['isTraceActive']) : ?>
+			if (xhttp.status == 200) {
+	<?php endif;?>
+		    var option = {
+			    responsive: true,
+		    };
+		    var ctx = document.getElementById("chart").getContext('2d');
+			var data = JSON.parse(xhttp.responseText);
+			var myChart = new Chart(ctx).Doughnut(data,option);
+<?php if (!$context->getConfig()['isTraceActive']) : ?>
+			}
+<?php endif;?>
+		}
+	}
+	xhttp.send();
+}
+
+// Load the list
+function getList(params, major, dir) {		
+
+	if ('<?php echo $type ?>') showChart(params);
+
+	// Execute the ajax request
+	var route = '<?php echo $this->url('accountingOperation/list', array('year' => $year, 'type' => $type)) ?>' + params + '&major=' + major + (((dir =='ASC') ? '&dir=ASC' : '&dir=DESC'));
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
+		if (xhttp.readyState == 4) {
+	<?php if (!$context->getConfig()['isTraceActive']) : ?>
+			if (xhttp.status == 200) {
+	<?php endif;?>
+			document.getElementById('list-panel').innerHTML = xhttp.responseText;
+		
+			$('#export-button').click(function () { exportList(); });
+
+			$('.detail-row').hide();
+			$('.invisible').hide();
+			
+			$(function () {
+			    $('.tip').tooltip({
+			        content: function () {
+			            return $(this).prop('title');
+			        }
+			    });
+			});
+			
+			$('.input_cell').keyup(function () {
+				var cells = $(this).val().split('\t');
+				k = 0;
+				for (i = 0; i < 16; i++) {
+					for (j = 0; j < <?php echo count($context->getConfig('accounting_operation/list')) ?>; j++) {
+						$('#input_cell_' + i + '_' + j).val(cells[k]);
+						if (k >= cells.length) break;
+						k++;
+					}
+					if (k >= cells.length) break;
+				}
+			});
+			
+			// Connect the sort anchors
+			$('.ppit-sort-anchor').each(function () {
+				$(this).click(function () {
+					sortList($(this).attr('id').split('-')[0]);
+				});
+			});
+			
+			// Connect the admin anchor
+			$('#admin-anchor').click(function () { 
+				document.location.href = '<?php echo $this->url('accountingOperation/index', array('type' => $type)) ?>'; 
+			});
+
+			// Connect the plus (unmask) anchors
+			$('.plus-anchor').each(function () {
+				$(this).click(function () {
+					unmaskList($(this).attr('id').split('-')[0]);
+				});
+			});
+			
+			// Connect the minus (mask) anchors
+			$('.minus-anchor').each(function () {
+				$(this).click(function () {
+					maskList($(this).attr('id').split('-')[0]);
+				});
+			});
+			
+			// Connect the detail anchors
+			$('.detail-anchor').each(function () {
+				$(this).click(function () {
+					var sequence = $(this).attr('id').split('_')[1];
+					getJournalDetail(sequence, $('#' + sequence + '-id').val());
+				});
+			});
+			
+			// Connect the distribution anchor
+			$('.distribution').hide();
+			var distributionValue = $('#select-distribution').val();
+			$('#distribution_' + distributionValue).show();
+			$('#select-distribution').change(function () {
+				$('.distribution').hide();
+				var distributionValue = $('#select-distribution').val();
+				$('#distribution_' + distributionValue).show();
+			});
+<?php if (!$context->getConfig()['isTraceActive']) : ?>
+			}
+<?php endif;?>
+		}
+	}
+	xhttp.send();
+	$('#search-button').removeClass('btn-success').addClass('btn-default');
+/*	$('#search-button').unbind('click');
+	$('#search-button').click(unpressSearchButton);*/
+}
+
+function pressSearchButton() {
+		$('.search').show();
+//		$('#search-button').addClass('active');
+/*		$('#search-button').attr('aria-pressed', 'true');
+		$('#search-button').unbind('click');
+		$('#search-button').click(unpressSearchButton);*/
+}
+
+function unpressSearchButton() {
+		$('.search').hide();
+		$('#search-button').removeClass('active');
+		$('#search-button').attr('aria-pressed', 'false');
+		$('#search-button').unbind('click');
+		$('#search-button').click(pressSearchButton);
+}
+
+function getSearch()
+{
+	// Hide the other panels
+	$('.ppit-panel').hide();
+	$('#index_action').show();
+	// Anchor to the main panel
+	$(location).attr('hash', '#');
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("GET", '<?php echo $this->url('accountingOperation/search', array('year' => $year, 'type' => $type)) ?>', false);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
+		if (xhttp.readyState == 4) {
+	<?php if (!$context->getConfig()['isTraceActive']) : ?>
+			if (xhttp.status == 200) {
+	<?php endif;?>
+				document.getElementById('index_action').innerHTML = xhttp.responseText;
+//				$('.search').hide();
+//				$('#search-button').click(pressSearchButton);
+				pressSearchButton();
+				<?php
+				$todoTitle = $context->getConfig('accountingOperation/search')['todoTitle'][$context->getLocale()];
+				?>
+				$('#mode-text').text('<?php echo $todoTitle ?>');
+				connectSearchInputs();
+	<?php if (!$context->getConfig()['isTraceActive']) : ?>
+			}
+	<?php endif;?>
+		}
+	}
+	xhttp.send();
+}
+
+function connectAuditPanel()
+{
+	$('#audit-panel').hide();
+	$('#audit-label').click(function () {
+		if ($('#audit-label').text() == '<?php echo $this->translate('Show', 'ppit-core', $context->getLocale()) ?>') {
+			$('#audit-panel').show();
+			$('#audit-label').text('<?php echo $this->translate('Mask', 'ppit-core', $context->getLocale()) ?>');
+		}
+		else {
+			$('#audit-panel').hide();
+			$('#audit-label').text('<?php echo $this->translate('Show', 'ppit-core', $context->getLocale()) ?>');
+		}
+	});
+}
+
+function connectJournalUpdateForm(id, action)
+{
+<?php foreach ($context->getConfig('journal_properties') as $propertyId => $property) : ?>
+	<?php if ($property['type'] == 'date') : ?>
+		$('#input_<?php echo $propertyId ?>').datepicker();
+	<?php endif;?>
+<?php endforeach ?>
+
+	var form = document.getElementById('ppit-form');
+	form.onsubmit = function(event) {
+		
+		event.preventDefault();
+	
+		// Check validity
+		var validity = checkJournalUpdateProperties(id);
+	
+		if (validity) {
+		
+			// Create a new FormData object.
+			var formData = new FormData();
+			
+			// Get the properties values
+<?php foreach ($context->getConfig('journal_properties') as $propertyId => $property) : ?>
+
+	<?php if ($property['type'] == 'input' || $property['type'] == 'date' || $property['type'] == 'textarea' || $property['type'] == 'select' || $property['type'] == 'number' || $property['type'] == 'email' || $property['type'] == 'phone' || $property['type'] == 'hidden') : ?>
+				formData.append('<?php echo $propertyId ?>', document.getElementById('<?php echo $propertyId ?>').value);
+
+	<?php elseif ($property['type'] == 'checkbox') : ?>
+				formData.append('<?php echo $propertyId ?>', ((document.getElementById('<?php echo $propertyId ?>').checked) ? 1 : 0));
+
+	<?php elseif ($property['type'] == 'file') : ?>
+				var fileSelect = document.getElementById('order_form');
+				if (fileSelect) {
+					var files = fileSelect.files;
+					for (var i = 0; i < files.length; i++) {
+						var file = files[i];
+						formData.append('order_form', file, file.name);
+					}
+				}
+
+	<?php endif ?>
+
+<?php endforeach ?>
+
+			var xhttp = new XMLHttpRequest();
+			var route, target;
+			route = '<?php echo $this->url('journal/update') ?>/' + id + '/' + action;
+			target = 'account-update-panel';
+			xhttp.open('POST', route, true);
+			// Set up a handler for when the request finishes.
+			xhttp.onload = function () {
+				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+
+<?php if ($context->getConfig()['isTraceActive']) : ?>
+					console.log('post, route = ' + route);
+					console.log(xhttp.responseText);
+<?php endif;?>
+					document.getElementById(target).innerHTML = xhttp.responseText;
+					getJournalList('?', 'operation_date', 'DESC');
+					$('.action-btn').removeClass('btn-primary').addClass('btn-default');
+				}
+			};
+			xhttp.send(formData);
+		}
+		else return false;
+	}
+}
+
+function getBankList() {
+	
+	var xhttp = new XMLHttpRequest();
+	var route = '<?php echo $this->url('journal/bankList') ?>';
+
+	xhttp.open('GET', route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4) {
+			document.getElementById('journal-bank-list-panel').innerHTML = xhttp.responseText;
+		}
+	}
+	xhttp.send();
+}
+
+<?php 
+$properties = array();
+$properties['operation_date'] = array('type' => 'date', 'mandatory' => true);
+$properties['reference'] = array('type' => 'input', 'mandatory' => false, 'maxSize' => 255);
+$properties['caption'] = array('type' => 'input', 'mandatory' => false, 'maxSize' => 255);
+$properties['proof_id'] = array('type' => 'file');
+$properties['bank_journal_reference'] = array('type' => 'select', 'mandatory' => false);
+
+for ($i = 0; $i < 10; $i++) {
+	$properties['direction_'.$i] = array('type' => 'select', 'mandatory' => false);
+	$properties['amount_'.$i] = array('type' => 'number', 'mandatory' => false, 'minValue' => 0, 'maxValue' => 9999999999);
+	$properties['account_'.$i] = array('type' => 'select', 'mandatory' => false);
+}
+$properties['update_time'] = array('type' => 'hidden');
+
+echo $this->partial('/partials/check-update-properties', array('entity' => 'Journal', 'context' => $context, 'properties' => $properties)) 
+?>
+
+function connectJournalUpdateForm(sequence, id)
+{
+<?php foreach ($properties as $property_id => $property) : ?>
+	<?php if ($property['type'] == 'date') : ?>
+		$('#input_<?php echo $property_id ?>').datepicker();
+	<?php endif;?>
+<?php endforeach ?>
+
+	var form = document.getElementById('ppit-form');
+	form.onsubmit = function(event) {
+		
+		event.preventDefault();
+	
+		// Check validity
+		var validity = checkJournalUpdateProperties();
+	
+		if (validity) {
+		
+			// Create a new FormData object.
+			var formData = new FormData();
+			
+			// Get the properties values
+<?php foreach ($properties as $property_id => $property) : ?>
+
+	<?php if ($property['type'] == 'input' || $property['type'] == 'date' || $property['type'] == 'textarea' || $property['type'] == 'select' || $property['type'] == 'number' || $property['type'] == 'email' || $property['type'] == 'phone' || $property['type'] == 'hidden') : ?>
+				formData.append('<?php echo $property_id ?>', document.getElementById('<?php echo $property_id ?>').value);
+
+	<?php elseif ($property['type'] == 'checkbox') : ?>
+				formData.append('<?php echo $property_id ?>', ((document.getElementById('<?php echo $property_id ?>').checked) ? 1 : 0));
+
+	<?php elseif ($property['type'] == 'file') : ?>
+				var fileSelect = document.getElementById('proof_id');
+				if (fileSelect) {
+					var files = fileSelect.files;
+					for (var i = 0; i < files.length; i++) {
+						var file = files[i];
+						formData.append('proof_id', file, file.name);
+					}
+				}
+	<?php endif ?>
+
+<?php endforeach ?>
+
+			var xhttp = new XMLHttpRequest();
+			var route, target;
+			route = '<?php echo $this->url('journal/update') ?>/' + id;
+			target = 'journal-update-panel';
+			xhttp.open('POST', route, true);
+			// Set up a handler for when the request finishes.
+			xhttp.onload = function () {
+				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+
+<?php if ($context->getConfig()['isTraceActive']) : ?>
+					console.log('post, route = ' + route);
+					console.log(xhttp.responseText);
+<?php endif;?>
+					document.getElementById(target).innerHTML = xhttp.responseText;
+					getList('?', 'sequence', 'DESC');
+					$('.action-btn').removeClass('btn-primary').addClass('btn-default');
+				}
+			};
+			xhttp.send(formData);
+		}
+		else return false;
+	}
+}
+
+function getJournalUpdate(sequence, id) {
+	
+	var xhttp = new XMLHttpRequest();
+	var route = '<?php echo $this->url('journal/update') ?>/' + id;
+
+	xhttp.open('GET', route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4) {
+			document.getElementById('journal-update-panel').innerHTML = xhttp.responseText;
+			connectJournalUpdateForm(sequence, id);
+		}
+	}
+	xhttp.send();
+}
+
+// Load the detail panel
+function getJournalDetail(sequence, id) {
+
+	// Ensure the target is displayed
+	$('#detail-row_' + sequence).show();
+
+	var route = '<?php echo $this->url('journal/detail') ?>' + '/' + id;
+
+	// Execute the ajax request
+	xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
+		if (xhttp.readyState == 4) {
+			document.getElementById('detail-row_' + sequence).innerHTML = xhttp.responseText;
+
+			connectRemoveIcon('remove-anchor', 'form_action');
+			getBankList();
+			getJournalUpdate(sequence, id);
+		}
+	}
+	xhttp.send();
+
+	// Highlight the clicked button (and only it in its class)
+	$('.index-btn').removeClass("btn-primary").addClass("btn-default");
+	$('#detail-anchor_' + sequence).removeClass("btn-default").addClass("btn-primary");
+}
+
+function activateOperation() {
+	getSearch();
+	getList('?', 'sequence', 'DESC');
+}

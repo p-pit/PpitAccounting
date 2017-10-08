@@ -95,7 +95,7 @@ class JournalController extends AbstractActionController
     	if (count($params) == 0) $mode = 'todo'; else $mode = 'search';
 
     	// Retrieve the list
-    	$entries = Journal::getList($journal_code, $params, $major, $dir, $mode);
+    	$entries = Journal::getList(null, $journal_code, $params, $major, $dir, $mode);
 
     	// Return the link list
     	$view = new ViewModel(array(
@@ -188,7 +188,7 @@ class JournalController extends AbstractActionController
 		// Retrieve the book entry
 		$id = (int) $this->params()->fromRoute('id', 0);
 		if ($id) $journal = Journal::retrieve($id);
-		else $journal = new Journal;
+		else $journal = Journal::instanciate();
 		$journal->availableBankJournalEntries = Journal::getAvailableBankJournalEntries();
 		if ($journal->bank_journal_entry) $journal->availableBankJournalEntries[] = $journal->bank_journal_entry;
 		
@@ -481,5 +481,29 @@ class JournalController extends AbstractActionController
 			throw $e;
 		}
 	    return $this->response;
+    }
+    
+    public function repriseAction()
+    {
+    	$entries = Journal::getList('2016', null, array(), 'sequence', 'ASC');
+    	$currentId = null;
+    	$amounts = array();
+    	foreach ($entries as $entry) {
+    		if ($entry->sequence) {
+	    		if ($entry->sequence.'_'.$entry->journal_code != $currentId) {
+	    			$currentId = $entry->sequence.'_'.$entry->journal_code;
+	    			$amounts[$currentId] = 0;
+	    		}
+	    		if ($entry->direction == 1) $amounts[$currentId] += $entry->amount;
+    		}
+    	}
+    	foreach ($entries as $entry) {
+    		if ($entry->sequence) {
+	    		$entry->total_amount = $amounts[$entry->sequence.'_'.$entry->journal_code];
+	    		echo $entry->sequence.'_'.$entry->journal_code.' '.$entry->total_amount.'<br>';
+				Journal::getTable()->save($entry);
+    		}
+    	}
+    	return $this->response;
     }
 }

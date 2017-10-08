@@ -1,0 +1,151 @@
+<!-- 
+/**
+ * PpitAccounting V1.0 (https://github.com/p-pit/PpitAccounting)
+ *
+ * @link      https://github.com/p-pit/PpitAccounting
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitCore/blob/master/license.txt GNU-GPL license
+ */
+-->
+
+<div class="panel panel-default">
+	<div class="panel-heading" style="background: <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
+		<strong>
+			<?php 
+			$title = $context->getConfig('accounting_operation/search')['title'][$context->getLocale()];
+			echo $title;
+			?>
+			(<span id="mode-text"></span>)
+		</strong>
+	
+<?php if ($context->isDemoModeActive()) : ?>
+		<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['accounting_operation/search/title'][$context->getLocale()] ?>">
+		    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+		</a>
+<?php endif;?>
+	</div>
+	<div class="panel-body">
+
+		<div class="col-md-6">
+
+<!-- Filters -->
+
+		<div class="col-sm-6">&nbsp;</div>
+		
+		<div class="col-sm-3">
+    		<button type="button" class="form-control btn btn-default btn-xs" title="<?php echo $this->translate('Search', 'ppit-core', $context->getLocale()) ?>" id="search-button">
+				<span class="glyphicon glyphicon-search"></span>
+			</button>
+<?php if ($context->isDemoModeActive()) : ?>
+				<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['accounting_operation/search'][$context->getLocale()] ?>">
+				    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+				</a>
+<?php endif;?>
+		</div>
+		<div class="col-sm-3 search">
+    		<button type="button" class="form-control btn btn-default btn-xs" title="<?php echo $this->translate('Erase', 'ppit-core', $context->getLocale()) ?>" id="erase-button">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+<?php if ($context->isDemoModeActive()) : ?>
+				<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['accounting_operation/search/x'][$context->getLocale()] ?>">
+				    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+				</a>
+<?php endif;?>
+		</div>
+		
+<?php foreach ($context->getConfig('accounting_operation/search')['properties'] as $propertyId => $unused) : ?>
+	<?php 
+	$property = $context->getConfig('accounting_operation')['properties'][$propertyId];
+	if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+	?>
+
+	<?php if ($property['type'] == 'select') : ?>
+
+		<label class="col-sm-6 control-label search"><?php echo $property['labels'][$context->getLocale()] ?></label>
+		<div class="input-group search">
+		    <span class="input-group-addon">
+				<input type="checkbox" class="search_check" id="search_check_<?php echo $propertyId ?>">
+			</span>
+
+			<?php		
+			$modalities = array();
+			if (array_key_exists('p-pit-studies', $context->getPerimeters()) && array_key_exists($propertyId, $context->getPerimeters()['p-pit-studies'])) {
+				foreach ($context->getPerimeters()['p-pit-studies'][$propertyId] as $modalityId) {
+					if ($propertyId == 'place_identifier') $modalities[$modalityId] = $places[$modalityId]->caption;
+					else $modalities[$modalityId] = $property['modalities'][$modalityId][$context->getLocale()];
+				} 
+			}
+			else {
+				if ($propertyId == 'place_identifier') foreach ($places as $place) {
+					$modalities[$place->id] = $place->caption;
+				} 
+				else foreach ($property['modalities'] as $modalityId => $modality) {
+					$modalities[$modalityId] = $modality[$context->getLocale()];
+				} 
+			}
+			?>
+
+			<select class="form-control search_input" id="search_<?php echo $propertyId ?>">
+				<option value=""></option>
+			<?php foreach ($modalities as $modalityId => $modality) : ?>
+				<?php 
+				if ($propertyId == 'year' && $modalityId == $year) $value = $year;
+				elseif ($propertyId == 'type' && $modalityId == $type) $value = $type;
+				else $value = '';
+				?>
+	    		<option value="<?php echo $modalityId ?>" <?php if ($value) echo 'selected="selected"' ?>><?php echo $modality ?></option>
+			<?php endforeach;?>
+				<option value="*">*</option>
+	    	</select>
+
+		</div>
+	
+	<?php elseif (in_array($property['type'], array('input', 'textarea'))) : ?>
+
+		<label class="col-sm-6 control-label search"><?php echo $property['labels'][$context->getLocale()] ?></label>
+		<div class="input-group search">
+		    <span class="input-group-addon">
+				<input type="checkbox" class="search_check" id="search_check_<?php echo $propertyId ?>">
+			</span>
+			<input class="form-control search_input" type="text" id="search_<?php echo $propertyId ?>" placeholder="<?php echo $this->translate('Contains', 'ppit-core', $context->getLocale()) ?>" />
+
+		</div>
+
+	<?php elseif (in_array($property['type'], array('date', 'time', 'datetime', 'number'))) : ?>
+
+		<label class="col-sm-6 control-label search"><?php echo $property['labels'][$context->getLocale()] ?></label>
+		<div class="input-group search">
+		    <span class="input-group-addon">
+				<input type="checkbox" class="search_check" id="search_check_min_<?php echo $propertyId ?>">
+			</span>
+	    	<input class="form-control search_input" type="text" id="search_min_<?php echo $propertyId ?>" class="form-control" placeholder="<?php echo $this->translate('Min', 'ppit-core', $context->getLocale()) ?>" />
+
+		</div>
+
+		<label class="col-sm-6 control-label search">&nbsp;</label>
+		<div class="input-group search">
+		    <span class="input-group-addon">
+				<input type="checkbox" class="search_check" id="search_check_max_<?php echo $propertyId ?>">
+			</span>
+	    	<input class="form-control search_input" type="text" class="search_input" id="search_max_<?php echo $propertyId ?>" placeholder="<?php echo $this->translate('Max', 'ppit-core', $context->getLocale()) ?>" />
+
+		</div>
+
+	<?php endif;?>
+<?php endforeach;?>
+		</div>
+
+		<div class="col-md-6">
+<?php if ($type) : ?>
+			<div class="col-md-6 col-md-offset-3"><canvas id="chart"></canvas></div>
+<?php endif;?>
+		</div>
+
+<!-- Add or update section -->
+		<div style="background-color: #ffffff;" class="row">
+			<div>&nbsp;</div>
+			<div id="list-panel"></div>
+		</div>
+
+	</div>
+</div>
