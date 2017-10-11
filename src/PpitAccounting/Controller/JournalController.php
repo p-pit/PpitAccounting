@@ -120,12 +120,23 @@ class JournalController extends AbstractActionController
     {
     	$context = Context::getCurrent();
     	$document = $this->params()->fromRoute('document', 0);
-    	require_once "vendor/dropbox/dropbox-sdk/lib/Dropbox/autoload.php";
     	$dropbox = $context->getConfig('ppitDocument')['dropbox'];
-    	$dropboxClient = new \Dropbox\Client($dropbox['credential'], $dropbox['clientIdentifier']);
-    	$link = $dropboxClient->createTemporaryDirectLink($dropbox['folders']['expenses'].'/'.$document);
-    	if ($link[0]) return $this->redirect()->toUrl($link[0]);
-    	else return $this->response;
+        $client = new Client(
+    			'https://api.dropboxapi.com/2/files/get_temporary_link',
+    			array('adapter' => 'Zend\Http\Client\Adapter\Curl', 'maxredirects' => 0, 'timeout' => 30)
+    	);
+    	$client->setEncType('application/json');
+    	$client->setMethod('POST');
+    	$client->getRequest()->getHeaders()->addHeaders(array('Authorization' => 'Bearer '.$dropbox['credential']));
+    	$client->setRawBody(json_encode(array('path' => $dropbox['folders']['expenses'].'/'.$document)));
+    	$response = $client->send();
+    	$this->response->http_status = $response->renderStatusLine();
+    	$result = json_decode($response->getBody(), true);
+    	if (is_array($result) && array_key_exists('link', $result)) return $this->redirect()->toUrl($result['link']);
+    	else {
+	    	$this->response->http_status = 400;
+    		return $this->response;
+    	}
     }
     
     public function exportAction()
