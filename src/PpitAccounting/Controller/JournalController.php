@@ -496,7 +496,7 @@ class JournalController extends AbstractActionController
     
     public function repriseAction()
     {
-    	$entries = Journal::getList('2016', null, array(), 'sequence', 'ASC');
+    	$entries = Journal::getList('2016', 'bank', array(), 'sequence', 'ASC');
     	$currentId = null;
     	$amounts = array();
     	foreach ($entries as $entry) {
@@ -505,7 +505,7 @@ class JournalController extends AbstractActionController
 	    			$currentId = $entry->sequence.'_'.$entry->journal_code;
 	    			$amounts[$currentId] = 0;
 	    		}
-	    		if ($entry->direction == 1) $amounts[$currentId] += $entry->amount;
+	    		if ($entry->journal_code == 'bank' || $entry->direction == 1) $amounts[$currentId] += $entry->amount;
     		}
     	}
     	foreach ($entries as $entry) {

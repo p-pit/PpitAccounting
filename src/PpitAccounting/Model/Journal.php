@@ -154,13 +154,12 @@ class Journal implements InputFilterAwareInterface
     		->order(array($major.' '.$dir, 'sequence DESC', 'journal_code','id'));
     	 
     	$where = new Where;
+		if (!$year) $year = AccountingYear::getCurrent()->year;
     	$where->equalTo('year', $year);
     	if ($journal_code) $where->equalTo('journal_code', $journal_code);
 
     	// Todo list vs search modes
     	if ($mode == 'todo') {
-			if (!$year) $year = AccountingYear::getCurrent()->year;
-    		$where->equalTo('year', $year);
     		$where->equalTo('status', 'new');
 /*    		if ($journal_code == 'general') {
 	    		$where->greaterThanOrEqualTo('accounting_journal.account', '6');

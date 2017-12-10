@@ -629,7 +629,7 @@ function getJournalDetail(sequence, id) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
 		if (xhttp.readyState == 4) {
-			document.getElementById('detail-row_' + sequence).innerHTML = xhttp.responseText;
+			document.getElementById('detail-div_' + sequence).innerHTML = xhttp.responseText;
 
 			connectRemoveIcon('remove-anchor', 'form_action');
 			getBankList();

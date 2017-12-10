@@ -4,7 +4,7 @@ namespace PpitAccounting;
 return array(
     'controllers' => array(
         'invokables' => array(
-            'PpitAccounting\Controller\Account' => 'PpitAccounting\Controller\AccountController',
+            'PpitAccounting\Controller\LedgerAccount' => 'PpitAccounting\Controller\LedgerAccountController',
         	'PpitAccounting\Controller\Journal' => 'PpitAccounting\Controller\JournalController',
         	'PpitAccounting\Controller\AccountingOperation' => 'PpitAccounting\Controller\AccountingOperationController',
         ),
@@ -29,12 +29,12 @@ return array(
     // The following section is new and should be added to your file
     'router' => array(
         'routes' => array(
-        	'account' => array(
+        	'ledgerAccount' => array(
                 'type'    => 'literal',
                 'options' => array(
-                    'route'    => '/account',
+                    'route'    => '/ledger-account',
                     'defaults' => array(
-                        'controller' => 'PpitAccounting\Controller\Account',
+                        'controller' => 'PpitAccounting\Controller\LedgerAccount',
                         'action'     => 'index',
                     ),
             	),
@@ -317,12 +317,12 @@ return array(
 		// Guard listeners to be attached to the application event manager
 		'guards' => array(
 			'BjyAuthorize\Guard\Route' => array(
-            	array('route' => 'account', 'roles' => array('admin')),
-            	array('route' => 'account/account', 'roles' => array('admin')),
-            	array('route' => 'account/balance', 'roles' => array('admin')),
-            	array('route' => 'account/balancePdf', 'roles' => array('admin')),
-				array('route' => 'account/incomeStatement', 'roles' => array('admin')),
-				array('route' => 'account/assessment', 'roles' => array('admin')),
+            	array('route' => 'ledgerAccount', 'roles' => array('admin')),
+            	array('route' => 'ledgerAccount/account', 'roles' => array('admin')),
+            	array('route' => 'ledgerAccount/balance', 'roles' => array('admin')),
+            	array('route' => 'ledgerAccount/balancePdf', 'roles' => array('admin')),
+				array('route' => 'ledgerAccount/incomeStatement', 'roles' => array('admin')),
+				array('route' => 'ledgerAccount/assessment', 'roles' => array('admin')),
 
 				array('route' => 'journal', 'roles' => array('admin')),
 				array('route' => 'journal/index', 'roles' => array('user')),
@@ -809,7 +809,7 @@ return array(
 							),
 					),
 					'balance' => array(
-							'route' => 'account/balance',
+							'route' => 'ledgerAccount/balance',
 							'params' => array(),
 							'urlParams' => array(),
 							'glyphicon' => 'glyphicon-book',

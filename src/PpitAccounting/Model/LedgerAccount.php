@@ -22,7 +22,7 @@ class AccountRow
 	public $credit_amount;
 }
 
-class Account
+class LedgerAccount
 {
 	public $year;
 	public $account;

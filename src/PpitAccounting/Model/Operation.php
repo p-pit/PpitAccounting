@@ -56,7 +56,11 @@ class Operation
     				if ($value == '*') $where->notEqualTo('accounting_journal.journal_code', '');
     				else $where->equalTo('accounting_journal.journal_code', $value);
     			}*/
-    			if ($propertyId == 'place_identifier') {
+    			if ($propertyId == 'status') {
+    				if ($value == '*') $where->notEqualTo('accounting_journal.status', '');
+    				else $where->equalTo('accounting_journal.status', $value);
+    			}
+    			elseif ($propertyId == 'place_identifier') {
     				if ($value == '*') $where->notEqualTo('core_place.identifier', '');
     				else $where->like('core_place.identifier', '%'.$value.'%');
     			}

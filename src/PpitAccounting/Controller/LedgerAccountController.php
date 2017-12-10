@@ -2,7 +2,7 @@
 namespace PpitAccounting\Controller;
 
 use DOMPDFModule\View\Model\PdfModel;
-use PpitAccounting\Model\Account;
+use PpitAccounting\Model\LedgerAccount;
 use PpitAccounting\Model\AccountingYear;
 use PpitAccounting\Model\Assessment;
 use PpitAccounting\Model\Balance;
@@ -17,7 +17,7 @@ use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
 use Zend\Mvc\Controller\AbstractActionController;
 
-class AccountController extends AbstractActionController
+class LedgerAccountController extends AbstractActionController
 {
 	public function accountAction()
 	{
@@ -27,7 +27,7 @@ class AccountController extends AbstractActionController
 		
     	$year = $this->params()->fromQuery('year', date('Y'));
     	$account = $this->params()->fromQuery('account');
-    	$account = new Account($year, $account);
+    	$account = new LedgerAccount($year, $account);
 		$view = new ViewModel(array(
 				'context' => $context,
 				'config' => $context->getconfig(),

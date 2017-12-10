@@ -85,7 +85,7 @@ echo $this->partial('/partials/header');
 	<?php foreach ($balance->rows as $row) : ?>
 						<tr>
 							<td><?php echo $row->account ?></td>
-							<td><a href="<?php echo $this->url('account/account') ?>?year=<?php echo $year ?>&account=<?php echo $row->account ?>"><?php echo $row->account_caption ?></a></td>
+							<td><a href="<?php echo $this->url('ledgerAccount/account') ?>?year=<?php echo $year ?>&account=<?php echo $row->account ?>"><?php echo $row->account_caption ?></a></td>
 							<td class="value"><?php echo $context->formatFLoat($row->debit_amount, 2) ?></td>
 							<td class="value"><?php echo $context->formatFLoat($row->credit_amount, 2) ?></td>
 							<td class="value"><?php echo ($row->debit_amount > $row->credit_amount) ? $context->formatFLoat($row->debit_amount - $row->credit_amount, 2) : 0 ?></td>
