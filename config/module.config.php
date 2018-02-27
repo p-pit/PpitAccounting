@@ -781,6 +781,7 @@ return array(
 	),
 	
 	'menus/p-pit-finance' => array(
+		'entries' => array(
 					'expense' => array(
 							'route' => 'expense/index',
 							'params' => array(),
@@ -818,6 +819,11 @@ return array(
 									'fr_FR' => 'Grand livre',
 							),
 					),
+		),
+		'labels' => array(
+			'default' => '2pit Finance',
+			'fr_FR' => 'P-Pit Finance',
+		),
 	),
 		
 	'journal/legalInterest' => array(

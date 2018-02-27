@@ -15,7 +15,7 @@ echo $this->partial('/partials/header');
 	    <div class="col-md-10 col-md-offset-1">
 			<div align="center">
 
-<?php foreach ($context->getConfig('menus/p-pit-finance') as $entryId => $entryDef) : ?>
+<?php foreach ($context->getConfig('menus/p-pit-finance')['entries'] as $entryId => $entryDef) : ?>
 	<?php if ($context->isAllowed($entryDef['route'])) : ?>
 				<button type="button" class="btn btn-default menu-btn" id="<?php echo $entryId ?>-anchor">
 		<?php if (array_key_exists('glyphicon', $entryDef)) : ?>
@@ -51,7 +51,7 @@ echo $this->partial('/partials/ppit-journal-scripts');
 echo $this->partial('/partials/ppit-controller') 
 ?>
 
-<?php foreach ($context->getConfig('menus/p-pit-finance') as $entryId => $entryDef) : ?>
+<?php foreach ($context->getConfig('menus/p-pit-finance')['entries'] as $entryId => $entryDef) : ?>
 $('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route'], $entryDef['params']) ?>'); });
 <?php endforeach;?>
 

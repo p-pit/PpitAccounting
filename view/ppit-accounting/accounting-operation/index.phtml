@@ -19,7 +19,7 @@ echo $this->partial('/partials/header');
 	<div>&nbsp;</div>
 	<div class="row" id="main_menu" >
 
-<?php foreach ($context->getConfig('menus/p-pit-finance') as $entryId => $entryDef) : ?>
+<?php foreach ($context->getConfig('menus/p-pit-finance')['entries'] as $entryId => $entryDef) : ?>
 	<?php if ($context->isAllowed($entryDef['route'])) : ?>
 		<?php if ($entryId == $type) $color = 'btn-primary'; else $color = 'btn-default' ?>
 		<div class="col-md-2">
@@ -47,7 +47,7 @@ echo $this->partial('/partials/header');
 
 <?php echo $this->partial('/partials/accounting-operation-scripts') ?>
 
-<?php foreach ($context->getConfig('menus/p-pit-finance') as $entryId => $entryDef) : ?>
+<?php foreach ($context->getConfig('menus/p-pit-finance')['entries'] as $entryId => $entryDef) : ?>
 $('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route'], $entryDef['params']) ?>'); });
 <?php endforeach;?>
 
