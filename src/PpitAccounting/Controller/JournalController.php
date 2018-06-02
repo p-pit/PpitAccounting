@@ -95,7 +95,7 @@ class JournalController extends AbstractActionController
     	if (count($params) == 0) $mode = 'todo'; else $mode = 'search';
 
     	// Retrieve the list
-    	$entries = Journal::getList(null, $journal_code, $params, $major, $dir, $mode);
+    	$entries = Journal::getList((array_key_exists('year', $params) ? $params['year'] : null), $journal_code, $params, $major, $dir, $mode);
 
     	// Return the link list
     	$view = new ViewModel(array(
