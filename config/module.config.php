@@ -778,13 +778,6 @@ return array(
     				'labels' => array('fr_FR' => 'P-Pit Finance', 'en_US' => 'Finance by 2Pit'),
     				'default' => 'expense',
 					'roles' => array(
-							'accountant' => array(
-									'show' => true,
-									'labels' => array(
-											'en_US' => 'Accountant',
-											'fr_FR' => 'Comptable',
-									),
-							),
 					),
 			),
 	),
