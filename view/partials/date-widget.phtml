@@ -1,0 +1,45 @@
+<div class="form-group" id="input_<?php echo $property ?>_group">
+        <label class="col-sm-5 control-label"><?php echo $label ?></label>
+        <div class="col-sm-7">
+                <input type="hidden" name="<?php echo $property ?>" id="<?php echo $property ?>" />
+                <input id="input_<?php echo $property ?>" class="form-control" value="<?php echo $context->decodeDate($value) ?>"<?php if (isset($isDisabled) && $isDisabled) echo ' disabled ="disabled"' ?>>
+        </div>
+        <div class="col-sm-12"><p class="help-block" id="input_<?php echo $property ?>_error"></p></div>
+</div>
+
+<script id="check_<?php echo $property ?>_script">
+
+jQuery(document).ready(function($){
+        $("#input_<?php echo $property ?>").datepicker();
+});
+
+function check_<?php echo $property ?>() 
+{
+        var validity = true;
+        // Initial hoped delivery date
+        <?php echo $property ?> = document.getElementById('input_<?php echo $property ?>').value;
+<?php if ($isMandatory) : ?>
+        if (<?php echo $property ?> == "") {
+                renderElement("input_<?php echo $property ?>", "<?php echo $this->translate('Please input a value', 'ppit-core', $context->getLocale()) ?>");
+                validity = false;
+        }
+<?php else : ?>
+        if (<?php echo $property ?> == "") return true;
+<?php endif ?>
+
+        error = checkDate(<?php echo $property ?>);
+        if (error) {
+                renderElement("input_<?php echo $property ?>", error);
+                validity = false;
+        }
+
+        <?php echo $property ?> = encodeDate(<?php echo $property ?>);
+
+<?php if (isset($minDate)) : ?>
+        if (validity) {
+                if (<?php echo $property ?> < '<?php echo $minDate ?>') {
+                        renderElement("input_<?php echo $property ?>", "<?php echo sprintf($this->translate('The date should not be earlier to %s.', 'ppit-order', $context->getLocale()), $context->decodeDate($minDate)) ?>");
+                        validity = false;
+                }
+        }
+<?php endif ?>

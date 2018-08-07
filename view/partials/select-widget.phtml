@@ -1,0 +1,34 @@
+<div class="form-group" id="<?php echo $property ?>_group">
+        <label class="col-sm-5 control-label"><?php echo $label ?></label>
+        <div class="col-sm-7">
+                <select name="<?php echo $property ?>" id="<?php echo $property ?>" class="form-control"<?php if (isset($isDisabled) && $isDisabled) echo ' disabled ="disabled"' ?>>
+<?php if (!$isDisabled) : ?>
+                        <option value=""><-- <?php echo $this->translate('Please choose', 'ppit-core', $context->getLocale()) ?> --></option>
+        <?php foreach ($modalities as $modality_id => $modality_caption) : ?>
+                        <option value="<?php echo $modality_id ?>" <?php if ($modality_id == $value) echo 'selected="selected"'; ?>><?php echo $modality_caption ?></option>
+        <?php endforeach;?>
+<?php endif;?>
+                </select>
+        </div>
+        <div class="col-sm-12"><p class="help-block" id="<?php echo $property ?>_error"></p></div>
+</div>
+
+<script id="check_<?php echo $property ?>_script">
+
+function check_<?php echo $property ?>() 
+{
+<?php if ($isMandatory) : ?>
+        value = document.getElementById("<?php echo $property ?>").value;
+        if (value == "") {
+                renderElement("<?php echo $property ?>", "<?php echo $this->translate('Please select a value', 'ppit-core', $context->getLocale()) ?>");
+                return false;
+        }
+        else {
+                renderElement("<?php echo $property ?>", null);
+                return true;
+        }
+<?php else : ?>
+        return true;
+<?php endif;?>  
+}
+</script>

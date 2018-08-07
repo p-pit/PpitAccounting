@@ -1,0 +1,41 @@
+<div class="form-group" id="input_<?php echo $property ?>_group">
+        <label class="col-sm-5 control-label"><?php echo $label ?></label>
+        <div class="col-sm-7">
+                <input type="hidden" name="<?php echo $property ?>" id="<?php echo $property ?>" />
+                <input id="input_<?php echo $property ?>" class="form-control" value="<?php echo $value ?>"<?php if (isset($isDisabled) && $isDisabled) echo ' disabled ="disabled"' ?>>
+        </div>
+        <div class="col-sm-12"><p class="help-block" id="input_<?php echo $property ?>_error"></p></div>
+</div>
+
+<script id="check_<?php echo $property ?>_script">
+
+function check_<?php echo $property ?>() 
+{
+        var validity = true, error;
+        
+<?php if ($isMandatory) : ?>
+        if (document.getElementById("input_<?php echo $property ?>").value == "") {
+                renderElement("input_<?php echo $property ?>", "<?php echo $this->translate('Please input a value', 'ppit-core', $context->getLocale()) ?>");
+                validity = false;
+        }
+    else {
+<?php endif;?>
+                number = document.getElementById("input_<?php echo $property ?>").value;
+                error = checkNumber(number, <?php echo $min ?>, <?php echo $max ?>);
+                if (error) {
+                        renderElement("input_<?php echo $property ?>", error);
+                        validity = false;
+                }
+                else { 
+                        renderElement("input_<?php echo $property ?>", null);
+                        number = getNumber(number, 2);
+                        document.getElementById("<?php echo $property ?>").value = number;
+                }
+<?php if ($isMandatory) : ?>
+        }
+<?php endif;?>
+
+        return validity;
+}
+
+</script>
