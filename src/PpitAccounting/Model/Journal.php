@@ -269,13 +269,13 @@ class Journal implements InputFilterAwareInterface
 		return 'OK';
 	}
 
-	public function add()
+	public function add($journal_code = 'general')
 	{
 		$context = Context::getCurrent();
 		$accountingYear = AccountingYear::getCurrent();
 		$this->year = $accountingYear->year;
 		$this->sequence = $accountingYear->next_value;
-		$this->journal_code = 'general';
+		$this->journal_code = $journal_code;
 		$this->accounting_date = date('Y-m-d');
 		$this->currency = 'EUR';
 		foreach ($this->rows as $row) {

@@ -3,6 +3,7 @@ namespace PpitAccounting\Controller;
 
 use PpitAccounting\Model\Journal;
 use PpitAccounting\ViewHelper\SsmlJournalViewHelper;
+use PpitCommitment\Model\Commitment;
 use PpitCore\Form\CsrfForm;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
@@ -256,6 +257,101 @@ class JournalController extends AbstractActionController
 		));
 		$view->setTerminal(true);
 		return $view;
+	}
+
+	public function registerSalesAction()
+	{
+		// Retrieve the context
+		$context = Context::getCurrent();
+
+		// Retrieve the type and the commitment list
+		$type = $this->params()->fromRoute('type');
+		$commitmentIds = explode(',', $this->params()->fromQuery('commitments'));
+		$commitments = array();
+		foreach ($commitmentIds as $commitment_id) {
+			$commitment = Commitment::get($commitment_id);
+			if ($commitment->status != 'registered') $commitments[] = $commitment;
+		}
+		
+		// Instanciate the csrf form
+		$csrfForm = new CsrfForm();
+		$csrfForm->addCsrfElement('csrf');
+		$error = null;
+		$message = null;
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			
+			$connection = Commitment::getTable()->getAdapter()->getDriver()->getConnection();
+			$connection->beginTransaction();
+			try {
+			
+				$journal = Journal::instanciate();
+				foreach ($commitments as $commitment) {
+					$data['operation_date'] = $commitment->commitment_date;
+					$data['reference'] = $commitment->invoice_identifier;
+					$data['caption'] = $commitment->caption;
+					$data['rows'] = array();
+					$data['rows'][] = array(
+						'account' => '706',
+						'direction' => 1,
+						'amount' => $commitment->excluding_tax,
+					);
+					$data['rows'][] = array(
+						'account' => '44587',
+						'direction' => 1,
+						'amount' => $commitment->tax_amount,
+					);
+					$data['rows'][] = array(
+						'account' => '411',
+						'direction' => -1,
+						'amount' => $commitment->tax_inclusive,
+					);
+					$rc = $journal->loadData($data);
+					if ($rc != 'OK') {
+						$error = 'Consistency';
+					}
+					$journal->add('general');
+					$commitment->status = 'registered';
+					$commitment->update(null);
+				}
+
+				// Generate excel export
+/*				$view = $this->getList('ASC');
+		
+		   		include 'public/PHPExcel_1/Classes/PHPExcel.php';
+		   		include 'public/PHPExcel_1/Classes/PHPExcel/Writer/Excel2007.php';
+		
+				$workbook = new \PHPExcel;
+				(new SsmlJournalViewHelper)->formatXls($workbook, $view);		
+				$writer = new \PHPExcel_Writer_Excel2007($workbook);
+				
+				header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+				header('Content-Disposition:inline;filename=Fichier.xlsx ');
+				$writer->save('php://output');
+		
+				$view = new ViewModel(array());
+				$view->setTerminal(true);
+				return $view;*/
+//				return $this->redirect()->toRoute('journal/export', [], ['query' => ['min_update_time' => date('Y-m-d')]]);
+			}
+			catch (\Exception $e) {
+				$connection->rollback();
+				throw $e;
+			}
+			$connection->commit();
+			$message = 'OK';
+		}
+    
+    	$view = new ViewModel(array(
+    		'context' => $context,
+    		'type' => $type,
+    		'commitments' => $commitments,
+    		'csrfForm' => $csrfForm,
+    		'message' => $message,
+    		'error' => $error,
+    	));
+    	$view->setTerminal(true);
+    	return $view;
 	}
 	
 	public function bankStatementAction()

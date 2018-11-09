@@ -200,6 +200,15 @@ return array(
 		                        ),
 		                    ),
 		                ),
+            			'registerSales' => array(
+            					'type' => 'segment',
+            					'options' => array(
+            							'route' => '/register-sales[/:type]',
+            							'defaults' => array(
+            									'action' => 'registerSales',
+            							),
+            					),
+            			),
             			'bankStatement' => array(
             					'type' => 'segment',
             					'options' => array(
@@ -333,6 +342,7 @@ return array(
 				array('route' => 'journal/export', 'roles' => array('user')),
 				array('route' => 'journal/update', 'roles' => array('admin')),
 				array('route' => 'journal/delete', 'roles' => array('admin')),
+				array('route' => 'journal/registerSales', 'roles' => array('accountant')),
 				array('route' => 'journal/bankList', 'roles' => array('admin')),
 				array('route' => 'journal/bankStatement', 'roles' => array('admin')),
 				array('route' => 'journal/bankUpdate', 'roles' => array('admin')),
@@ -776,15 +786,14 @@ return array(
 	'ppitApplications' => array(
 			'p-pit-finance' => array(
     				'labels' => array('fr_FR' => 'P-Pit Finance', 'en_US' => 'Finance by 2Pit'),
-    				'default' => 'expense',
-					'roles' => array(
-					),
+    				'default' => 'journal/index',
+					'defaultRole' => 'accountant',
 			),
 	),
 	
 	'menus/p-pit-finance' => array(
 		'entries' => array(
-					'expense' => array(
+/*					'expense' => array(
 							'route' => 'expense/index',
 							'params' => array(),
 							'glyphicon' => 'glyphicon-piggy-bank',
@@ -792,7 +801,7 @@ return array(
 									'en_US' => 'Expenses',
 									'fr_FR' => 'Dépenses',
 							),
-					),
+					),*/
 					'bank-statement' => array(
 							'route' => 'journal/index',
 							'params' => array('journal_code' => 'bank'),
@@ -1267,6 +1276,7 @@ return array(
 					'journal_code' => 'select',
 					'year' => 'select',
 					'account' => 'range',
+					'update_time' => 'range',
 			),
 			'more' => array(
 					'operation_date' => 'range',
