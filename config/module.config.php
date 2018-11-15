@@ -1267,6 +1267,13 @@ return array(
 							'fr_FR' => 'Libellé du compte',
 					),
 			),
+			'account_name' => array(
+					'type' => 'input',
+					'labels' => array(
+							'en_US' => 'Client',
+							'fr_FR' => 'Client',
+					),
+			),
 	),
 	'journal/search' => array(
 			'title' => array('en_US' => 'Operations', 'fr_FR' => 'Opérations'),

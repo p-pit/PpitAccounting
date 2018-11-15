@@ -51,6 +51,7 @@ class Journal implements InputFilterAwareInterface
     // Joined properties
     public $place_identifier;
     public $place_caption;
+    public $account_name;
     
     // Transient properties
     public $rows = array();
@@ -96,6 +97,7 @@ class Journal implements InputFilterAwareInterface
         // Joined properties
         $this->place_identifier = (isset($data['place_identifier'])) ? $data['place_identifier'] : null;
         $this->place_caption = (isset($data['place_caption'])) ? $data['place_caption'] : null;
+        $this->account_name = (isset($data['account_name'])) ? $data['account_name'] : null;
     }
 
     public function getProperties() {
@@ -151,16 +153,18 @@ class Journal implements InputFilterAwareInterface
     public static function getList($year, $journal_code, $params, $major = 'sequence', $dir = 'DESC', $mode = 'todo')
     {
     	$select = Journal::getTable()->getSelect()
+    		->join('commitment', 'commitment.id = accounting_journal.commitment_id', array(), 'left')
+    		->join('core_account', 'core_account.id = commitment.account_id', array('account_name' => 'name'), 'left')
     		->order(array($major.' '.$dir, 'sequence DESC', 'journal_code','id'));
     	 
     	$where = new Where;
 		if (!$year) $year = AccountingYear::getCurrent()->year;
-    	$where->equalTo('year', $year);
+    	$where->equalTo('accounting_journal.year', $year);
     	if ($journal_code) $where->equalTo('journal_code', $journal_code);
 
     	// Todo list vs search modes
     	if ($mode == 'todo') {
-    		$where->equalTo('status', 'new');
+    		$where->equalTo('accounting_journal.status', 'new');
 /*    		if ($journal_code == 'general') {
 	    		$where->greaterThanOrEqualTo('accounting_journal.account', '6');
 	    		$where->lessThanOrEqualTo('accounting_journal.account', '799999');

@@ -289,18 +289,21 @@ class JournalController extends AbstractActionController
 				foreach ($commitments as $commitment) {
 					$data['operation_date'] = $commitment->commitment_date;
 					$data['reference'] = $commitment->invoice_identifier;
-					$data['caption'] = $commitment->caption;
+					$data['caption'] = $commitment->account_name.' - '.$commitment->caption;
+					$data['commitment_id'] = $commitment->id;
 					$data['rows'] = array();
 					$data['rows'][] = array(
 						'account' => '706',
 						'direction' => 1,
 						'amount' => $commitment->excluding_tax,
 					);
-					$data['rows'][] = array(
-						'account' => '44587',
-						'direction' => 1,
-						'amount' => $commitment->tax_amount,
-					);
+					if ($commitment->tax_amount) {
+						$data['rows'][] = array(
+							'account' => '44587',
+							'direction' => 1,
+							'amount' => $commitment->tax_amount,
+						);
+					}
 					$data['rows'][] = array(
 						'account' => '411',
 						'direction' => -1,
