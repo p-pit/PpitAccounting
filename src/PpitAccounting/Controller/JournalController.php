@@ -142,6 +142,13 @@ class JournalController extends AbstractActionController
     
     public function exportAction()
     {
+    	$place_id = $this->params()->fromQuery('place_id');
+    	$place = null;
+    	if ($place_id) $place = Place::get($place_id);
+    	$fileName = 'Sales';
+    	if ($place) $fileName .= '-'.$place->identifier;
+    	$fileName .= '-'.date('Y-m-d').'.xlsx';
+    	
     	$view = $this->getList('ASC');
 
    		include 'public/PHPExcel_1/Classes/PHPExcel.php';
@@ -152,7 +159,7 @@ class JournalController extends AbstractActionController
 		$writer = new \PHPExcel_Writer_Excel2007($workbook);
 		
 		header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-		header('Content-Disposition:inline;filename=Fichier.xlsx ');
+		header('Content-Disposition:inline;filename='.$fileName);
 		$writer->save('php://output');
 
 		return $this->response;
