@@ -25,7 +25,7 @@ class SsmlJournalViewHelper
 		$sheet = $workbook->getActiveSheet();
 		
 		$i = 0;
-		$colNames = array(1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E', 6 => 'F', 7 => 'G', 8 => 'H', 9 => 'I', 10 => 'J', 11 => 'K', 12 => 'L');
+		$colNames = array(1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E', 6 => 'F', 7 => 'G', 8 => 'H', 9 => 'I', 10 => 'J', 11 => 'K', 12 => 'L', 13 => 'M');
 		
 		foreach($context->getConfig('journal_properties') as $propertyId => $property) {
 			$i++;
@@ -44,7 +44,9 @@ class SsmlJournalViewHelper
 				$i++;
 				if ($property['type'] == 'date') $sheet->setCellValue($colNames[$i].$j, $context->decodeDate($entry->properties[$propertyId]));
 				elseif ($property['type'] == 'number') $sheet->setCellValue($colNames[$i].$j, $entry->properties[$propertyId]);
+				elseif ($propertyId == 'place_caption') $sheet->setCellValue($colNames[$i].$j, $entry->place_caption);
 				elseif ($propertyId == 'account_name') $sheet->setCellValue($colNames[$i].$j, $entry->account_name);
+				elseif ($propertyId == 'account') $sheet->setCellValue($colNames[$i].$j, $entry->account.(($entry->account == 411) ? sprintf('%07d', (int) $entry->sub_account) : ''));
 				else $sheet->setCellValue($colNames[$i].$j, $entry->properties[$propertyId]);
 			}
 		}

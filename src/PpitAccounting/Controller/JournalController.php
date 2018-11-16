@@ -287,6 +287,7 @@ class JournalController extends AbstractActionController
 			
 				$journal = Journal::instanciate();
 				foreach ($commitments as $commitment) {
+					$data['place_id'] = $commitment->account->place_id;
 					$data['operation_date'] = $commitment->commitment_date;
 					$data['reference'] = $commitment->invoice_identifier;
 					$data['caption'] = $commitment->account_name.' - '.$commitment->caption;
@@ -306,6 +307,7 @@ class JournalController extends AbstractActionController
 					}
 					$data['rows'][] = array(
 						'account' => '411',
+						'sub_account' => $commitment->account_identifier,
 						'direction' => -1,
 						'amount' => $commitment->tax_inclusive,
 					);

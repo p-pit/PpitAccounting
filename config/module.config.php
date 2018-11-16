@@ -1274,6 +1274,13 @@ return array(
 							'fr_FR' => 'Client',
 					),
 			),
+			'place_caption' => array(
+					'type' => 'input',
+					'labels' => array(
+							'en_US' => 'Place',
+							'fr_FR' => 'Établissement',
+					),
+			),
 	),
 	'journal/search' => array(
 			'title' => array('en_US' => 'Operations', 'fr_FR' => 'Opérations'),
@@ -1282,6 +1289,7 @@ return array(
 			'main' => array(
 					'journal_code' => 'select',
 					'year' => 'select',
+					'place_id' => 'select',
 					'account' => 'range',
 					'update_time' => 'range',
 			),

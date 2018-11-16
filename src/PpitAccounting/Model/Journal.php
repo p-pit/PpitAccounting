@@ -155,6 +155,7 @@ class Journal implements InputFilterAwareInterface
     	$select = Journal::getTable()->getSelect()
     		->join('commitment', 'commitment.id = accounting_journal.commitment_id', array(), 'left')
     		->join('core_account', 'core_account.id = commitment.account_id', array('account_name' => 'name'), 'left')
+    		->join('core_place', 'core_place.id = core_account.place_id', array('place_identifier' => 'identifier', 'place_caption' => 'caption'), 'left')
     		->order(array($major.' '.$dir, 'sequence DESC', 'journal_code','id'));
     	 
     	$where = new Where;
@@ -176,6 +177,7 @@ class Journal implements InputFilterAwareInterface
     		// Set the filters
     		foreach ($params as $propertyId => $property) {
     			if ($propertyId == 'journal_code') $where->equalTo('journal_code', $property);
+    			elseif ($propertyId == 'place_id') $where->equalTo('core_account.place_id', $property);
     			elseif (substr($propertyId, 0, 4) == 'min_') $where->greaterThanOrEqualTo('accounting_journal.'.substr($propertyId, 4), $property);
     			elseif (substr($propertyId, 0, 4) == 'max_') $where->lessThanOrEqualTo('accounting_journal.'.substr($propertyId, 4), $property);
     			else $where->like('accounting_journal.'.$propertyId, '%'.$property.'%');
@@ -286,6 +288,7 @@ class Journal implements InputFilterAwareInterface
 			if ($row['account']) {
 				$this->id = 0;
 				$this->account = $row['account'];
+				if (array_key_exists('sub_account', $row)) $this->sub_account = $row['sub_account'];
 				$this->direction = $row['direction'];
 				$this->amount = $row['amount'];
 				Journal::getTable()->save($this);
