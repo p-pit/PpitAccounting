@@ -9,7 +9,6 @@ class SsmlJournalViewHelper
 	public static function formatXls($workbook, $view)
 	{
 		$context = Context::getCurrent();
-		$translator = $context->getServiceManager()->get('translator');
 
 		$title = $context->getConfig('core_account/search')['title'][$context->getLocale()];
 		
