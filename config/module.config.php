@@ -786,7 +786,7 @@ return array(
 	'ppitApplications' => array(
 			'p-pit-finance' => array(
     				'labels' => array('fr_FR' => 'P-Pit Finance', 'en_US' => 'Finance by 2Pit'),
-    				'default' => 'journal/index',
+    				'default' => 'bank-statement',
 					'defaultRole' => 'accountant',
 			),
 	),
@@ -1289,9 +1289,9 @@ return array(
 			'main' => array(
 					'journal_code' => 'select',
 					'year' => 'select',
-					'place_id' => 'select',
+//					'place_id' => 'select',
 					'account' => 'range',
-					'update_time' => 'range',
+//					'update_time' => 'range',
 			),
 			'more' => array(
 					'operation_date' => 'range',
