@@ -43,3 +43,22 @@ function check_<?php echo $property ?>()
                 }
         }
 <?php endif ?>
+
+<?php if (isset($maxDate)) : ?>
+  if (validity) {
+    if (<?php echo $property ?> > '<?php echo $maxDate ?>') {
+      renderElement("input_<?php echo $property ?>", "<?php echo sprintf($this->translate('The date should not be later to %s.', 'ppit-order', $context->getLocale()), $context->decodeDate($maxDate)) ?>");
+      validity = false;
+    }
+  }
+<?php endif;?>
+
+  if (validity) {
+    renderElement("input_<?php echo $property ?>", null);
+    document.getElementById('<?php echo $property ?>').value = <?php echo $property ?>;
+    }
+
+  return validity;
+}
+
+</script>
