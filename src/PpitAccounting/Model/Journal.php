@@ -495,6 +495,7 @@ class Journal implements InputFilterAwareInterface
 
     	// Generate the opening y+1 journal entry
     	$nextRow = new Journal;
+    	$row->status = 'new';
     	$nextRow->year = $year + 1;
     	$nextRow->sequence = 0;
     	$nextRow->journal_code = 'general';
