@@ -404,6 +404,7 @@ class Journal implements InputFilterAwareInterface
     	}
     	// Generate the closing journal entry
     	$row = new Journal;
+    	$row->status = 'new';
     	$row->year = $year;
     	$row->sequence = $next_value;
     	$row->journal_code = 'closing';
@@ -482,6 +483,7 @@ class Journal implements InputFilterAwareInterface
 
     	// Generate the closing journal entry
     	$row = new Journal;
+    	$row->status = 'new';
     	$row->year = $year;
     	$row->sequence = $next_value;
     	$row->journal_code = 'closing';
