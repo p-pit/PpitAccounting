@@ -285,7 +285,7 @@ return array(
             				'index' => array(
             						'type' => 'segment',
             						'options' => array(
-            								'route' => '/index[/:year][/:type]',
+            								'route' => '/index[/:year][/:type][/:app]',
             								'defaults' => array(
             										'action' => 'index',
             								),
@@ -1019,8 +1019,9 @@ return array(
 					'2016' => array('en_US' => '2016', 'fr_FR' => '2016'),
 					'2017' => array('en_US' => '2017', 'fr_FR' => '2017'),
 					'2018' => array('en_US' => '2018', 'fr_FR' => '2018'),
+					'2019' => array('en_US' => '2019', 'fr_FR' => '2019'),
 			),
-			'default' => 2018,
+			'default' => 2019,
 			'labels' => array(
 					'en_US' => 'Year',
 					'fr_FR' => 'Année',

@@ -60,15 +60,10 @@
 	<tr class="operation">
 	
 		<td style="text-align: center">
-			<input type="hidden" id="<?php echo $operation->properties['sequence'] ?>-id" value="<?php echo $operation->properties['id'] ?>"/>
+<!--			<input type="hidden" id="<?php echo $operation->properties['sequence'] ?>-id" value="<?php echo $operation->properties['id'] ?>"/>
 			<button type="button" class="btn btn-default index-btn detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="detail-anchor_<?php echo $operation->properties['sequence'] ?>">
 				<span class="glyphicon glyphicon-zoom-in" id="<?php echo $operation->properties['sequence'] ?>-glyphicon"></span>
-			</button>
-<?php if ($i++ == 0 && $context->isDemoModeActive()) : ?>
-			<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['accounting_operation/list/detail'][$context->getLocale()] ?>">
-			    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
-			</a>
-<?php endif;?>
+			</button> -->
 		</td>
 
 	<?php foreach ($context->getConfig('accounting_operation/list')['properties'] as $propertyId => $unused) : ?>

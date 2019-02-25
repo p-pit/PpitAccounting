@@ -19,9 +19,9 @@ echo $this->partial('/partials/header');
 	<div>&nbsp;</div>
 	<div class="row" id="main_menu" >
 
-<?php foreach ($context->getConfig('menus/p-pit-finance')['entries'] as $entryId => $entryDef) : ?>
+<?php foreach ($context->getConfig('menus/'.(($app) ? $app : 'p-pit-finance'))['entries'] as $entryId => $entryDef) : ?>
 	<?php if ($context->isAllowed($entryDef['route'])) : ?>
-		<?php if ($entryId == $type) $color = 'btn-primary'; else $color = 'btn-default' ?>
+		<?php if (substr($entryId, 0, 9) == 'operation') $color = 'btn-primary'; else $color = 'btn-default' ?>
 		<div class="col-md-2">
 				<button type="button" class="btn menu-btn <?php echo $color ?>" style="width:100%; text-align: left" id="<?php echo $entryId ?>-anchor">
 				<?php if (array_key_exists('glyphicon', $entryDef)) : ?>
@@ -39,7 +39,7 @@ echo $this->partial('/partials/header');
 	<!-- Main panel -->
 <div class="row">
 	<div class="col-md-12 ppit-panel" id="index_action"></div>
-</div
+</div>
 
 <div>&nbsp;</div>
 
@@ -47,7 +47,7 @@ echo $this->partial('/partials/header');
 
 <?php echo $this->partial('/partials/accounting-operation-scripts') ?>
 
-<?php foreach ($context->getConfig('menus/p-pit-finance')['entries'] as $entryId => $entryDef) : ?>
+<?php foreach ($context->getConfig('menus/'.(($app) ? $app : 'p-pit-finance'))['entries'] as $entryId => $entryDef) : ?>
 $('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route'], $entryDef['params']) ?>'); });
 <?php endforeach;?>
 

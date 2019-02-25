@@ -24,6 +24,7 @@ class AccountingOperationController extends AbstractActionController
 
     	// Retrieve parameters
     	$type = $this->params()->fromRoute('type');
+		$app = $this->params()->fromRoute('app');
     	$year = $this->params()->fromRoute('year', $context->getConfig('accounting_operation/year')['default']);
     	$place = Place::get($context->getPlaceId());
 
@@ -31,7 +32,8 @@ class AccountingOperationController extends AbstractActionController
 		return new ViewModel(array(
     			'context' => $context,
     			'type' => $type,
-    			'year' => $year,
+    			'app' => $app,
+				'year' => $year,
 				'place' => $place,
     			'applicationId' => $applicationId,
 		));

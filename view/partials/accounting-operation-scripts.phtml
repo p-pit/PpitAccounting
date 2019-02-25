@@ -160,7 +160,7 @@ function connectSearchInputs() {
 
 	<?php if ($propertyId == 'type') : ?>
 		$('#search_<?php echo $propertyId ?>').change(function () { 
-			document.location.href = '<?php echo $this->url('accountingOperation/index', array('year' => $year)) ?>' + (($('#search_type').val()) ? '/' + $('#search_type').val() : ''); 
+			document.location.href = '<?php echo $this->url('accountingOperation/index', array('year' => $year)) ?>' + (($('#search_type').val()) ? '/' + $('#search_type').val() : $type) + '/' + '<?php echo $app ?>';
 		});
 
 	<?php elseif ($propertyId == 'year') : ?>

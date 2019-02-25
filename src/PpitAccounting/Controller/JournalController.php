@@ -307,7 +307,7 @@ class JournalController extends AbstractActionController
 							'direction' => 1,
 							'amount' => $commitment->excluding_tax,
 						);
-						if ($commitment->tax_amount) {
+						if ($commitment->tax_amount > 0) {
 							$data['rows'][] = array(
 								'account' => '44571',
 								'direction' => 1,
