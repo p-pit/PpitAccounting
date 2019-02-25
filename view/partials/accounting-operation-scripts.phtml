@@ -160,12 +160,12 @@ function connectSearchInputs() {
 
 	<?php if ($propertyId == 'type') : ?>
 		$('#search_<?php echo $propertyId ?>').change(function () { 
-			document.location.href = '<?php echo $this->url('accountingOperation/index', array('year' => $year)) ?>' + (($('#search_type').val()) ? '/' + $('#search_type').val() : $type) + '/' + '<?php echo $app ?>';
+			document.location.href = '<?php echo $this->url('accountingOperation/index', array('year' => $year)) ?>' + (($('#search_type').val()) ? '/' + $('#search_type').val() : $type) + '/<?php echo $app ?>';
 		});
 
 	<?php elseif ($propertyId == 'year') : ?>
 		$('#search_<?php echo $propertyId ?>').change(function () { 
-			document.location.href = '<?php echo $this->url('accountingOperation/index') ?>/' + $('#search_year').val() + '<?php echo ($type) ? '/'.$type : '' ?>';
+			document.location.href = '<?php echo $this->url('accountingOperation/index') ?>/' + $('#search_year').val() + '/<?php echo $type ?>/<?php echo $app ?>';
 		});
 
 	<?php elseif (in_array($property['type'], array('date', 'time', 'datetime', 'number'))) : ?>
