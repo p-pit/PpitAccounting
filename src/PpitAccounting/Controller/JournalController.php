@@ -4,6 +4,7 @@ namespace PpitAccounting\Controller;
 use PpitAccounting\Model\Journal;
 use PpitAccounting\ViewHelper\SsmlJournalViewHelper;
 use PpitCommitment\Model\Commitment;
+use PpitCommitment\Model\Term;
 use PpitCore\Form\CsrfForm;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
@@ -349,25 +350,6 @@ class JournalController extends AbstractActionController
 					$commitment->status = 'registered';
 					$commitment->update(null);
 				}
-
-				// Generate excel export
-/*				$view = $this->getList('ASC');
-		
-		   		include 'public/PHPExcel_1/Classes/PHPExcel.php';
-		   		include 'public/PHPExcel_1/Classes/PHPExcel/Writer/Excel2007.php';
-		
-				$workbook = new \PHPExcel;
-				(new SsmlJournalViewHelper)->formatXls($workbook, $view);		
-				$writer = new \PHPExcel_Writer_Excel2007($workbook);
-				
-				header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-				header('Content-Disposition:inline;filename=Fichier.xlsx ');
-				$writer->save('php://output');
-		
-				$view = new ViewModel(array());
-				$view->setTerminal(true);
-				return $view;*/
-//				return $this->redirect()->toRoute('journal/export', [], ['query' => ['min_update_time' => date('Y-m-d')]]);
 			}
 			catch (\Exception $e) {
 				$connection->rollback();
@@ -387,6 +369,95 @@ class JournalController extends AbstractActionController
     	));
     	$view->setTerminal(true);
     	return $view;
+	}
+
+	public function registerSettlementsAction()
+	{
+		// Retrieve the context
+		$context = Context::getCurrent();
+	
+		// Retrieve the type and the commitment list
+		$type = $this->params()->fromRoute('type');
+		$termIds = explode(',', $this->params()->fromQuery('terms'));
+		$terms = array();
+		foreach ($termIds as $term_id) {
+			$term = Term::get($term_id);
+			if ($term->status != 'registered') $terms[] = $term;
+		}
+	
+		// Instanciate the csrf form
+		$csrfForm = new CsrfForm();
+		$csrfForm->addCsrfElement('csrf');
+		$error = null;
+		$message = null;
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+				
+			$connection = Term::getTable()->getAdapter()->getDriver()->getConnection();
+			$connection->beginTransaction();
+			try {
+					
+				$journal = Journal::instanciate();
+				foreach ($terms as $term) {
+					$data['place_id'] = $term->place_id;
+					$data['operation_date'] = $term->settlement_date;
+					$data['reference'] = $term->invoice_identifier . ' - ' . $term->reference;
+					$data['caption'] = $term->name.' - '.$term->commitment_caption;
+					$data['commitment_id'] = $term->commitment_id;
+					$data['rows'] = array();
+					if ($term->amount > 0) {
+						$data['rows'][] = array(
+							'account' => '512',
+							'direction' => 1,
+							'amount' => $term->amount,
+						);
+						$data['rows'][] = array(
+							'account' => '411',
+							'sub_account' => $term->account_identifier,
+							'direction' => -1,
+							'amount' => $term->amount,
+						);
+					}
+					else { // Credit and overdue case
+						$data['rows'][] = array(
+							'account' => '512',
+							'direction' => -1,
+							'amount' => $term->amount,
+						);
+						$data['rows'][] = array(
+							'account' => '411',
+							'sub_account' => $term->account_identifier,
+							'direction' => 1,
+							'amount' => $term->amount,
+						);
+					}
+					$rc = $journal->loadData($data);
+					if ($rc != 'OK') {
+						$error = 'Consistency';
+					}
+					$journal->add('settlements');
+					$term->status = 'registered';
+					$term->update(null);
+				}
+			}
+			catch (\Exception $e) {
+				$connection->rollback();
+				throw $e;
+			}
+			$connection->commit();
+			$message = 'OK';
+		}
+	
+		$view = new ViewModel(array(
+			'context' => $context,
+			'type' => $type,
+			'terms' => $terms,
+			'csrfForm' => $csrfForm,
+			'message' => $message,
+			'error' => $error,
+		));
+		$view->setTerminal(true);
+		return $view;
 	}
 	
 	public function bankStatementAction()

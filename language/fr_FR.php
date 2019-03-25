@@ -26,11 +26,13 @@
 		'Proof' => 'Justificatif',
 		'Reference' => 'Référence',
 		'Register sales' => 'Comptabiliser les ventes',
+		'Register settlements' => 'Comptabiliser les encaissements',
 		'Schema' => 'Schéma',
 		'Select a schema' => 'Choisir un schéma',
 		'Sequence' => 'Séquence',
 		'Sub-account' => 'Sous-compte',
 		'Sum' => 'Total',
+		'Terms to be registered' => 'Échéances à comptabiliser',
 		'The expense has been recorded and cannot been updated' => 'La dépense a été comptabilisée et ne peut plus être modifiée',
 		'The expense has been recorded and cannot been deleted' => 'La dépense a été comptabilisée et ne peut plus être supprimée',
 	);

@@ -1,0 +1,56 @@
+<!-- 
+/**
+ * PpitCore V1.0 (https://github.com/p-pit/PpitCore)
+ *
+ * @link      https://github.com/p-pit/PpitCore
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitCore/blob/master/license.txt GNU-GPL license
+ */
+-->
+
+<h4 style="text-align: center">
+	<strong><?php echo $this->translate('Register settlements', 'ppit-accounting', $context->getLocale()) ?></strong>
+</h4>
+
+<!-- Form header -->
+<form action="" id="ppit-form" method="post" class="form-horizontal" enctype="multipart/form-data">
+			
+<!-- Global message -->
+<?php if ($message == 'OK') : ?>
+	<div id="message">
+			<div class="alert alert-success"><h4><?php echo $this->translate('Your request has been registered', 'ppit-core', $context->getLocale()) ?></h4></div>
+	</div>
+<?php endif;?>
+
+<?php 
+if ($message == 'OK') $isDisabled = true; else $isDisabled = false;
+?>
+	<div class="panel-body">
+
+        <p><?php echo $this->translate('Terms to be registered', 'ppit-accounting', $context->getLocale()) ?>:</p>
+
+<?php foreach ($terms as $term) : ?>
+        <div class="form-group">
+          <div class="col-sm-12">
+            <input class="form-control" disabled="disabled" value="<?php echo $term->name ?> - <?php echo $term->commitment_caption ?>" />
+          </div>
+        </div>
+<?php endforeach;?>
+
+<?php if ($message != 'OK') : ?>
+    <div class="form-group">
+		<div class="col-sm-5">&nbsp;</div>
+		<div class="col-sm-7">
+			<input id="register-settlements-button" class="btn btn-default" value="<?php echo $this->translate('Submit', 'ppit-core', $context->getLocale()) ?>">
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-12">
+			<div class="alert alert-warning" id="register-settlements-alert" style="text-align: center">
+				<strong><?php echo $this->translate('Please confirm', 'ppit-core', $context->getLocale()) ?></strong>
+			</div>
+		</div>
+	</div>
+<?php endif;?>
+	</div>
+</form>

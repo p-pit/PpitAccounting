@@ -209,7 +209,16 @@ return array(
             							),
             					),
             			),
-            			'bankStatement' => array(
+            			'registerSettlements' => array(
+            					'type' => 'segment',
+            					'options' => array(
+            							'route' => '/register-settlements[/:type]',
+            							'defaults' => array(
+            									'action' => 'registerSettlements',
+            							),
+            					),
+            			),
+	            		'bankStatement' => array(
             					'type' => 'segment',
             					'options' => array(
             							'route' => '/bank-statement[/:id]',
@@ -343,6 +352,7 @@ return array(
 				array('route' => 'journal/update', 'roles' => array('admin')),
 				array('route' => 'journal/delete', 'roles' => array('admin')),
 				array('route' => 'journal/registerSales', 'roles' => array('accountant')),
+				array('route' => 'journal/registerSettlements', 'roles' => array('accountant')),
 				array('route' => 'journal/bankList', 'roles' => array('admin')),
 				array('route' => 'journal/bankStatement', 'roles' => array('admin')),
 				array('route' => 'journal/bankUpdate', 'roles' => array('admin')),
