@@ -989,8 +989,9 @@ return array(
 			'modalities' => array(
 					'general' => array('en_US' => 'General', 'fr_FR' => 'General'),
 					'bank' => array('en_US' => 'Bank', 'fr_FR' => 'Banque'),
-					'sales' => array('en_US' => 'Sales', 'fr_FR' => 'Sales'),
-					'expenses' => array('en_US' => 'Expenses', 'fr_FR' => 'Expenses'),
+					'sales' => array('en_US' => 'Sales', 'fr_FR' => 'Ventes'),
+					'settlements' => array('en_US' => 'Settlements', 'fr_FR' => 'Encaissements'),
+					'expenses' => array('en_US' => 'Expenses', 'fr_FR' => 'Dépenses'),
 					'closing' => array('en_US' => 'Closing', 'fr_FR' => 'Clôture'),
 			),
 			'labels' => array(
