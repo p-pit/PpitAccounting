@@ -297,7 +297,7 @@ class JournalController extends AbstractActionController
 				foreach ($commitments as $commitment) {
 					if ($commitment->excluding_tax == 0) continue;
 					$data['place_id'] = $commitment->account->place_id;
-					$data['operation_date'] = $commitment->commitment_date;
+					$data['operation_date'] = $commitment->invoice_date;
 					$data['reference'] = $commitment->invoice_identifier;
 					$data['caption'] = $commitment->account_name.' - '.$commitment->caption;
 					$data['commitment_id'] = $commitment->id;
