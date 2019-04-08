@@ -371,6 +371,116 @@ class JournalController extends AbstractActionController
     	return $view;
 	}
 
+	public function registerTermSalesAction()
+	{
+		// Retrieve the context
+		$context = Context::getCurrent();
+	
+		// Retrieve the type and the commitment list
+		$type = $this->params()->fromRoute('type');
+		$termIds = explode(',', $this->params()->fromQuery('terms'));
+		$terms = array();
+		foreach ($termIds as $term_id) {
+			$term = Term::get($term_id);
+			if ($term->status != 'registered') $terms[] = $term;
+		}
+	
+		// Instanciate the csrf form
+		$csrfForm = new CsrfForm();
+		$csrfForm->addCsrfElement('csrf');
+		$error = null;
+		$message = null;
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+				
+			$connection = Term::getTable()->getAdapter()->getDriver()->getConnection();
+			$connection->beginTransaction();
+			try {
+					
+				$journal = Journal::instanciate();
+				foreach ($terms as $term) {
+					if ($term->amount == 0) continue;
+					
+					$tax_rate = 0.2; // To make configurable
+					$excluding_tax = round($term->amount / (1 + $tax_rate), 2);
+					$tax_amount = $term->amount - $excluding_tax;
+					$tax_inclusive = $term->amount;
+						
+					$data['place_id'] = $term->place_id;
+					$data['operation_date'] = $term->settlement_date;
+					$data['reference'] = $term->invoice_identifier . (($term->reference) ? ' - ' . $term->reference : '');
+					$data['caption'] = $term->name.' - '.$term->commitment_caption;
+					$data['commitment_id'] = $term->commitment_id;
+					$data['rows'] = array();
+					if ($term->amount > 0) {
+						$data['rows'][] = array(
+							'account' => '706',
+							'direction' => 1,
+							'amount' => $excluding_tax,
+						);
+						if ($tax_amount > 0) {
+							$data['rows'][] = array(
+								'account' => '44571',
+								'direction' => 1,
+								'amount' => $tax_amount,
+							);
+						}
+						$data['rows'][] = array(
+							'account' => '512',
+							'sub_account' => $term->account_identifier,
+							'direction' => -1,
+							'amount' => $tax_inclusive,
+						);
+					}
+					else { // Credit case
+						$data['rows'][] = array(
+							'account' => '709',
+							'direction' => -1,
+							'amount' => $excluding_tax,
+						);
+						if ($tax_amount) {
+							$data['rows'][] = array(
+								'account' => '44571',
+								'direction' => -1,
+								'amount' => $tax_amount,
+							);
+						}
+						$data['rows'][] = array(
+							'account' => '512',
+							'sub_account' => $term->account_identifier,
+							'direction' => 1,
+							'amount' => $tax_inclusive,
+						);
+					}
+					$rc = $journal->loadData($data);
+					if ($rc != 'OK') {
+						$error = 'Consistency';
+					}
+					$journal->add('general');
+					$term->status = 'registered';
+					$term->update(null);
+				}
+			}
+			catch (\Exception $e) {
+				$connection->rollback();
+				throw $e;
+			}
+			$connection->commit();
+			$message = 'OK';
+		}
+	
+		$view = new ViewModel(array(
+			'context' => $context,
+			'type' => $type,
+			'terms' => $terms,
+			'csrfForm' => $csrfForm,
+			'message' => $message,
+			'error' => $error,
+		));
+		$view->setTerminal(true);
+		return $view;
+	}
+	
 	public function registerSettlementsAction()
 	{
 		// Retrieve the context
@@ -401,7 +511,7 @@ class JournalController extends AbstractActionController
 				foreach ($terms as $term) {
 					$data['place_id'] = $term->place_id;
 					$data['operation_date'] = $term->settlement_date;
-					$data['reference'] = $term->invoice_identifier . ' - ' . $term->reference;
+					$data['reference'] = $term->invoice_identifier . (($term->reference) ? ' - ' . $term->reference : '');
 					$data['caption'] = $term->name.' - '.$term->commitment_caption;
 					$data['commitment_id'] = $term->commitment_id;
 					$data['rows'] = array();

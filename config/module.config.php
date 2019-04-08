@@ -209,6 +209,15 @@ return array(
             							),
             					),
             			),
+            			'registerTermSales' => array(
+            					'type' => 'segment',
+            					'options' => array(
+            							'route' => '/register-term-sales[/:type]',
+            							'defaults' => array(
+            									'action' => 'registerTermSales',
+            							),
+            					),
+            			),
             			'registerSettlements' => array(
             					'type' => 'segment',
             					'options' => array(
@@ -352,6 +361,7 @@ return array(
 				array('route' => 'journal/update', 'roles' => array('admin')),
 				array('route' => 'journal/delete', 'roles' => array('admin')),
 				array('route' => 'journal/registerSales', 'roles' => array('accountant')),
+				array('route' => 'journal/registerTermSales', 'roles' => array('accountant')),
 				array('route' => 'journal/registerSettlements', 'roles' => array('accountant')),
 				array('route' => 'journal/bankList', 'roles' => array('admin')),
 				array('route' => 'journal/bankStatement', 'roles' => array('admin')),
