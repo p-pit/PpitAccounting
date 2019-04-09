@@ -545,7 +545,7 @@ class JournalController extends AbstractActionController
 					if ($rc != 'OK') {
 						$error = 'Consistency';
 					}
-					$journal->add('settlements');
+					$journal->add('general');
 					$term->status = 'registered';
 					$term->update(null);
 				}
