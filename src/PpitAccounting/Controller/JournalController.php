@@ -517,13 +517,13 @@ class JournalController extends AbstractActionController
 					$data['rows'] = array();
 					if ($term->amount > 0) {
 						$data['rows'][] = array(
-							'account' => '512',
+							'account' => '411',
+							'sub_account' => $term->account_identifier,
 							'direction' => 1,
 							'amount' => $term->amount,
 						);
 						$data['rows'][] = array(
-							'account' => '411',
-							'sub_account' => $term->account_identifier,
+							'account' => '512',
 							'direction' => -1,
 							'amount' => $term->amount,
 						);
