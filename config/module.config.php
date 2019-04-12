@@ -829,9 +829,18 @@ return array(
 									'fr_FR' => 'Dépenses',
 							),
 					),*/
-					'bank-statement' => array(
+					'journal' => array(
 							'route' => 'journal/index',
-							'params' => array('journal_code' => 'bank'),
+							'params' => array('journal_code' => 'general'),
+							'glyphicon' => 'glyphicon-ok',
+							'label' => array(
+									'en_US' => 'Journal',
+									'fr_FR' => 'Journal',
+							),
+					),
+					'bank-statement' => array(
+							'route' => 'journal/bankStatement',
+							'params' => array(),
 							'glyphicon' => 'glyphicon-ok',
 							'label' => array(
 									'en_US' => 'Bank statement',
