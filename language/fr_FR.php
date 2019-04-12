@@ -4,6 +4,7 @@
 		'Account balance' => 'Balance comptable',
 		'Accounting date' => 'Date de comptabilisation',
 		'Accounting year' => 'Exercice comptable',
+		'Actualize from bank' => 'Actualiser depuis la banque',
 		'Amount' => 'Montant',
 		'Balance' => 'Solde',
 		'Bank journal reference' => 'Dénotage relevé bancaire',
@@ -27,6 +28,7 @@
 		'Reference' => 'Référence',
 		'Register sales' => 'Comptabiliser les ventes',
 		'Register settlements' => 'Comptabiliser les encaissements',
+		'Reconciliate' => 'Rapprocher',
 		'Schema' => 'Schéma',
 		'Select a schema' => 'Choisir un schéma',
 		'Sequence' => 'Séquence',
@@ -35,4 +37,5 @@
 		'Terms to be registered' => 'Échéances à comptabiliser',
 		'The expense has been recorded and cannot been updated' => 'La dépense a été comptabilisée et ne peut plus être modifiée',
 		'The expense has been recorded and cannot been deleted' => 'La dépense a été comptabilisée et ne peut plus être supprimée',
+		'New transactions list to be integrated' => 'Liste des nouvelles transactions à intégrer',
 	);

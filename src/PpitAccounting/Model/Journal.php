@@ -107,6 +107,7 @@ class Journal implements InputFilterAwareInterface
     	$data['id'] = (int) $this->id;
     	$data['status'] = $this->status;
     	$data['place_id'] = (int) $this->place_id;
+    	$data['place_caption'] = $this->place_caption;
     	$data['year'] = $this->year;
     	$data['sequence'] = (int) $this->sequence;
     	$data['journal_code'] = $this->journal_code;
@@ -134,6 +135,7 @@ class Journal implements InputFilterAwareInterface
 
     public function toArray() {
     	$data = $this->getProperties();
+    	unset($data['place_caption']);
     	unset($data['account_caption']);
     	return $data;
     }
@@ -165,7 +167,7 @@ class Journal implements InputFilterAwareInterface
 
     	// Todo list vs search modes
     	if ($mode == 'todo') {
-    		$where->equalTo('accounting_journal.status', 'new');
+//    		$where->equalTo('accounting_journal.status', 'new');
 /*    		if ($journal_code == 'general') {
 	    		$where->greaterThanOrEqualTo('accounting_journal.account', '6');
 	    		$where->lessThanOrEqualTo('accounting_journal.account', '799999');
@@ -280,7 +282,7 @@ class Journal implements InputFilterAwareInterface
 		$context = Context::getCurrent();
 		$accountingYear = AccountingYear::getCurrent();
 		$this->year = $accountingYear->year;
-		$this->sequence = $accountingYear->next_value;
+		if ($journal_code =='general') $this->sequence = $accountingYear->next_value;
 		$this->journal_code = $journal_code;
 		$this->accounting_date = date('Y-m-d');
 		$this->currency = 'EUR';
@@ -294,13 +296,16 @@ class Journal implements InputFilterAwareInterface
 				Journal::getTable()->save($this);
 			}
 		}
-		$accountingYear->next_value++;
-		AccountingYear::getTable()->save($accountingYear);
-		
-		if ($this->bank_journal_reference) {
-			$bankJournalEntry = Journal::getTable()->get($this->bank_journal_reference);
-			$bankJournalEntry->sequence = $this->sequence;
-			Journal::getTable()->save($bankJournalEntry);
+
+		if ($journal_code =='general') {
+			$accountingYear->next_value++;
+			AccountingYear::getTable()->save($accountingYear);
+			
+			if ($this->bank_journal_reference) {
+				$bankJournalEntry = Journal::getTable()->get($this->bank_journal_reference);
+				$bankJournalEntry->sequence = $this->sequence;
+				Journal::getTable()->save($bankJournalEntry);
+			}
 		}
 	}
 

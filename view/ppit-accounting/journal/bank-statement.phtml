@@ -1,201 +1,199 @@
-<!-- Load the common form javascript functions -->
-<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+<!-- 
+/**
+ * PpitCore V1.0 (https://github.com/p-pit/PpitCore)
+ *
+ * @link      https://github.com/p-pit/PpitCore
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitCore/blob/master/license.txt GNU-GPL license
+ */
+-->
 
 <?php
 $title = $context->getConfig('journal/index')['title'][$context->getLocale()];
 $this->headTitle($title);
 echo $this->partial('/partials/header');
 ?>
-
-<!-- A supprimer -->
-<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
-
-<div class="container">
-	
-	<div>&nbsp;</div>
-	
-	<div id="main_menu" >
-	    <div class="col-md-10 col-md-offset-1">
-			<div align="center">
+  
+  <div>&nbsp;</div>
+  
+  <div class="row" id="main_menu" >
+    <div class="col-md-10 col-md-offset-1">
+      <div align="center">
 
 <?php foreach ($context->getConfig('menus/p-pit-finance')['entries'] as $entryId => $entryDef) : ?>
-	<?php if ($context->isAllowed($entryDef['route'])) : ?>
-				<button type="button" class="btn btn-default menu-btn" id="<?php echo $entryId ?>-anchor">
-		<?php if (array_key_exists('glyphicon', $entryDef)) : ?>
-					<span class="glyphicon <?php echo $entryDef['glyphicon'] ?>"></span>
-		<?php endif;?>
-					<?php echo $entryDef['label'][$context->getLocale()] ?>
-				</button>
-	<?php endif ?>
+  <?php if ($context->isAllowed($entryDef['route'])) : ?>
+        <button type="button" class="btn btn-default menu-btn" id="<?php echo $entryId ?>-anchor">
+    <?php if (array_key_exists('glyphicon', $entryDef)) : ?>
+          <span class="glyphicon <?php echo $entryDef['glyphicon'] ?>"></span>
+    <?php endif;?>
+          <?php echo $entryDef['label'][$context->getLocale()] ?>
+        </button>
+  <?php endif ?>
 <?php endforeach;?>
 
-			</div>
-			<div>&nbsp;</div>
-		</div>
-	</div>
-	
-	<div class="row">
-	    <div class="col-md-6 col-md-offset-3">
-	
-			<div class="panel panel-default">
-				<div class="panel-heading" style="background: <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
-					<?php echo $this->translate('Bank statement', 'ppit-accounting', $context->getLocale()).': '.$this->translate('Add a book entry', 'ppit-accounting', $context->getLocale()) ?>
-				</div>
-			    <div class="panel-body">
+      </div>
+      <div>&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- Main panel -->
+  <div class="row">
+    <div class="col-md-12 ppit-panel" id="index_action"></div>
+
+<div class="panel panel-default">
+  <div class="panel-heading" style="background: <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
+	<strong><?php echo $this->translate('Bank statement', 'ppit-accounting', $context->getLocale()) ?></strong>
+  </div>
+  <div class="panel-body">
+
+<!-- Actions -->
+  <div>
+    <a type="button" class="btn btn-default" href="<?php echo $this->url('journal/qonto') ?>">
+      <span class="glyphicon glyphicon-cloud-download"></span>
+      <span><?php echo $this->translate('Actualize from bank', 'ppit-accounting', $context->getLocale()) ?></span>
+    </a>
+  </div>
+  <div>&nbsp;</div>
+
+<!-- Form header -->
+<form action="" id="ppit-form" method="post" class="form-horizontal" enctype="multipart/form-data">
 			
-					<!-- Form header -->
-					<?php echo $this->partial('/partials/form-header', array(
-								'update_time' => $journal->update_time,
-								'message' => $message,
-								'error' => $error,
-								'csrfForm' => $csrfForm,
-								'context' => $context,
-					));
-					$properties = array();
-					?>
-			
-					<?php if ($message == 'OK') $isDisabled = true; else $isDisabled = false; ?>
-				
-			<!-- Operation date -->
-					<?php
-						echo $this->partial('/partials/date-widget.phtml', array(
-							'property' => 'operation_date',
-							'label' => '* '.$this->translate('Operation date', 'ppit-accounting', $context->getLocale()),
-							'value' => $journal->operation_date,
-							'isMandatory' => true,
-							'context' => $context,
-							'isDisabled' => $isDisabled,
-					));
-					$properties['operation_date'] = 'input';
-					?>
-					
-			<!-- Reference -->
-					
-					<?php
-						echo $this->partial('/partials/input-widget.phtml', array(
-							'property' => 'reference',
-							'label' => '* '.$this->translate('Reference', 'ppit-accounting', $context->getLocale()),
-							'value' => $journal->reference,
-							'isMandatory' => true,
-							'maxLength' => 255,
-							'context' => $context,
-							'isDisabled' => $isDisabled,
-					));
-					$properties['reference'] = 'input';
-					?>
-					
-			<!-- Caption -->
-					<?php
-						echo $this->partial('/partials/input-widget.phtml', array(
-							'property' => 'caption',
-							'label' => '* '.$this->translate('Caption', 'ppit-core', $context->getLocale()),
-							'value' => $journal->caption,
-							'isMandatory' => true,
-							'maxLength' => 255,
-							'context' => $context,
-							'isDisabled' => $isDisabled,
-					));
-					$properties['caption'] = 'input';
-					?>
-			
-					<div>&nbsp;</div>
-			
-			<!-- Direction -->
-					<?php
-						echo $this->partial('/partials/select-widget.phtml', array(
-							'property' => 'direction_0',
-							'label' => $this->translate('Direction', 'ppit-accounting', $context->getLocale()),
-							'modalities' => array('-1' => $this->translate('Debit', 'ppit-accounting', $context->getLocale()), '1' => $this->translate('Credit', 'ppit-acounting', $context->getLocale())),
-							'value' => (array_key_exists(0, $journal->rows)) ? $journal->rows[0]['direction'] : '',
-							'isMandatory' => false,
-							'context' => $context,
-							'isDisabled' => $isDisabled,
-					));
-					$properties['direction_0'] = 'select';
-					?>
-					
-			<!-- Amount -->
-					<?php
-						echo $this->partial('/partials/number-widget.phtml', array(
-							'property' => 'amount_0',
-							'label' => $this->translate('Amount', 'ppit-core', $context->getLocale()),
-							'value' => (array_key_exists(0, $journal->rows)) ? $context->formatFloat($journal->rows[0]['amount'], 2) : '',
-							'isMandatory' => false,
-							'min' => 0,
-							'max' => 999999,
-							'context' => $context,
-							'isDisabled' => $isDisabled,
-					));
-					$properties['amount_0'] = 'input';
-					?>
-			
-			<!-- Account -->
-					<input type="hidden" id="account_0" name="account_0" value="512" />
-					<?php
-					$properties['account_0'] = 'hidden';
-					?>
-			
+<!-- Global message -->
 <?php if ($message == 'OK') : ?>
-			
-			<!-- Foot return link -->
-					<div class="form-group" id="foot_return_link">
-						<div class="col-sm-5">&nbsp;</div>
-						<div class="col-sm-7">
-							<?php echo $this->partial('/partials/action-widget.phtml', array(
-									'context' => $context,
-									'target' => 'form_action',
-									'id' => 'update-foot-return-anchor',
-									'class' => 'index-btn',
-									'text' => $this->translate('Close', 'ppit-core', $context->getLocale()),
-							)) ?>
-						</div>
-					</div>
-			
-<?php else : ?>
-			
-			<!-- Submit button -->
-				    <div class="form-group">
-						<div class="col-sm-5">&nbsp;</div>
-						<div class="col-sm-7">
-							<input name="submit" type="submit" id="update-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Confirm', 'ppit-core', $context->getLocale()) ?>">
-							&nbsp;&nbsp;
-							<?php echo $this->partial('/partials/action-widget.phtml', array(
-									'context' => $context,
-									'target' => 'form_action',
-									'id' => 'update-cancel-anchor',
-									'class' => 'index-btn',
-									'text' => $this->translate('Cancel', 'ppit-core', $context->getLocale()),
-							)) ?>
-						</div>
-					</div>
-<?php endif;?>
-					</form>
-				</div>
-			</div>
-		</div>
+	<div id="message">
+			<div class="alert alert-success"><h4><?php echo $this->translate('Your request has been registered', 'ppit-core', $context->getLocale()) ?></h4></div>
 	</div>
-</div>
+<?php endif;?>
 
-<script id="journal/bankStatement-script">
+<?php 
+if ($message == 'OK') $isDisabled = true; else $isDisabled = false;
+?>
 
-<?php foreach ($context->getConfig('menus/p-pit-finance')['entries'] as $entryId => $entryDef) : ?>
-$('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route']) ?>'); });
+<div style="overflow-x:auto;">
+  <table class="table table-striped ppit_index">
+  <tr>
+
+<?php foreach ($context->getConfig('bank_statement/list')['properties'] as $propertyId => $unused) : ?>
+  <?php 
+  $property = $context->getConfig('accounting_operation')['properties'][$propertyId];
+  if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+  ?>
+  <?php if ($property) : ?>
+    <th align="center">
+      
+      <?php $label = (array_key_exists('short', $property)) ? $property['short'][$context->getLocale()] : $property['labels'][$context->getLocale()] ?>
+    <?php if ($label) : ?>
+      <button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="<?php echo $propertyId ?>-anchor">
+        <span><?php echo ($propertyId == 'sequence') ? $this->translate('Reconciliate', 'ppit-accounting', $context->getLocale()) : $label ?></span>
+      <?php if ($major == $propertyId) : ?>
+        <span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+      <?php endif ?>
+      </button>
+    <?php endif;?>
+    </th>
+  <?php endif;?>
 <?php endforeach;?>
+  </tr>
+
+<?php $i = 0; foreach ($transactions as $transaction) : ?>
+  <?php 
+  $amount = $transaction->amount;
+  if ($transaction->direction == -1) $amount *= -1;
+  ?>
+  
+  <tr class="operation">
+ 
+  <?php foreach ($context->getConfig('bank_statement/list')['properties'] as $propertyId => $unused) : ?>
+    <?php 
+    $property = $context->getConfig('accounting_operation')['properties'][$propertyId];
+    if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+    ?>
+    <?php if ($property) : ?>
+  
+      <?php if ($propertyId == 'sequence') : ?>
+    <td>
+      <select class="form-control" name="sequence-<?php echo $transaction->reference ?>" <?php if ($transaction->status == 'matched') : ?>disabled="disabled"<?php endif;?>>
+        <option/>
+    <?php foreach ($operations as $operation) : ?>
+      <?php 
+      $total_amount = $operation->properties['total_amount'];
+      if ($operation->properties['direction'] == -1) $total_amount *= -1;
+      ?>
+      <?php if ($amount == $total_amount) : ?>
+        <option value="<?php echo $operation->properties['sequence'] ?>" <?php if ($operation->properties['sequence'] == $transaction->sequence) : ?>selected<?php endif;?>><?php echo $operation->properties['sequence'] . ' | ' . $operation->properties['caption'] . ' | ' . $operation->properties['operation_date'] . ' | ' . $total_amount ?>
+      <?php endif;?>
+    <?php endforeach;?>
+      </select>
+    </td>
+  
+      <?php elseif ($propertyId == 'amount') : ?>
+    <td style="text-align: right"><?php echo (($transaction->direction == -1) ? '-' : '') . $context->formatFloat($transaction->amount, 2) . '&nbsp;' .  $transaction->currency ?></td>
+  
+      <?php elseif ($property['type'] == 'date') : ?>
+    <td><?php echo $context->decodeDate($transaction->properties[$propertyId]) ?></td>
+
+      <?php elseif ($property['type'] == 'number') : ?>
+    <td style="text-align: right"><?php echo $context->formatFloat($transaction->properties[$propertyId], 2) ?></td>
+
+      <?php elseif ($property['type'] =='select') : ?>
+    <td><?php if ($transaction->properties[$propertyId]) echo $property['modalities'][$transaction->properties[$propertyId]][$context->getLocale()] ?></td>
+
+      <?php else : ?>
+    <td><?php echo $transaction->properties[$propertyId] ?></td>
+
+      <?php endif;?>
+
+    <?php endif;?>
+  <?php endforeach;?>
+  </tr>
+  
+<?php endforeach; ?>
+  <tr>
+    <th colspan="<?php echo count($context->getConfig('bank_statement/list')['properties']) + 1 ?>" style="text-align: center">
+<?php 
+$property = $context->getConfig('accounting_operation')['properties'][$major];
+if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+?>
+      <?php echo $property['labels'][$context->getLocale()] ?>&nbsp;&nbsp;&nbsp;&nbsp;
+      <?php echo $this->translate('Number', 'ppit-core', $context->getLocale()) ?>: <?php echo $count ?>&nbsp;&nbsp;&nbsp;&nbsp;
+      <?php if ($sum) echo $this->translate('Sum', 'ppit-core', $context->getLocale()).': '.$sum ?>&nbsp;&nbsp;&nbsp;&nbsp;
+      <?php if ($average) echo $this->translate('Average', 'ppit-core', $context->getLocale()).': '.$average ?>
+
+<?php if ($distribution) : ?>
+      <select id="select-distribution">
+  <?php foreach ($distribution as $modality => $value) : ?>
+        <option value="<?php echo $modality ?>"><?php echo $property['modalities'][$modality][$context->getLocale()] ?></option>
+  <?php endforeach;?>
+      </select>
+      &nbsp;&nbsp;
+  <?php foreach ($distribution as $modality => $value) : ?>
+      <span class="distribution" id="distribution_<?php echo $modality ?>"><?php echo $value ?> / <?php echo $count ?> = <?php echo round($value / $count * 100, 1) ?>%</span>
+  <?php endforeach;?>
+<?php endif;?>
+    </th>
+  </tr>
+
+</table>
 
 <?php if ($message != 'OK') : ?>
-
-	// Submit
-	<?php
-	echo $this->partial('/partials/form-script', array(
-			'context' => $context,
-			'formRoute' => $this->url('journal/bankStatement', array('id' => $id)),
-			'formScript' =>'journal/bankStatement-script',
-			'properties' => $properties,
-/*			'mainRoute' => $this->url('journal/index'),
-			'mainScript' =>'journal/index-script',
-			'hideForm' => false,*/
-	)) ?>
-
+    <div class="form-group">
+		<div class="col-sm-5">&nbsp;</div>
+		<div   class="col-sm-7">
+			<input type="submit" class="btn btn-warning" value="<?php echo $this->translate('Submit', 'ppit-core', $context->getLocale()) ?>">
+		</div>
+	</div>
 <?php endif;?>
+	</div>
+</form>
+        
+      </div>
+    </div>
+  </div>
+
+<script>
+
+<?php foreach ($context->getConfig('menus/p-pit-finance')['entries'] as $entryId => $entryDef) : ?>
+$('#<?php echo $entryId ?>-anchor').click(function () { $(location).attr('href', '<?php echo $this->url($entryDef['route'], $entryDef['params']) ?>'); });
+<?php endforeach;?>
 
 </script>

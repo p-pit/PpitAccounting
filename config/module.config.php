@@ -227,17 +227,23 @@ return array(
             							),
             					),
             			),
-	            		'bankStatement' => array(
-            					'type' => 'segment',
-            					'options' => array(
-            							'route' => '/bank-statement[/:id]',
-            							'constraints' => array(
-            										'id'     => '[0-9]*',
-               							),
-            							'defaults' => array(
-            									'action' => 'bankStatement',
-            							),
-            					),
+            			'qonto' => array(
+            				'type' => 'segment',
+            				'options' => array(
+            					'route' => '/qonto[/:place_id]',
+								'defaults' => array(
+									'action' => 'qonto',
+								),
+            				)
+            			),
+            			'bankStatement' => array(
+            				'type' => 'segment',
+            				'options' => array(
+            					'route' => '/bank-statement[/:place_id]',
+								'defaults' => array(
+									'action' => 'bankStatement',
+								),
+            				)
             			),
             			'bankUpdate' => array(
             					'type' => 'segment',
@@ -363,8 +369,9 @@ return array(
 				array('route' => 'journal/registerSales', 'roles' => array('accountant')),
 				array('route' => 'journal/registerTermSales', 'roles' => array('accountant')),
 				array('route' => 'journal/registerSettlements', 'roles' => array('accountant')),
-				array('route' => 'journal/bankList', 'roles' => array('admin')),
+				array('route' => 'journal/qonto', 'roles' => array('accountant')),
 				array('route' => 'journal/bankStatement', 'roles' => array('admin')),
+				array('route' => 'journal/bankList', 'roles' => array('admin')),
 				array('route' => 'journal/bankUpdate', 'roles' => array('admin')),
 				array('route' => 'journal/nextStep', 'roles' => array('admin')),
             	array('route' => 'journal/previousStep', 'roles' => array('admin')),
@@ -1013,6 +1020,7 @@ return array(
 			'type' => 'select',
 			'modalities' => array(
 					'new' => array('en_US' => 'New', 'fr_FR' => 'Nouveau'),
+					'matched' => array('en_US' => 'Matched', 'fr_FR' => 'Rapproché'),
 			),
 			'labels' => array(
 					'en_US' => 'Status',
@@ -1083,6 +1091,24 @@ return array(
 					'fr_FR' => 'Libellé',
 			),
 	),
+	'accounting_operation/direction' => array(
+			'type' => 'select',
+			'modalities' => array(
+				'-1'	=> ['default' => 'Debit', 'fr_FR' => 'Débit'],
+				'1'	=> ['default' => 'Credit', 'fr_FR' => 'Crédit'],
+			),
+			'labels' => array(
+					'en_US' => 'Direction',
+					'fr_FR' => 'Sens',
+			),
+	),
+	'accounting_operation/amount' => array(
+			'type' => 'number',
+			'labels' => array(
+					'en_US' => 'Amount',
+					'fr_FR' => 'Montant',
+			),
+	),
 	'accounting_operation/total_amount' => array(
 			'type' => 'number',
 			'labels' => array(
@@ -1120,6 +1146,8 @@ return array(
 					'accounting_date' => array('type' => 'specific', 'definition' => 'accounting_operation/accounting_date'),
 					'reference' => array('type' => 'specific', 'definition' => 'accounting_operation/reference'),
 					'caption' => array('type' => 'specific', 'definition' => 'accounting_operation/caption'),
+					'direction' => array('type' => 'specific', 'definition' => 'accounting_operation/direction'),
+					'amount' => array('type' => 'specific', 'definition' => 'accounting_operation/amount'),
 					'total_amount' => array('type' => 'specific', 'definition' => 'accounting_operation/total_amount'),
 					'currency' => array('type' => 'specific', 'definition' => 'accounting_operation/currency'),
 					'update_time' => array('type' => 'specific', 'definition' => 'accounting_operation/update_time'),
@@ -1161,6 +1189,19 @@ return array(
 					'currency' => null,
 					'update_time' => null,
 			),
+	),
+
+	'bank_statement/list' => array(
+		'properties' => array(
+			'sequence' => null,
+			'status' => null,
+			'place_caption' => null,
+			'year' => null,
+			'operation_date' => null,
+			'reference' => null,
+			'caption' => null,
+			'amount' => null,
+		),
 	),
 	
 	'accounting_operation/detail' => array(

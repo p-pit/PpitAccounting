@@ -2,6 +2,7 @@
 namespace PpitAccounting\Controller;
 
 use PpitAccounting\Model\Journal;
+use PpitAccounting\Model\Operation;
 use PpitAccounting\ViewHelper\SsmlJournalViewHelper;
 use PpitCommitment\Model\Commitment;
 use PpitCommitment\Model\Term;
@@ -11,6 +12,7 @@ use PpitCore\Model\Csrf;
 use PpitCore\Model\Place;
 use PpitLearning\Model\Evaluation;
 use Zend\Db\Sql\Where;
+use Zend\Http\Client;
 use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -570,6 +572,187 @@ class JournalController extends AbstractActionController
 		return $view;
 	}
 	
+	public function qontoAction()
+	{
+		// Retrieve the context and parameters
+		$context = Context::getCurrent();
+		$place_id = $this->params()->fromRoute('place_id');
+		$year = $this->params()->fromQuery('year', date('Y'));
+		$settled_at_from = $this->params()->fromQuery('settled_at_from', date($year . '-01-01'));
+		
+		if (!$place_id) $place_id = $context->getInstance()->default_place_id;
+		$place = Place::get($place_id);
+		
+		// Set the filter
+		if ($settled_at_from) $settled_at_from = '&settled_at_from=' . $settled_at_from;
+		
+		// Retrieve the transactions from QONTO
+		$credentials = $context->getConfig()['ppitUserSettings']['safe'][$context->getInstance()->caption]['qonto'];
+		$client = new Client(
+			'https://thirdparty.qonto.eu/v2/transactions?slug=' . $credentials['slug'] . '&iban=' . $credentials['iban'] . (($settled_at_from) ? $settled_at_from : ''),
+			['adapter' => 'Zend\Http\Client\Adapter\Curl', 'maxredirects' => 0, 'timeout' => 30]
+		);
+		$client->setEncType('application/json');
+		$client->getRequest()->getHeaders()->addHeaders(array('Authorization' => 'ppit-7209:cbd3664a395d'));
+		$client->setMethod('GET');
+		$response = $client->send();
+		
+		$data = array();
+		$this->response->setStatusCode($response->getStatusCode());
+		$this->response->setReasonPhrase($response->getReasonPhrase());
+		if ($response->getStatusCode() == 200) {
+			$transactions = json_decode(gzdecode($response->getContent()), true)['transactions'];
+			foreach ($transactions as $transaction) {
+				$existing = Journal::get($transaction['transaction_id'], 'reference');
+				if (!$existing) {
+					$data[] = array(
+						'status' => 'new',
+						'place_id' => $place_id,
+						'place_caption' => $place->caption,
+						'year' => date('Y'),
+						'sequence' => null,
+						'operation_date' => substr($transaction['settled_at'], 0, 10),
+						'reference' => $transaction['transaction_id'],
+						'caption' => $transaction['label'] . (($transaction['reference']) ? ' - ' . $transaction['reference'] : ''),
+						'rows' => array(array(
+							'account' => '512',
+							'direction' => ($transaction['side'] == 'debit') ? -1 : 1,
+							'amount' => $transaction['amount_cents'] / 100,
+						)),
+						'total_amount' => $transaction['amount_cents'] / 100,
+						'currency' => 'EUR',
+						'update_time' => null,
+					);
+				}
+			}
+		}
+		
+		// Instanciate the csrf form
+		$csrfForm = new CsrfForm();
+		$csrfForm->addCsrfElement('csrf');
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+
+			$connection = Term::getTable()->getAdapter()->getDriver()->getConnection();
+			$connection->beginTransaction();
+			try {
+
+				foreach ($data as $transaction) {
+					$journal = Journal::instanciate();
+					$rc = $journal->loadData($transaction);
+					if ($rc != 'OK') {
+						$this->response->setStatusCode('500');
+						$this->response->setReasonPhrase('Consistency');
+					}
+					$journal->add('bank');
+				}
+			}
+			catch (\Exception $e) {
+				$connection->rollback();
+				$this->response->setStatusCode('500');
+				$this->response->setReasonPhrase('Fatal error');
+			}
+			$connection->commit();
+			return $this->redirect()->toRoute('journal/bankStatement');
+		}
+	
+		$view = new ViewModel(array(
+			'context' => $context,
+			'place' => $place,
+			'transactions' => $data,
+			'csrfForm' => $csrfForm,
+			'post' => $request->isPost(),
+		));
+		return $view;
+	}
+	
+	public function bankStatementAction()
+	{
+		// Retrieve the context and parameters
+		$context = Context::getCurrent();
+		$place_id = $this->params()->fromRoute('place_id');
+		$year = $this->params()->fromQuery('year', date('Y'));
+		$major = ($this->params()->fromQuery('major', 'operation_date'));
+		$dir = ($this->params()->fromQuery('dir', 'ASC'));
+		
+		if (!$place_id) $place_id = $context->getInstance()->default_place_id;
+		$place = Place::get($place_id);
+		
+		// Retrieve the transactions not already matched
+		$operations = Operation::getList('', $year, ['status' => 'new']);
+
+		$error = null;
+		$message = null;
+		
+		// Retrieve the unmatched bank transactions
+		$transactions = Journal::getList($year, 'bank', ['status' => 'new'], 'status', 'DESC');
+		
+		// Aggregate
+		$specification = $context->getConfig('accounting_operation');
+		$sum = 0;
+		$distribution = array();
+		foreach ($transactions as $transaction) {
+			$majorSpecification = $specification['properties'][$major];
+			if ($majorSpecification['type'] == 'specific') $majorSpecification = $context->getConfig($majorSpecification['definition']);
+			if ($majorSpecification['type'] == 'number') $sum += $transaction[$major];
+			elseif ($majorSpecification['type'] == 'select') {
+				if (array_key_exists($transaction->properties[$major], $distribution)) $distribution[$transaction->properties[$major]]++;
+				else $distribution[$transaction->properties[$major]] = 1;
+			}
+		}
+		$average = (count($transactions)) ? round($sum / count($transactions), 1) : null;
+		
+		// Instanciate the csrf form
+		$csrfForm = new CsrfForm();
+		$csrfForm->addCsrfElement('csrf');
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			
+			$connection = Term::getTable()->getAdapter()->getDriver()->getConnection();
+			$connection->beginTransaction();
+			try {
+				foreach ($transactions as $transaction) {
+					$matching = $request->getPost('sequence-' . $transaction->reference);
+					if ($matching) {
+						$transaction->sequence = $matching;
+						$transaction->status = 'matched';
+						Journal::getTable()->save($transaction);
+						
+						$rows = Journal::getList($year, 'general', ['sequence' => $matching]);
+						foreach ($rows as $row) {
+							$row->status = 'matched';
+							Journal::getTable()->save($row);
+						}
+					}
+				}
+			}
+			catch (\Exception $e) {
+				$connection->rollback();
+				throw $e;
+			}
+			$connection->commit();
+			$transactions = Journal::getList($year, 'bank', ['status' => 'new'], 'status', 'DESC');
+			$message = 'OK';
+		}
+	
+		$view = new ViewModel(array(
+			'context' => $context,
+			'place' => $place,
+			'transactions' => $transactions,
+			'operations' => $operations,
+			'count' => count($transactions),
+			'sum' => $sum,
+			'average' => $average,
+			'distribution' => $distribution,
+			'major' => $major,
+			'dir' => $dir,
+			'csrfForm' => $csrfForm,
+			'message' => $message,
+			'error' => $error,
+		));
+		return $view;
+	}
+/*	
 	public function bankStatementAction()
 	{
 		// Retrieve the context
@@ -630,7 +813,7 @@ class JournalController extends AbstractActionController
 		));
 		$view->setTerminal(true);
 		return $view;
-	}
+	}*/
 
 	public function bankUpdateAction()
 	{

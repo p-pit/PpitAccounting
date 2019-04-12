@@ -42,7 +42,7 @@ class Operation
     	 
     	// Todo list vs search modes
     	if ($mode == 'todo') {
-	    	$where->equalTo('accounting_journal.status', 'new');
+//	    	$where->equalTo('accounting_journal.status', 'new');
     	}
     	else {
     		// Set the filters
@@ -110,6 +110,8 @@ class Operation
 					$operations[$row->sequence.'_'.$row->journal_code]->properties['caption'] = $row->caption;
 					$operations[$row->sequence.'_'.$row->journal_code]->properties['proof_id'] = $row->proof_id;
 					$operations[$row->sequence.'_'.$row->journal_code]->properties['proof_url'] = $row->proof_url;
+					$operations[$row->sequence.'_'.$row->journal_code]->properties['direction'] = $row->direction;
+					$operations[$row->sequence.'_'.$row->journal_code]->properties['amount'] = $row->amount;
 					$operations[$row->sequence.'_'.$row->journal_code]->properties['total_amount'] = $row->total_amount;
 					$operations[$row->sequence.'_'.$row->journal_code]->properties['currency'] = $row->currency;
 					$operations[$row->sequence.'_'.$row->journal_code]->properties['expense_id'] = $row->expense_id;

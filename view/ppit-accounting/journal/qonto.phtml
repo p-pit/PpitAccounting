@@ -1,0 +1,96 @@
+<!-- 
+/**
+ * PpitCore V1.0 (https://github.com/p-pit/PpitCore)
+ *
+ * @link      https://github.com/p-pit/PpitCore
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitCore/blob/master/license.txt GNU-GPL license
+ */
+-->
+
+  <!-- Main panel -->
+  <div class="row">
+    <div class="col-md-12 ppit-panel" id="index_action"></div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+	  <div class="form-group">
+	    <div class="col-sm-12">
+	      <div class="alert alert-warning" style="text-align: center">
+	        <strong><?php echo $this->translate('New transactions list to be integrated', 'ppit-accounting', $context->getLocale()) ?></strong>
+	      </div>
+	    </div>
+	  </div>
+
+<!-- Form header -->
+<form action="" id="ppit-form" method="post" class="form-horizontal" enctype="multipart/form-data">
+
+  <table class="table table-striped ppit_index">
+  <tr>
+
+<?php foreach ($context->getConfig('accounting_operation/list')['properties'] as $propertyId => $unused) : ?>
+  <?php 
+  $property = $context->getConfig('accounting_operation')['properties'][$propertyId];
+  if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+  ?>
+  <?php if (in_array($propertyId, ['year', 'operation_date', 'reference', 'caption', 'total_amount'])) : ?>
+    <th align="center">
+      
+      <?php $label = (array_key_exists('short', $property)) ? $property['short'][$context->getLocale()] : $property['labels'][$context->getLocale()] ?>
+    <?php if ($label) : ?>
+      <button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="<?php echo $propertyId ?>-anchor">
+        <span><?php echo $label ?></span>
+      </button>
+    <?php endif;?>
+    </th>
+  <?php endif;?>
+<?php endforeach;?>
+  </tr>
+
+<?php $i = 0; foreach ($transactions as $transaction) : ?>
+  
+  <tr class="operation">
+
+  <?php foreach ($context->getConfig('accounting_operation/list')['properties'] as $propertyId => $unused) : ?>
+    <?php 
+    $property = $context->getConfig('accounting_operation')['properties'][$propertyId];
+    if ($property['type'] == 'specific') $property = $context->getConfig($property['definition']);
+    ?>
+    <?php if (in_array($propertyId, ['year', 'operation_date', 'reference', 'caption', 'total_amount'])) : ?>
+  
+      <?php if ($property['type'] == 'date') : ?>
+    <td><?php echo $context->decodeDate($transaction[$propertyId]) ?></td>
+
+      <?php elseif ($property['type'] == 'number') : ?>
+    <td style="text-align: right"><?php echo $context->formatFloat($transaction[$propertyId], 2) ?></td>
+
+      <?php elseif ($property['type'] =='select') : ?>
+    <td><?php if ($transaction[$propertyId]) echo $property['modalities'][$transaction[$propertyId]][$context->getLocale()] ?></td>
+
+      <?php else : ?>
+    <td><?php echo $transaction[$propertyId] ?></td>
+
+      <?php endif;?>
+
+    <?php endif;?>
+  <?php endforeach;?>
+  </tr>
+  
+<?php endforeach; ?>
+ 
+</table>
+
+<?php if (!$post) : ?>
+    <div class="form-group">
+		<div class="col-sm-5">&nbsp;</div>
+		<div class="col-sm-7">
+			<input type="submit" id="register-settlements-button" class="btn btn-warning" value="<?php echo $this->translate('Confirm', 'ppit-core', $context->getLocale()) ?>">
+		</div>
+	</div>
+<?php endif;?>
+
+</form>
+        
+    </div>
+  </div>
+</div>
