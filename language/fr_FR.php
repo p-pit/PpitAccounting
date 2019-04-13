@@ -23,6 +23,7 @@
 		'Loss' => 'Perte',
 		'Operation date' => 'Date d\'opération',
 		'Outcome' => 'Résultat',
+		'Nothing to match' => 'Rien à rapprocher',
 		'Products' => 'Produits',
 		'Proof' => 'Justificatif',
 		'Reference' => 'Référence',

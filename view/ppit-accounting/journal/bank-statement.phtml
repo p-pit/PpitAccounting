@@ -112,18 +112,29 @@ if ($message == 'OK') $isDisabled = true; else $isDisabled = false;
   
       <?php if ($propertyId == 'sequence') : ?>
     <td>
-      <select class="form-control" name="sequence-<?php echo $transaction->reference ?>" <?php if ($transaction->status == 'matched') : ?>disabled="disabled"<?php endif;?>>
-        <option/>
-    <?php foreach ($operations as $operation) : ?>
-      <?php 
-      $total_amount = $operation->properties['total_amount'];
-      if ($operation->properties['direction'] == -1) $total_amount *= -1;
-      ?>
-      <?php if ($amount == $total_amount) : ?>
-        <option value="<?php echo $operation->properties['sequence'] ?>" <?php if ($operation->properties['sequence'] == $transaction->sequence) : ?>selected<?php endif;?>><?php echo $operation->properties['sequence'] . ' | ' . $operation->properties['caption'] . ' | ' . $operation->properties['operation_date'] . ' | ' . $total_amount ?>
-      <?php endif;?>
+    <?php $matchables = []; foreach ($operations as $operation) : ?>
+        <?php 
+        $total_amount = $operation->properties['total_amount'];
+        if ($operation->properties['direction'] == -1) $total_amount *= -1;
+        if ($amount == $total_amount && $transaction->operation_date == $operation->properties['operation_date']) $matchables[] = $operation;
+        ?>
     <?php endforeach;?>
+    <?php if (count($matchables) == 0) : ?>
+      <?php echo $this->translate('Nothing to match', 'ppit-accounting', $context->getLocale())?>
+    <?php else : ?>
+      <select class="form-control" name="sequence-<?php echo $transaction->reference ?>" <?php if ($transaction->status == 'matched') : ?>disabled="disabled"<?php endif;?>>
+        <option><?php echo $this->translate('Please choose', 'ppit-core', $context->getLocale()) ?></option>
+      <?php foreach ($matchables as $matchable) : ?>
+        <?php 
+        $total_amount = $matchable->properties['total_amount'];
+        if ($matchable->properties['direction'] == -1) $total_amount *= -1;
+        if ($matchable->properties['sequence'] || count($matchable) == 1) $matched = $matchable; 
+        else $matched = null;
+        ?>
+        <option value="<?php echo $matchable->properties['sequence'] ?>" <?php if ($matched) : ?>selected<?php endif;?>><?php echo $matchable->properties['sequence'] . ' | ' . $matchable->properties['caption'] . ' | ' . $matchable->properties['operation_date'] . ' | ' . $total_amount ?>
+      <?php endforeach;?>
       </select>
+    <?php endif;?>
     </td>
   
       <?php elseif ($propertyId == 'amount') : ?>

@@ -832,7 +832,7 @@ return array(
 					'journal' => array(
 							'route' => 'journal/index',
 							'params' => array('journal_code' => 'general'),
-							'glyphicon' => 'glyphicon-ok',
+							'glyphicon' => 'glyphicon-edit',
 							'label' => array(
 									'en_US' => 'Journal',
 									'fr_FR' => 'Journal',
