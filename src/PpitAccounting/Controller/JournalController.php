@@ -685,7 +685,7 @@ class JournalController extends AbstractActionController
 		$message = null;
 		
 		// Retrieve the unmatched bank transactions
-		$transactions = Journal::getList($year, 'bank', ['status' => 'new'], 'status', 'DESC');
+		$transactions = Journal::getList($year, 'bank', ['status' => 'new']);
 		
 		// Aggregate
 		$specification = $context->getConfig('accounting_operation');
@@ -731,7 +731,7 @@ class JournalController extends AbstractActionController
 				throw $e;
 			}
 			$connection->commit();
-			$transactions = Journal::getList($year, 'bank', ['status' => 'new'], 'status', 'DESC');
+//			$transactions = Journal::getList($year, 'bank', ['status' => 'new'], 'status', 'DESC');
 			$message = 'OK';
 		}
 	

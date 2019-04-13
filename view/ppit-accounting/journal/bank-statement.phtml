@@ -72,6 +72,7 @@ if ($message == 'OK') $isDisabled = true; else $isDisabled = false;
 <div style="overflow-x:auto;">
   <table class="table table-striped ppit_index">
   <tr>
+    <th>&nbsp;</th>
 
 <?php foreach ($context->getConfig('bank_statement/list')['properties'] as $propertyId => $unused) : ?>
   <?php 
@@ -111,7 +112,6 @@ if ($message == 'OK') $isDisabled = true; else $isDisabled = false;
     <?php if ($property) : ?>
   
       <?php if ($propertyId == 'sequence') : ?>
-    <td>
     <?php $minGap = 40; $matchables = []; $matched = null; foreach ($operations as $operation) : ?>
         <?php 
         $total_amount = $operation->properties['total_amount'];
@@ -130,8 +130,15 @@ if ($message == 'OK') $isDisabled = true; else $isDisabled = false;
         ?>
     <?php endforeach;?>
     <?php if (count($matchables) == 0) : ?>
+    <td>&nbsp;</td>
+    <td>
       <?php echo $this->translate('Nothing to match', 'ppit-accounting', $context->getLocale())?>
+    </td>
     <?php else : ?>
+    <td>
+      <?php if ($transaction->status != 'matched') : ?><input type="checkbox" name="check-<?php echo $transaction->reference ?>" id="check-<?php echo $transaction->reference ?>" <?php if ($transaction->status == 'matched') : ?>disabled="disabled"<?php endif;?>></input><?php endif;?>
+    </td>
+    <td>
       <select class="form-control" name="sequence-<?php echo $transaction->reference ?>" <?php if ($transaction->status == 'matched') : ?>disabled="disabled"<?php endif;?>>
         <option><?php echo $this->translate('Please choose', 'ppit-core', $context->getLocale()) ?></option>
       <?php foreach ($matchables as $matchable) : ?>
@@ -142,8 +149,8 @@ if ($message == 'OK') $isDisabled = true; else $isDisabled = false;
         <option value="<?php echo $matchable->properties['sequence'] ?>" <?php if ($matched == $matchable) : ?>selected<?php endif;?>><?php echo $matchable->properties['sequence'] . ' | ' . $matchable->properties['caption'] . ' | ' . $matchable->properties['operation_date'] . ' | ' . $total_amount ?>
       <?php endforeach;?>
       </select>
-    <?php endif; ?>
     </td>
+    <?php endif; ?>
   
       <?php elseif ($propertyId == 'amount') : ?>
     <td style="text-align: right"><?php echo (($transaction->direction == -1) ? '-' : '') . $context->formatFloat($transaction->amount, 2) . '&nbsp;' .  $transaction->currency ?></td>
