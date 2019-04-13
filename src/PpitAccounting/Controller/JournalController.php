@@ -679,7 +679,7 @@ class JournalController extends AbstractActionController
 		$place = Place::get($place_id);
 		
 		// Retrieve the transactions not already matched
-		$operations = Operation::getList('', $year, ['status' => 'new']);
+		$operations = Operation::getList('general', $year, ['status' => 'new']);
 
 		$error = null;
 		$message = null;
