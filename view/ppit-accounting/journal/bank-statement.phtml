@@ -116,7 +116,7 @@ if ($message == 'OK') $isDisabled = true; else $isDisabled = false;
         <?php 
         $total_amount = $operation->properties['total_amount'];
         if ($operation->properties['direction'] == -1) $total_amount *= -1;
-        if ($amount == $total_amount && $transaction->operation_date == $operation->properties['operation_date']) $matchables[] = $operation;
+        if ($amount == $total_amount) $matchables[] = $operation;
         ?>
     <?php endforeach;?>
     <?php if (count($matchables) == 0) : ?>
