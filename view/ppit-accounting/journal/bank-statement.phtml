@@ -114,10 +114,10 @@ if ($message == 'OK') $isDisabled = true; else $isDisabled = false;
       <?php if ($propertyId == 'sequence') : ?>
     <?php $minGap = 40; $matchables = []; $matched = null; foreach ($operations as $operation) : ?>
         <?php 
+        $matchables[] = $operation;
         $total_amount = $operation->properties['total_amount'];
         if ($operation->properties['direction'] == -1) $total_amount *= -1;
         if ($amount == $total_amount) {
-          $matchables[] = $operation;
           if ($transaction->sequence == $operation->properties['sequence']) $matched = $operation; 
 	      else {
             $gap = abs(date_diff(date_create($operation->properties['operation_date']), date_create($transaction->operation_date))->days);
