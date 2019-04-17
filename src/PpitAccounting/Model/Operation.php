@@ -117,7 +117,10 @@ class Operation
 					$operations[$row->sequence.'_'.$row->journal_code]->properties['expense_id'] = $row->expense_id;
 					$operations[$row->sequence.'_'.$row->journal_code]->properties['commitment_id'] = $row->commitment_id;
 					$operations[$row->sequence.'_'.$row->journal_code]->properties['update_time'] = $row->update_time;
+					if ($row->account == '512') $operations[$row->sequence.'_'.$row->journal_code]->properties['isBankOperation'] = true;
+					else $operations[$row->sequence.'_'.$row->journal_code]->properties['isBankOperation'] = false;
 				}
+				elseif ($row->account == '512') $operations[$row->sequence.'_'.$row->journal_code]->properties['isBankOperation'] = true;
 //				if ($row->direction == 1) $operations[$row->sequence]->properties['total_amount'] += $row->amount;
 			}
     	}

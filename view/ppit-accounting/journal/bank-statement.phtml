@@ -151,6 +151,9 @@ if ($message == 'OK') $isDisabled = true; else $isDisabled = false;
       </select>
     </td>
     <?php endif; ?>
+
+      <?php elseif ($propertyId =='status') : ?>
+    <td><?php echo $property['modalities'][$transaction->status][$context->getLocale()] ?></td>
   
       <?php elseif ($propertyId == 'amount') : ?>
     <td style="text-align: right"><?php echo (($transaction->direction == -1) ? '-' : '') . $context->formatFloat($transaction->amount, 2) . '&nbsp;' .  $transaction->currency ?></td>
@@ -201,14 +204,12 @@ if ($property['type'] == 'specific') $property = $context->getConfig($property['
 
 </table>
 
-<?php if ($message != 'OK') : ?>
     <div class="form-group">
 		<div class="col-sm-5">&nbsp;</div>
 		<div   class="col-sm-7">
 			<input type="submit" class="btn btn-warning" value="<?php echo $this->translate('Submit', 'ppit-core', $context->getLocale()) ?>">
 		</div>
 	</div>
-<?php endif;?>
 	</div>
 </form>
         

@@ -152,7 +152,7 @@ class Journal implements InputFilterAwareInterface
     	return $entries;
     }
 
-    public static function getList($year, $journal_code, $params, $major = 'sequence', $dir = 'DESC', $mode = 'todo')
+    public static function getList($year, $journal_code, $params, $major = 'sequence', $dir = 'DESC', $mode = 'search')
     {
     	$select = Journal::getTable()->getSelect()
     		->join('commitment', 'commitment.id = accounting_journal.commitment_id', array(), 'left')
@@ -167,7 +167,7 @@ class Journal implements InputFilterAwareInterface
 
     	// Todo list vs search modes
     	if ($mode == 'todo') {
-//    		$where->equalTo('accounting_journal.status', 'new');
+    		$where->equalTo('accounting_journal.status', 'new');
 /*    		if ($journal_code == 'general') {
 	    		$where->greaterThanOrEqualTo('accounting_journal.account', '6');
 	    		$where->lessThanOrEqualTo('accounting_journal.account', '799999');

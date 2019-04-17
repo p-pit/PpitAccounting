@@ -678,8 +678,12 @@ class JournalController extends AbstractActionController
 		if (!$place_id) $place_id = $context->getInstance()->default_place_id;
 		$place = Place::get($place_id);
 		
-		// Retrieve the transactions not already matched
-		$operations = Operation::getList('general', $year, ['status' => 'new']);
+		// Retrieve the transactions involving the bank account not already matched
+		$operations = [];
+		$cursor = Operation::getList('general', $year, ['status' => 'new']);
+		foreach ($cursor as $operation) {
+			if ($operation->properties['isBankOperation']) $operations[] = $operation;
+		}
 
 		$error = null;
 		$message = null;
@@ -712,8 +716,9 @@ class JournalController extends AbstractActionController
 			$connection->beginTransaction();
 			try {
 				foreach ($transactions as $transaction) {
-					$matching = $request->getPost('sequence-' . $transaction->reference);
-					if ($matching) {
+					$matched = $request->getPost('check-' . $transaction->reference);
+					if ($matched) {
+						$matching = $request->getPost('sequence-' . $transaction->reference);
 						$transaction->sequence = $matching;
 						$transaction->status = 'matched';
 						Journal::getTable()->save($transaction);
@@ -731,7 +736,6 @@ class JournalController extends AbstractActionController
 				throw $e;
 			}
 			$connection->commit();
-//			$transactions = Journal::getList($year, 'bank', ['status' => 'new'], 'status', 'DESC');
 			$message = 'OK';
 		}
 	
