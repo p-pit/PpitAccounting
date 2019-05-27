@@ -40,6 +40,7 @@ class IncomeStatement
     	$where = new Where;
     	$where->in('account', $filter);
     	$where->equalTo('journal_code', 'general');
+    	$where->notEqualTo('reference', 'closing');
     	$select->where($where);
     	$select->where(array('year' => $year));
     	$cursor = Journal::getTable()->selectWith($select);
