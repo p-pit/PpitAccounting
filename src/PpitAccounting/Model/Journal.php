@@ -3,7 +3,6 @@ namespace PpitAccounting\Model;
 
 use PpitAccounting\Model\AccountingYear;
 use PpitCore\Model\Context;
-use PpitCore\Model\Document;
 use Zend\Db\Sql\Where;
 use Zend\InputFilter\Factory as InputFactory;
 use Zend\InputFilter\InputFilter;
