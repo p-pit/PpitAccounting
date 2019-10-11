@@ -421,6 +421,7 @@ return array(
 			604 => array('caption' => 'Achat d\'études et de prestations', 'class' => 6),
 			6063 => array('caption' => 'fournitures d’entretien et de petit équipement', 'class' => 6),
 			611 => array('caption' => 'Locations', 'class' => 6),
+			6132 => array('caption' => 'Locations immobilières', 'class' => 6),
 			6135 => array('caption' => 'Locations mobilières', 'class' => 6),
 			616 => array('caption' => 'Primes d\'assurance', 'class' => 6),
 			617 => array('caption' => 'Etudes et recherches', 'class' => 6),
