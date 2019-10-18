@@ -438,6 +438,7 @@ return array(
 			6333 => array('caption' => 'Participation à la formation', 'class' => 6),
 			63511 => array('caption' => 'Contribution économique territoriale', 'class' => 6),
 			6413 => array('caption' => 'Primes et gratifications', 'class' => 6),
+			6475 => array('caption' => 'Médecine du travail, pharmacie', 'class' => 6),
 			6511 => array('caption' => 'Redevances pour concessions, brevets, licences, marques, procédés, logiciels', 'class' => 6),
 			654 => array('caption' => 'Pertes sur créances irrécouvrables', 'class' => 6),
 			658 => array('caption' => 'Charges diverses de gestion courante', 'class' => 6),
