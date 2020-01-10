@@ -697,7 +697,7 @@ class JournalController extends AbstractActionController
 		// Retrieve the context and parameters
 		$context = Context::getCurrent();
 		$place_id = $this->params()->fromRoute('place_id');
-		$year = $this->params()->fromQuery('year', date('Y'));
+		$year = AccountingYear::getCurrent()->year;
 		$major = ($this->params()->fromQuery('major', 'operation_date'));
 		$dir = ($this->params()->fromQuery('dir', 'ASC'));
 		
