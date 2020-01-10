@@ -40,6 +40,11 @@ class JournalController extends AbstractActionController
     			'currentEntry' => $currentEntry,
     	));
     }
+    
+    public function indexV2Action()
+    {
+    	return $this->indexAction();
+    }
 
     public function getFilters($params)
     {
@@ -86,6 +91,11 @@ class JournalController extends AbstractActionController
     	$view->setTerminal(true);
     	return $view;
     }
+    
+    public function searchV2Action()
+    {
+    	return $this->searchAction();
+    }
 
     public function getList($dir = 'DESC')
     {
@@ -118,6 +128,11 @@ class JournalController extends AbstractActionController
     public function listAction()
     {
     	return $this->getList();
+    }
+    
+    public function listV2Action()
+    {
+    	return $this->listAction();
     }
     
     public function dropboxLinkAction()
@@ -182,6 +197,11 @@ class JournalController extends AbstractActionController
     	));
     	$view->setTerminal(true);
     	return $view;
+    }
+    
+    public function detailV2Action()
+    {
+    	return $this->detailAction();
     }
 
     public function bankListAction()
@@ -267,6 +287,11 @@ class JournalController extends AbstractActionController
 		));
 		$view->setTerminal(true);
 		return $view;
+	}
+	
+	public function updateV2Action()
+	{
+		return $this->updateAction();
 	}
 
 	public function registerSalesAction()

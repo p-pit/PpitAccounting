@@ -107,7 +107,16 @@ return array(
         										),
         								),
         						),
-        						'search' => array(
+        						'indexV2' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/index-v2[/:journal_code]',
+        										'defaults' => array(
+        												'action' => 'indexV2',
+        										),
+        								),
+        						),
+            					'search' => array(
         								'type' => 'segment',
         								'options' => array(
         										'route' => '/search[/:journal_code]',
@@ -116,7 +125,16 @@ return array(
         										),
         								),
         						),
-        						'list' => array(
+            					'searchV2' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/search-v2[/:journal_code]',
+        										'defaults' => array(
+        												'action' => 'searchV2',
+        										),
+        								),
+        						),
+            					'list' => array(
         								'type' => 'segment',
         								'options' => array(
         										'route' => '/list[/:journal_code]',
@@ -125,7 +143,16 @@ return array(
         										),
         								),
         						),
-        						'dropboxLink' => array(
+            					'listV2' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/list-v2[/:journal_code]',
+        										'defaults' => array(
+        												'action' => 'listV2',
+        										),
+        								),
+        						),
+            					'dropboxLink' => array(
         								'type' => 'segment',
         								'options' => array(
         										'route' => '/dropbox-link[/:document]',
@@ -164,7 +191,19 @@ return array(
         										),
         								),
         						),
-            			'update' => array(
+	       						'detailV2' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/detail-v2[/:id]',
+        										'constraints' => array(
+        												'id' => '[0-9]*',
+        										),
+        										'defaults' => array(
+        												'action' => 'detailV2',
+        										),
+        								),
+        						),
+	            		'update' => array(
             					'type' => 'segment',
             					'options' => array(
             							'route' => '/update[/:id]',
@@ -173,6 +212,18 @@ return array(
                							),
             							'defaults' => array(
             									'action' => 'update',
+            							),
+            					),
+            			),
+	            		'updateV2' => array(
+            					'type' => 'segment',
+            					'options' => array(
+            							'route' => '/update-v2[/:id]',
+            							'constraints' => array(
+            										'id'     => '[0-9]*',
+               							),
+            							'defaults' => array(
+            									'action' => 'updateV2',
             							),
             					),
             			),
@@ -359,12 +410,17 @@ return array(
 
 				array('route' => 'journal', 'roles' => array('admin')),
 				array('route' => 'journal/index', 'roles' => array('user')),
+				array('route' => 'journal/indexV2', 'roles' => array('user')),
 				array('route' => 'journal/search', 'roles' => array('user')),
-            	array('route' => 'journal/list', 'roles' => array('user')),
-            	array('route' => 'journal/dropboxLink', 'roles' => array('user')),
+				array('route' => 'journal/searchV2', 'roles' => array('user')),
+				array('route' => 'journal/list', 'roles' => array('user')),
+				array('route' => 'journal/listV2', 'roles' => array('user')),
+				array('route' => 'journal/dropboxLink', 'roles' => array('user')),
 				array('route' => 'journal/detail', 'roles' => array('user')),
+				array('route' => 'journal/detailV2', 'roles' => array('user')),
 				array('route' => 'journal/export', 'roles' => array('user')),
 				array('route' => 'journal/update', 'roles' => array('admin')),
+				array('route' => 'journal/updateV2', 'roles' => array('admin')),
 				array('route' => 'journal/delete', 'roles' => array('admin')),
 				array('route' => 'journal/registerSales', 'roles' => array('accountant')),
 				array('route' => 'journal/registerTermSales', 'roles' => array('accountant')),
@@ -1079,6 +1135,7 @@ return array(
 					'2017' => array('en_US' => '2017', 'fr_FR' => '2017'),
 					'2018' => array('en_US' => '2018', 'fr_FR' => '2018'),
 					'2019' => array('en_US' => '2019', 'fr_FR' => '2019'),
+					'2020' => array('en_US' => '2020', 'fr_FR' => '2020'),
 			),
 			'default' => 2019,
 			'labels' => array(
