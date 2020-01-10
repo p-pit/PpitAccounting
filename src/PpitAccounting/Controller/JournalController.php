@@ -635,7 +635,7 @@ class JournalController extends AbstractActionController
 						'status' => 'new',
 						'place_id' => $place_id,
 						'place_caption' => $place->caption,
-						'year' => date('Y'),
+						'year' => $year,
 						'sequence' => null,
 						'operation_date' => substr($transaction['settled_at'], 0, 10),
 						'reference' => $transaction['transaction_id'],
