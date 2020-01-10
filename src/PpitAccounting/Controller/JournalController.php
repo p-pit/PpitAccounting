@@ -604,18 +604,18 @@ class JournalController extends AbstractActionController
 		$context = Context::getCurrent();
 		$place_id = $this->params()->fromRoute('place_id');
 		$year = AccountingYear::getCurrent()->year;
-		$settled_at_from = $this->params()->fromQuery('settled_at_from', date($year . '-01-01'));
 		
 		if (!$place_id) $place_id = $context->getInstance()->default_place_id;
 		$place = Place::get($place_id);
 		
 		// Set the filter
-		if ($settled_at_from) $settled_at_from = '&settled_at_from=' . $settled_at_from;
+		$settled_at_from = '&settled_at_from=' . date($year . '-01-01');
+		$settled_at_to = '&settled_at_to=' . date($year . '-12-31');
 		
 		// Retrieve the transactions from QONTO
 		$credentials = $context->getConfig()['ppitUserSettings']['safe'][$context->getInstance()->caption]['qonto'];
 		$client = new Client(
-			'https://thirdparty.qonto.eu/v2/transactions?slug=' . $credentials['slug'] . '&iban=' . $credentials['iban'] . (($settled_at_from) ? $settled_at_from : ''),
+			'https://thirdparty.qonto.eu/v2/transactions?slug=' . $credentials['slug'] . '&iban=' . $credentials['iban'] . '&settled_at_from=' . $settled_at_from . '&settled_at_to=' . $settled_at_to,
 			['adapter' => 'Zend\Http\Client\Adapter\Curl', 'maxredirects' => 0, 'timeout' => 30]
 		);
 		$client->setEncType('application/json');
