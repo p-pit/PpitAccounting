@@ -603,7 +603,7 @@ class JournalController extends AbstractActionController
 		// Retrieve the context and parameters
 		$context = Context::getCurrent();
 		$place_id = $this->params()->fromRoute('place_id');
-		$year = AccountingYear::getCurrent();
+		$year = AccountingYear::getCurrent()->year;
 		$settled_at_from = $this->params()->fromQuery('settled_at_from', date($year . '-01-01'));
 		
 		if (!$place_id) $place_id = $context->getInstance()->default_place_id;
