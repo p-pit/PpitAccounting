@@ -1,6 +1,7 @@
 <?php
 namespace PpitAccounting\Controller;
 
+use PpitAccounting\Model\AccountingYear;
 use PpitAccounting\Model\Journal;
 use PpitAccounting\Model\Operation;
 use PpitAccounting\ViewHelper\SsmlJournalViewHelper;
@@ -602,7 +603,7 @@ class JournalController extends AbstractActionController
 		// Retrieve the context and parameters
 		$context = Context::getCurrent();
 		$place_id = $this->params()->fromRoute('place_id');
-		$year = $this->params()->fromQuery('year', date('Y'));
+		$year = $this->params()->fromQuery('year', AccountingYear::getCurrent());
 		$settled_at_from = $this->params()->fromQuery('settled_at_from', date($year . '-01-01'));
 		
 		if (!$place_id) $place_id = $context->getInstance()->default_place_id;
