@@ -1,0 +1,104 @@
+<!-- 
+/**
+ * PpitAccounting V1.0 (https://github.com/p-pit/PpitAccounting)
+ *
+ * @link      https://github.com/p-pit/PpitAccounting
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitAccounting/blob/master/license.txt GNU-GPL license
+ */
+-->
+
+<style>
+table td { 
+  font-size: 0.9rem;
+}
+</style>
+
+<div class="col-md-12 mt-4">
+    
+  <input type="hidden" id="term-number" value="<?php echo count($entries) ?>" />
+
+  <table class="table table-sm table-hover">
+    <tr class="table-info">
+      <th>&nbsp;</th>
+	
+<?php foreach ($context->getConfig('journal/list') as $propertyId => $rendering) : ?>
+		<th align="center">
+	<?php $label = $context->getConfig('journal_properties')[$propertyId]['labels'][$context->getLocale()] ?>
+	<?php if ($label) : ?>
+			<button type="button" class="btn btn-sm sort_anchor <?php if ($major == $propertyId) echo 'btn-secondary active '.(($major == $propertyId) ? (($dir == 'ASC') ? 'sort_anchor_up' : 'sort_anchor_down') : '') ?>" id="<?php echo $propertyId ?>-anchor">
+				<span><?php echo $label ?></span>
+  <?php if ($major == $propertyId) : ?>
+          <i class="fas fa-caret-<?php echo ($dir == 'ASC') ? 'up' : 'down' ?>"></i>
+  <?php endif ?>
+			</button>
+	<?php endif;?>
+		</th>
+<?php endforeach;?>
+
+		<th>&nbsp;</th>
+
+<?php 
+$income = 0;
+foreach ($entries as $entry) if ($entry->direction == -1) $income -= $entry->amount; else $income += $entry->amount;
+?>
+
+	<tr>
+		<td>
+			<button type="button" class="btn btn-sm btn-outline-primary index-btn journal-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="journal-detail-anchor_0">
+              <i class="fas fa-plus" id="add-glyphicon"></i>
+			</button>
+		</td>
+		<td colspan="4" class="text-right font-weight-bold <?php echo ($income < 0) ? 'text-danger' : 'text-success' ?>">
+			<?php echo $this->translate('Outcome', 'ppit-accounting', $context->getLocale()) ?>: 
+			<?php echo $context->formatFloat($income, 2) ?>
+		</td>
+	</tr>
+	
+<?php foreach ($entries as $entry) : ?>
+	
+	<tr class="journal">
+		<td>
+			<button type="button" class="btn btn-sm btn-outline-primary index-btn journal-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="journal-detail-anchor_<?php echo $entry->id ?>">
+            <i class="fas fa-search" id="<?php echo $entry->id ?>-glyphicon"></i>
+			</button>
+		</td>
+
+	<?php foreach ($context->getConfig('journal/list') as $propertyId => $rendering) : ?>
+		
+		<?php $property = $context->getConfig('journal_properties')[$propertyId] ?>
+
+		<?php if ($propertyId == 'account') : ?>
+		<?php $accountCaption = $config['ppitAccountingSettings']['accounts'][$entry->account]['caption'] ?>
+		<td><?php echo $accountCaption ?></td>
+  
+        <?php elseif ($propertyId == 'journal_code') : ?>
+        <td class="text-center"><?php echo $entry->journal_code ?></td>
+  
+        <?php elseif ($propertyId == 'year') : ?>
+        <td class="text-center"><?php echo $entry->year ?></td>
+  
+        <?php elseif ($propertyId == 'sequence') : ?>
+        <td class="text-center"><?php echo $entry->sequence ?></td>
+			
+		<?php elseif ($propertyId == 'operation_date') : ?>
+		<td><?php echo $context->decodeDate($entry->operation_date) ?></td>
+  
+        <?php elseif ($propertyId == 'reference') : ?>
+        <td><?php echo $entry->reference ?></td>
+	
+		<?php elseif ($propertyId == 'caption') : ?>
+		<td><?php echo $entry->caption ?></td>
+	
+		<?php elseif ($propertyId == 'amount') : ?>
+		<td class="text-right <?php if ($entry->direction == -1) : ?>text-danger font-italic<?php endif;?>"><?php echo $context->formatFloat($entry->amount, 2) ?></td>
+		
+		<?php endif;?>
+		
+	<?php endforeach;?>
+	</tr>
+	
+<?php endforeach; ?>
+
+</table>
+</div>

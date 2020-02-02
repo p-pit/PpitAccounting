@@ -110,7 +110,7 @@ return array(
         						'indexV2' => array(
         								'type' => 'segment',
         								'options' => array(
-        										'route' => '/index-v2[/:journal_code]',
+        										'route' => '/index-v2[/:journal_code][/:entryId]',
         										'defaults' => array(
         												'action' => 'indexV2',
         										),
@@ -530,6 +530,7 @@ return array(
 				1012 => 5,
 				1013 => 5,
 				109 => 5,
+				120 => 6,
 				129 => 6,
 				2184 => 1,
 				2751 => 2,
@@ -907,8 +908,8 @@ return array(
 							),
 					),*/
 					'journal' => array(
-							'route' => 'journal/index',
-							'params' => array('journal_code' => 'general'),
+							'route' => 'journal/indexV2',
+							'params' => array('journal_code' => 'general', 'entryId' => 'journal'),
 							'glyphicon' => 'glyphicon-edit',
 							'label' => array(
 									'en_US' => 'Journal',
@@ -1437,26 +1438,28 @@ return array(
 			'todoTitle' => array('en_US' => 'current', 'fr_FR' => 'en cours'),
 			'searchTitle' => array('en_US' => 'current', 'fr_FR' => 'recherche'),
 			'main' => array(
-					'journal_code' => 'select',
-					'year' => 'select',
-//					'place_id' => 'select',
-					'account' => 'range',
-//					'update_time' => 'range',
+				'journal_code' => 'select',
+				'year' => 'select',
+				'account' => 'range',
+				'operation_date' => 'range',
+				'accounting_date' => 'range',
+				'reference' => 'contains',
+				'caption' => 'contains',
+				'direction' => 'select',
+				'amount' => 'range',
 			),
 			'more' => array(
-					'operation_date' => 'range',
-					'accounting_date' => 'range',
-					'reference' => 'contains',
-					'caption' => 'contains',
-					'direction' => 'select',
-					'amount' => 'range',
 			),
 	),
 	'journal/list' => array(
-			'account' => 'text',
-			'operation_date' => 'text',
-			'direction' => 'text',
-			'amount' => 'text',
+		'year' => 'text',
+		'sequence' => 'text',
+		'journal_code' => 'text',
+		'operation_date' => 'date',
+		'reference' => 'text',
+		'caption' => 'text',
+		'amount' => 'text',
+		'account' => 'text',
 	),
 	'journal/detail' => array(
 			'title' => array('en_US' => 'Student sheet:', 'fr_FR' => 'Opération'),

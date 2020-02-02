@@ -1,0 +1,189 @@
+<?php echo $this->partial('/partials/search-scripts-v2') ?>
+
+<script>
+
+var criterion = 'sequence', dir = 'ASC';
+
+function getSearch() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", '<?php echo $this->url('journal/searchV2', array('journal_code' => $journal_code)) ?>', false);
+  xhttp.onreadystatechange = function() {
+    if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
+    if (xhttp.readyState == 4) {
+      if (xhttp.status == 200) {
+        $('#index-panel').html(xhttp.responseText);
+
+        let refresh = function () {
+            $('#refresh-button').removeClass('btn-warning').addClass('btn-default');
+            $('#refresh-button').attr('disabled', 'disabled');
+            getList(getSearchParams(''));
+        }
+        // Trigger the Entry key event that refreshes the list
+        $(document).keyup(function(e) {    
+          if (e.keyCode == 13) {
+              refresh();
+          }
+        });
+      
+        // Connect the refresh button that refreshes the list
+        $('#refresh-button').click(refresh);
+        
+          // Connect the erase button that reset all the search engine inputs and checks and refresh the list
+          $('#erase-button').click(function() {
+            $('.search_input').val('');
+            $('.search_selectpicker').selectpicker('refresh');
+            $('.search_check_value').val('0');
+            $('.search_check').removeClass('btn-secondary').addClass('btn-default').removeClass('active');
+            $('#refresh-button').removeClass('btn-warning').addClass('btn-default');
+            $('#erase-button').removeClass('btn-success').addClass('btn-default');
+            $('#erase-button').attr('disabled', 'disabled');
+            getList(getSearchParams(''));
+          });
+     
+          $('.search_selectpicker').selectpicker('refresh');
+          
+          // Connect the date picker on date inputs
+          $('.search_input_date').datepicker();
+          
+          // Trigger the change event on date inputs and refresh the list
+          $('.search_input_date').change(function () {
+            var propertyId = $(this).attr('id').split('-')[1];
+            $('#refresh-button').removeClass('btn-default').addClass('btn-warning');
+            $('#refresh-button').attr('disabled', false);
+            $('#erase-button').removeClass('btn-default').addClass('btn-success');
+            $('#erase-button').attr('disabled', false);
+            $('#search_check-' + propertyId).removeClass('btn-default').addClass('btn-secondary').addClass('active');
+            $('#search_check_value-' + propertyId).val('1');
+          }); 
+     
+          // Trigger the change event on search inputs and refresh the list
+          $('.search_input_select').change(function () {
+            var propertyIdAttr = $(this).attr('id');
+            if (propertyIdAttr) {
+              var propertyId = propertyIdAttr.split('-')[1];
+              $('#refresh-button').removeClass('btn-default').addClass('btn-warning');
+              $('#refresh-button').attr('disabled', false);
+              $('#erase-button').removeClass('btn-default').addClass('btn-success');
+              $('#erase-button').attr('disabled', false);
+              $('#search_check-' + propertyId).removeClass('btn-default').addClass('btn-secondary').addClass('active');
+              $('#search_check_value-' + propertyId).val('1');
+            }
+          }); 
+
+          // Trigger the keyup event on search inputs and refresh the list
+          $('.search_input').keyup(function () {
+            if ($(this).val().length > 2) {
+              var propertyId = $(this).attr('id').split('-')[1];
+              $('#refresh-button').removeClass('btn-default').addClass('btn-warning');
+              $('#refresh-button').attr('disabled', false);
+              $('#erase-button').removeClass('btn-default').addClass('btn-success');
+              $('#erase-button').attr('disabled', false);
+              $('#search_check-' + propertyId).removeClass('btn-default').addClass('btn-secondary').addClass('active');
+              $('#search_check_value-' + propertyId).val('1');
+            }
+          });
+
+          // Trigger the click event on per-property checks (allowing to search on empty values) and refresh the list
+          $('.search_check').click(function() {
+            $('#refresh-button').removeClass('btn-default').addClass('btn-warning');
+            $('#refresh-button').attr('disabled', false);
+            $('#erase-button').removeClass('btn-default').addClass('btn-success');
+            $('#erase-button').attr('disabled', false);
+            var propertyId = $(this).attr('id').split('-')[1], check = 'search_check_value-' + propertyId;
+            if ($('#' + check).val() == '1') {
+              $(this).removeClass('btn-secondary').addClass('btn-default').removeClass('active');
+              $('#' + check).val('0');
+              $('#search-' + propertyId).val('');
+              $('#search_min-' + propertyId).val('');
+              $('#search_max-' + propertyId).val('');
+            }
+            else {
+              $(this).removeClass('btn-default').addClass('btn-secondary').addClass('active');
+              $('#' + check).val('1');
+            }
+          });
+
+          getList(getSearchParams(''));
+        
+      }
+      else {
+    	toastr.error('<?php echo $this->translate('A technical error has occured. PLease try again later', 'ppit-core', $context->getLocale()) ?>: ' + xhttp.status);  
+      }
+    }
+  }
+  xhttp.send();
+}
+
+// Get the list
+
+function getList(params) {    
+  route = '<?php echo $this->url('journal/listV2', array('journal_code' => $journal_code)) ?>' + params + '&major=' + criterion + ((dir =='ASC') ? '&dir=ASC' : '&dir=DESC');
+  xhttp = new XMLHttpRequest();
+  xhttp.open("GET", route, true);
+  xhttp.onreadystatechange = function() {
+    if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
+    if (xhttp.readyState == 4) {
+      if (xhttp.status == 200) {
+        $('#list-panel').html(xhttp.responseText);
+        $('#export-button').click(function () { getExport(); });
+	      
+        // Connect the sort anchors
+        $('.sort_anchor').click(function () {
+          criterion = $(this).attr('id').split('-')[0];
+          ascCriterion = $('.sort_anchor_up').attr('id');
+          descCriterion = $('.sort_anchor_down').attr('id');
+          if (criterion + '-anchor' == ascCriterion) dir = 'DESC';
+          else if (criterion + '-anchor' == descCriterion) dir = 'ASC';
+          else dir = 'ASC';
+          getList(getSearchParams(''));
+        });
+      }
+      else {
+      	toastr.error('<?php echo $this->translate('A technical error has occured. PLease try again later', 'ppit-core', $context->getLocale()) ?>: ' +  xhttp.status);  
+      }  
+    }
+  }
+  xhttp.send();
+}
+
+// Export the list
+function getExport() {
+
+	var params = getSearchParams('');
+	document.location.href = '<?php echo $this->url('journal/export', array('journal_code' => $journal_code)) ?>' + params;
+}
+
+function connectAuditPanel()
+{
+	$('#audit-panel').hide();
+	$('#audit-label').click(function () {
+		if ($('#audit-label').text() == '<?php echo $this->translate('Show', 'ppit-core', $context->getLocale()) ?>') {
+			$('#audit-panel').show();
+			$('#audit-label').text('<?php echo $this->translate('Mask', 'ppit-core', $context->getLocale()) ?>');
+		}
+		else {
+			$('#audit-panel').hide();
+			$('#audit-label').text('<?php echo $this->translate('Show', 'ppit-core', $context->getLocale()) ?>');
+		}
+	});
+}
+
+function getBankList() {
+	
+	var xhttp = new XMLHttpRequest();
+	var route = '<?php echo $this->url('journal/bankList') ?>';
+
+	xhttp.open('GET', route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4) {
+          if (xhttp.status == 200) {
+			document.getElementById('journal-bank-list-panel').innerHTML = xhttp.responseText;
+          }
+		}
+	}
+	xhttp.send();
+}
+
+getSearch();
+
+</script>

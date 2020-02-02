@@ -1,0 +1,81 @@
+<!-- 
+/**
+ * PpitCore V1.0 (https://github.com/p-pit/PpitCore)
+ *
+ * @link      https://github.com/p-pit/PpitCore
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitCore/blob/master/license.txt GNU-GPL license
+ */
+-->
+
+<div class="row">
+		
+<?php foreach ($context->getConfig('journal/search')['main'] as $propertyId => $rendering) : ?>
+	<?php $label = $context->getConfig('journal_properties')[$propertyId]['labels'][$context->getLocale()] ?>
+
+    <div class="col-md-3">
+	
+	<?php if ($rendering == 'contains') : ?>
+
+      <div class="input-group input-group-sm mb-2 mr-sm-2">
+        <input type="hidden" value="0" class="search_check_value" id="search_check_value-<?php echo $propertyId ?>" />
+        <div class="input-group-prepend">
+          <button type="button" class="btn btn-secondary input-group-text search_check" id="search_check-<?php echo $propertyId ?>"><?php echo $label ?></button>
+        </div>
+        <input class="form-control search_input search_input_text" type="text" id="search-<?php echo $propertyId ?>" />
+      </div>
+
+	<?php elseif ($rendering == 'range') : ?>
+
+      <div class="input-group input-group-sm mb-2 mr-sm-2">
+        <input type="hidden" value="0" class="search_check_value" id="search_check_value-<?php echo $propertyId ?>" />
+        <div class="input-group-prepend">
+          <button type="button" class="btn btn-secondary input-group-text search_check" id="search_check-<?php echo $propertyId ?>"><?php echo $label ?></button>
+        </div>
+        <input class="form-control search_input search_input_date search_input_date_min" type="text" id="search_min-<?php echo $propertyId ?>" placeholder="<?php echo $this->translate('Min', 'ppit-core', $context->getLocale()) ?>" />
+        <input class="form-control search_input search_input_date search_input_date_max" type="text" id="search_max-<?php echo $propertyId ?>" placeholder="<?php echo $this->translate('Max', 'ppit-core', $context->getLocale()) ?>" />
+      </div>
+
+	<?php elseif ($rendering == 'select') : ?>
+
+		<?php
+		$modalities = array();
+		foreach ($context->getConfig('journal_properties')[$propertyId]['modalities'] as $modalityId => $modality) {
+			$modalities[$modalityId] = $modality[$context->getLocale()];
+		} 
+		?>
+
+      <div class="input-group input-group-sm mb-2 mr-sm-2">
+        <input type="hidden" value="0" class="search_check_value" id="search_check_value-<?php echo $propertyId ?>" />
+        <div class="input-group-prepend">
+          <button type="button" class="btn btn-secondary input-group-text search_check" id="search_check-<?php echo $propertyId ?>"><?php echo $label ?></button>
+        </div>
+        <select class="form-control search_input search_input_select selectpicker search_selectpicker" id="search-<?php echo $propertyId ?>" data-none-selected-text multiple>
+      <?php foreach ($modalities as $modalityId => $modalityLabel) : ?>
+          <option value="<?php echo $modalityId ?>"><?php echo $modalityLabel ?></option>
+      <?php endforeach;?>
+        </select>
+      </div>
+
+	<?php endif;?>
+
+    </div>
+
+<?php endforeach;?>
+
+
+      <div class="col-md-3">    
+        <div class="input-group input-group-sm mb-2 mr-sm-2">
+          <button type="button" class="btn btn-default" disabled title="<?php echo $this->translate('Refresh the list', 'ppit-core', $context->getLocale()) ?>" id="refresh-button">
+            <i class="fa fa-sync-alt text-center"></i>
+          </button>
+          <button type="button" class="btn btn-default input-group-text" disabled title="<?php echo $this->translate('Erase', 'ppit-core', $context->getLocale()) ?>" id="erase-button">
+            <i class="fa fa-times text-center"></i>
+          </button>
+          <a type="button" class="input-group-text btn" role="button" data-toggle="tooltip" data-placement="top" title="<?php echo $this->translate('Export', 'ppit-core', $context->getLocale()) ?>" id="export-button">
+            <i class="fa fa-cloud-download-alt"></i>
+          </a>
+        </div>
+      </div> <!-- col -->
+       
+    </div> <!-- row -->

@@ -44,7 +44,44 @@ class JournalController extends AbstractActionController
     
     public function indexV2Action()
     {
-    	return $this->indexAction();
+		// Retrieve the context and parameters
+		$context = Context::getCurrent();
+		$journal_code = $this->params()->fromRoute('journal_code', 'general');
+		$place = Place::get($context->getPlaceId());
+
+    	$params = $this->getFilters($this->params());
+
+    	// Transient: Serialize a list of the entries from all menus
+    	$menuEntries = [];
+    	foreach ($context->getApplications() as $applicationId => $application) {
+    		if ($context->getConfig('menus/'.$applicationId)) {
+    			foreach ($context->getConfig('menus/' . $applicationId)['entries'] as $entryId => $entryDef) {
+    				$menuEntries[$entryId] = ['menuId' => $applicationId, 'menu' => $application, 'definition' => $entryDef];
+    			}
+    		}
+    	}
+    	$tab = $this->params()->fromRoute('entryId', 'account');
+    	
+    	// Retrieve the application
+    	$app = $menuEntries[$tab]['menuId'];
+    	$applicationName = $context->localize($menuEntries[$tab]['menu']['labels']);
+    			
+    	// Feed the layout
+		$this->layout('/layout/core-layout');
+		$this->layout()->setVariables(array(
+			'context' => Context::getCurrent(),
+    		'journal_code' => $journal_code,
+			'params' => $params,
+			'place' => $place,
+			'tab' => $tab,
+			'app' => $app,
+			'active' => 'application',
+			'applicationName' => $applicationName,
+			'pageScripts' => 'ppit-accounting/journal/scripts',
+		));
+    	
+		$view = $this->indexAction();
+    	return $view;
     }
 
     public function getFilters($params)
