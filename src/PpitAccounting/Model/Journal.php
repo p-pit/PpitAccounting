@@ -466,7 +466,7 @@ class Journal implements InputFilterAwareInterface
     
     	// Read the general journal
     	$select = Journal::getTable()->getSelect()
-	    	->where(array('year' => $year));
+	    	->where(array('year' => $year, 'status' => 'new'));
     	$cursor = Journal::getTable()->selectWith($select);
     
     	// Initialize the balances for each product or charge account
