@@ -30,16 +30,6 @@ class JournalController extends AbstractActionController
 		$instance_id = $context->getInstanceId();
 
 //		$menu = Context::getCurrent()->getConfig('menus/p-pit-finance')['entries'];
-		$currentEntry = $this->params()->fromQuery('entry', 'journal');
-
-    	return new ViewModel(array(
-    			'context' => $context,
-    			'config' => $context->getConfig(),
-    			'place' => $place,
-    			'journal_code' => $journal_code,
-//    			'menu' => $menu,
-    			'currentEntry' => $currentEntry,
-    	));
     }
     
     public function indexV2Action()
@@ -47,6 +37,8 @@ class JournalController extends AbstractActionController
 		// Retrieve the context and parameters
 		$context = Context::getCurrent();
 		$journal_code = $this->params()->fromRoute('journal_code', 'general');
+//		$currentEntry = $this->params()->fromQuery('entry', 'journal');
+		
 		$place = Place::get($context->getPlaceId());
 
     	$params = $this->getFilters($this->params());
@@ -70,19 +62,26 @@ class JournalController extends AbstractActionController
 		$this->layout('/layout/core-layout');
 		$this->layout()->setVariables(array(
 			'context' => Context::getCurrent(),
-    		'journal_code' => $journal_code,
+			'app' => $app,
+			'tab' => $tab,
+			'journal_code' => $journal_code,
 			'params' => $params,
 			'place' => $place,
-			'tab' => $tab,
-			'app' => $app,
 			'active' => 'application',
 			'applicationName' => $applicationName,
 			'pageScripts' => 'ppit-accounting/journal/scripts',
 		));
-    	
-		$view = $this->indexAction();
-    	return $view;
-    }
+
+		return new ViewModel(array(
+			'context' => $context,
+			'config' => $context->getConfig(),
+			'app' => $app,
+			'tab' => $tab,
+			'place' => $place,
+			'journal_code' => $journal_code,
+//			'currentEntry' => $currentEntry,
+		));
+	}
 
     public function getFilters($params)
     {
