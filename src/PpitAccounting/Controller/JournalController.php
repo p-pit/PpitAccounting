@@ -30,6 +30,16 @@ class JournalController extends AbstractActionController
 		$instance_id = $context->getInstanceId();
 
 //		$menu = Context::getCurrent()->getConfig('menus/p-pit-finance')['entries'];
+		$currentEntry = $this->params()->fromQuery('entry', 'journal');
+
+    	return new ViewModel(array(
+    			'context' => $context,
+    			'config' => $context->getConfig(),
+    			'place' => $place,
+    			'journal_code' => $journal_code,
+//    			'menu' => $menu,
+    			'currentEntry' => $currentEntry,
+    	));
     }
     
     public function indexV2Action()
