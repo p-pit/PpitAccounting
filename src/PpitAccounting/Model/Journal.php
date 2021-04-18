@@ -466,7 +466,7 @@ class Journal implements InputFilterAwareInterface
     
     	// Read the general journal
 		$where = new Where();
-		$where->equals('year', $year);
+		$where->equalTo('year', $year);
 		$where->in('status', ['new', 'matched']);
     	$select = Journal::getTable()->getSelect();
 		$select->where($where);
