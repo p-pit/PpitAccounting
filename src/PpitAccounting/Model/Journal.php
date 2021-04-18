@@ -465,8 +465,11 @@ class Journal implements InputFilterAwareInterface
     	$next_value = $accountingYear->next_value;
     
     	// Read the general journal
-    	$select = Journal::getTable()->getSelect()
-	    	->where(array('year' => $year, 'status' => 'new'));
+		$where = new Where();
+		$where->equals('year', $year);
+		$where->in('status', ['new', 'matched']);
+    	$select = Journal::getTable()->getSelect();
+		$select->where($where);
     	$cursor = Journal::getTable()->selectWith($select);
     
     	// Initialize the balances for each product or charge account

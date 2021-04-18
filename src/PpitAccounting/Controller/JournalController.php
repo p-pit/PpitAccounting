@@ -982,6 +982,7 @@ class JournalController extends AbstractActionController
 			$connection->rollback();
 			throw $e;
 		}
+		return $this->response;
 	}
 	
 	public function previousStepAction()
@@ -1000,6 +1001,7 @@ class JournalController extends AbstractActionController
 			$connection->rollback();
 			throw $e;
 		}
+		return $this->response;
 	}
 	
 	public function computeInterestsAction()
