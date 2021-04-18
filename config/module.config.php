@@ -1153,6 +1153,7 @@ return array(
 					'2018' => array('en_US' => '2018', 'fr_FR' => '2018'),
 					'2019' => array('en_US' => '2019', 'fr_FR' => '2019'),
 					'2020' => array('en_US' => '2020', 'fr_FR' => '2020'),
+					'2021' => array('en_US' => '2021', 'fr_FR' => '2021'),
 			),
 			'default' => 2019,
 			'labels' => array(
