@@ -1324,14 +1324,34 @@ return array(
 			'year' => array(
 					'type' => 'select',
 					'modalities' => array(
-							'2015' => array(
-									'en_US' => '2015',
-									'fr_FR' => '2015',
-							),
-							'2016' => array(
-									'en_US' => '2016',
-									'fr_FR' => '2016',
-							),
+						'2015' => array(
+								'en_US' => '2015',
+								'fr_FR' => '2015',
+						),
+						'2016' => array(
+								'en_US' => '2016',
+								'fr_FR' => '2016',
+						),
+						'2017' => array(
+							'en_US' => '2017',
+							'fr_FR' => '2017',
+						),
+						'2018' => array(
+							'en_US' => '2018',
+							'fr_FR' => '2018',
+						),
+						'2019' => array(
+							'en_US' => '2019',
+							'fr_FR' => '2019',
+						),
+						'2020' => array(
+							'en_US' => '2020',
+							'fr_FR' => '2020',
+						),
+						'2021' => array(
+							'en_US' => '2021',
+							'fr_FR' => '2021',
+						),
 					),
 					'labels' => array(
 							'en_US' => 'Year',
