@@ -661,11 +661,11 @@ class JournalController extends AbstractActionController
 		// Retrieve the transactions from QONTO
 		$credentials = $context->getConfig()['ppitUserSettings']['safe'][$context->getInstance()->caption]['qonto'];
 		$client = new Client(
-			'https://thirdparty.qonto.eu/v2/transactions?slug=' . $credentials['slug'] . '&iban=' . $credentials['iban'] . '&settled_at_from=' . $settled_at_from . '&settled_at_to=' . $settled_at_to,
+			'https://thirdparty.qonto.com/v2/transactions?slug=' . $credentials['slug'] . '&iban=' . $credentials['iban'] . '&settled_at_from=' . $settled_at_from . '&settled_at_to=' . $settled_at_to,
 			['adapter' => 'Zend\Http\Client\Adapter\Curl', 'maxredirects' => 0, 'timeout' => 30]
 		);
 		$client->setEncType('application/json');
-		$client->getRequest()->getHeaders()->addHeaders(array('Authorization' => 'ppit-7209:cbd3664a395d'));
+		$client->getRequest()->getHeaders()->addHeaders(array('Authorization' => $credentials['Authorization']));
 		$client->setMethod('GET');
 		$response = $client->send();
 		
